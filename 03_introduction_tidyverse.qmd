@@ -1,0 +1,478 @@
+# An Introduction to the `tidyverse` {#sec-intro_tidyverse}
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The `tidyverse` Philosophy
+
+The `tidyverse` is a collection of packages that cover most of the central tasks of data science, from opening data files, to cleaning variables, producing descriptive and inferential statistics, and presenting results in tables and plots. The `tidyverse` is developed by [Hadley Wickham and colleagues at Posit (the developers of `RStudio`)](https://tidyverse.org/). The main `tidyverse` packages can be installed using the `install.packages("tidyverse")` function. Calling `library(tidyverse)` loads the "core" `tidyverse` packages, a subset of those installed by `install.packages("tidyverse")`: `ggplot2`, `dplyr`, `tidyr`, `readr`, `purrr`, `tibble`, `stringr`, `forcats`, and `lubridate`. Collectively, these cover the most common data science tasks, but we will need to load a few extra, as and when. Note, some of the core packages also load specific functions from other `tidyverse` packages (notably the `magrittr %>%` *pipe* operator; see next section).
+
+```{r}
+# install.packages("tidyverse")
+library(tidyverse)
+```
+
+`tidyverse` packages work seamlessly together because they follow a [common design philosophy](https://design.tidyverse.org/). As this philosophy is public and well-documented, other developers can write packages that fit within the `tidyverse` ecosystem (and do). The two main features of the `tidyverse` philosophy are incrementalism and *tidy data*.
+
+### Incrementalism (and the `%>%` pipe)
+
+`tidyverse` functions are generally designed to do one thing. If a function requires data to be prepared in a specific way, this is usually done prior using separate functions. `tidyverse` functions have simple descriptive 'verb' names, such as `select()` to choose columns from a `tibble`, `filter()` to retain specific rows, and `mutate()` to add or edit columns. This single-purpose philosophy makes it easier to read and write `tidyverse` code as it builds in a sequence of relatively simple steps.
+
+To facilitate incrementalism, the `tidyverse` makes heavy use of the *pipe* (`%>%`) operator (from `magrittr`). The pipe works as follows: it takes the object produced on its left hand side and puts it into the first argument of the function on its right hand side. This is best explained by example:
+
+```{r}
+c(1, 2, 3) %>% mean()
+```
+
+In this command, `R` first created the vector, `c(1, 2, 3)`, then put this into the first argument of the `mean()` function.
+
+Pipes can be chained together. For instance:
+
+```{r}
+c(1, 2, 3) %>% 
+  mean() %>% 
+  paste("is the mean value")
+```
+
+A series of pipe operations can be read as "do this, then do this, then do this...". Observe that the above is easier to read than:
+
+```{r}
+#| eval: false
+paste(mean(c(1,2,3)), "is the mean value")
+```
+
+To be compatible with the pipe operator, `tidyverse` functions are designed to take the data to be operated on as their first argument. Note, sometimes (particularly when using non-`tidyverse` functions), the relevant argument is not the first. In which case, one can use the dot (`.`) placeholder within the function call to indicate where the piped object should go.[^03_introduction_tidyverse-1] For instance:
+
+[^03_introduction_tidyverse-1]: As of version 4.1.0, a native pipe (`|>`) has been available with Base `R`. This works similarly to the `magrittr` pipe, albeit with [some exceptions](https://tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/), so we use the `%>%` pipe here. Note, `magrittr` also has a number of [other pipes](https://magrittr.tidyverse.org/reference/index.html) that can be quite useful.
+
+```{r}
+c(1, 2, 3) %>% 
+  mean() %>%
+  paste("The mean value is", .)
+```
+
+### Tidy Data
+
+The second main feature of the `tidyverse` philosophy is *tidy data*. As noted, most `tidyverse` functions are designed to take data as their first input and most output data, too. `tidyverse` functions generally operate on `tibbles` structured in a *tidy* way where each variable is in its own column, each observation is in its own row, and each value is in its own cell - in LDA settings, this generally means "long format", with one row per person-sweep, though we will see other structures in the course, too. Tidy data are helpful because they work works well with R's vectorised structure. More on *tidy data* can be read in Wickham ([2014](https://doi.org/10.18637/jss.v059.i10)).
+
+### A Warning: Continuous Development
+
+The `tidyverse` is under continuous development, and the developers are predisposed to tinker, withdrawing or retiring functions that no longer fit with their (developing) philosophy. They are also opinionated, choosing to restrict functions to encourage best practices (for instance, in the last chapter, we saw how `tibbles` do not use recycling of vectors of length greater than 1). It is therefore helpful to keep up to date with changes to the `tidyverse`. The [tidyverse blog](https://www.tidyverse.org/blog/) is a good place to start.
+
+## Some Useful `tidyverse` Functions
+
+There are several `tidyverse` functions we will use repeatedly in this course. We'll introduce these here, and discuss more advanced ways of using them in later sessions.
+
+### `glue::glue()`
+
+Above we constructed a string from `R` objects using `paste()`. The `glue` package (a non-core `tidyverse` package) provides multiple functions for constructing strings, but with more user-friendly interfaces. The package's main function `glue()` uses *curly braces* (`{}`) to indicate where `R` objects should be inserted into a string. For instance:
+
+```{r}
+#| warning: false
+library(glue)
+glue("The mean of 1 to 10 is {mean(1:10)}")
+```
+
+This syntax is also used in multiple other functions in the `tidyverse`. For instance, we will use it to reshape data from wide-to-long (and vice versa).
+
+### `haven::read_dta()`
+
+`haven` (a non-core `tidyverse` package) contains functions for reading data from other statistical programmes ( `Stata`, `SPSS`, and `SAS`) into `R`. Importantly, the `read_dta()` function reads Stata (`.dta`) files into `R` as `tibbles`. The function uses the same syntax as the `read_*()` functions from `readr`, which are used to read delimited text (e.g., `.csv` files). Below, we read in the cohort member derived variable data from MCS Sweep 7 (17y):
+
+```{r}
+mcs_fld <- Sys.getenv("mcs_fld")
+ncds_fld <- Sys.getenv("ncds_fld")
+
+library(haven)
+mcs_17y <- glue("{mcs_fld}/17y/mcs7_cm_derived.dta") %>%
+  read_dta()
+mcs_17y
+```
+
+Note, `read_dta()` imports variable metadata into attributes using the `labelled` class. `read_dta()` has several arguments that can be used to control how data are imported, which we will look at in later chapters.
+
+### `tibble::tibble()`
+
+As discussed, `tibbles` are the `tidyverse`'s version of `data.frames`. They differ from `data.frames` in a few key ways:
+
+-   They do not convert character vectors to factors by default.
+-   They do not perform partial matching of column names when using the `$` operator.
+-   They have a more user-friendly print method that shows only the first 10 rows and as many columns as fit on the screen.
+-   They do not use recycling of vectors of length greater than 1 when assigning values to columns.
+-   Subsetting a `tibble` with `[rows, columns]` syntax always returns a `tibble`
+
+`tibbles` can be created from scratch using the `tibble` function and `data.frames` can be converted to `tibbles` using the `as_tibble()` function. A nice characteristic of the `tibble` function is that columns just created can be used to create other columns within the same function call.
+
+```{r}
+tibble(
+  x = 1:3,
+  y = x^2,
+  z = y + 2
+)
+```
+
+The `tibble` package contains a few other helpful functions, including:
+
+-   `tribble()`: for creating small `tibbles` in a row-wise fashion.
+-   `enframe()` and `deframe()`: for converting named vectors or lists to `tibbles` and vice-versa.
+-   `as_tibble_row()`: for converting vectors to single-row `tibbles`.
+-   `lst`: for creating lists using just-created sub-objects similar to `tibble()`.
+
+### `dplyr::select()`
+
+`select()` keeps (or drops) specified columns from a `tibble`. The code below keeps the columns `MCSID` (family identifier), `GCNUM00` (the within-family cohort member \[CM\] identifier), `GCMCS7AG` (CM's age), `GCBMIN7` (CM's raw BMI), and `GCOBFLG7` (CM's BMI category according to age- and sex-adjusted adjusted IOTF cut-offs).
+
+```{r}
+mcs_17y_mini <- mcs_17y %>%
+  select(MCSID, GCNUM00, GCMCS7AG, GCBMIN7, GCOBFLG7)
+mcs_17y_mini
+```
+
+Columns can be dropped with the '`-`' symbol.
+
+```{r}
+mcs_17y_mini %>%
+  select(-GCMCS7AG)
+```
+
+More complex selection of columns can be achieved using [`tidyselect` *helpers*](https://tidyselect.r-lib.org/reference/index.html). We will learn more about these in [Chapter @sec-data_munging].
+
+Columns can be renamed within `select()` using `new_name = old_name` notation. If we just wish to rename columns or move them, we can use the `rename()` or `relocate()` functions. Extracting a single column (equivalent to `$` or `[[ ]]`) can be done will `pull()`.
+
+```{r}
+mcs_17y %>%
+  select(fid = MCSID, pid = GCNUM00, GCMCS7AG, GCBMIN7, GCOBFLG7) %>%
+  rename(age = GCMCS7AG, bmi = GCBMIN7, bmi_cat_iotf = GCOBFLG7) %>%
+  relocate(pid, .before = 1) %>% # To put pid as first column
+  relocate(age, .after = last_col()) %>% # To put age as last column
+  pull(bmi) # To extract a single column 
+```
+
+The `rename_with()` function can be used to rename columns *en masse* by applying functions to column names. We will see this in [Chapter @sec-data_munging].
+
+### `dplyr::filter()`
+
+What `select()` is to columns, `filter()` is to rows. Passing Boolean expressions or logical vectors to the `filter()` function returns the rows for which the expressions are `TRUE` (i.e. it filters ***in***). `NA`'s are discarded.
+
+```{r}
+mcs_17y_mini %>%
+  filter(GCMCS7AG >= 18)
+```
+
+Filtering ***out*** can be achieved with `filter_out()`. Multiple statements can be passed to `filter()` and `filter_out()` using multiple arguments. These are evaluated at the same time, rather than sequentially, so are equivalent to writing `statement_1 & statement_2 & ...`. Thus the following gives the same result - `mean(GCBMIN7)` is evaluated before any filtering is done:
+
+```{r}
+#| eval: false
+mcs_17y %>%
+  filter(GCMCS7AG >= 18,
+         GCBMIN7 > mean(GCBMIN7))
+
+mcs_17y %>%
+  filter(GCBMIN7 > mean(GCBMIN7),
+         GCMCS7AG >= 18)
+```
+
+If you want to ensure the statements are evaluated sequentially, you can chain multiple `filter()` calls together using the pipe operator.
+
+To combine multiple statements with an `OR`, the "`|`" operator or `when_any()` function can be used. Below we get individuals who are either age 18 or older or have above average BMI.
+
+```{r}
+#| eval: false
+mcs_17y %>%
+  filter(GCBMIN7 > mean(GCBMIN7) |
+           GCMCS7AG >= 18)
+
+mcs_17y %>%
+  filter(when_any(GCBMIN7 > mean(GCBMIN7),
+                  GCMCS7AG >= 18))
+```
+
+Note, this code is not accurate because the MCS `.dta` files use negative values for missing data (e.g., `-1 = "Not Applicable"`), and these values have been used when calculating `mean(GCBMIN7)`. Later, we will see ways of handling this appropriately, but one solution is simply to filter the offending rows. Note, one special type of `filter()` operation is to retain rows with non-`NA` values for specific columns. This can be achieved using the `drop_na()` function.
+
+#### Task I
+
+1.  Load the NCDS Sweep 10 (55y) derived variable file (`ncds_2013_derived.dta`) into `R`. Use `select()` to create a smaller `tibble` with the following columns, also renaming the columns to sometime more descriptive: `NCDSID` (cohort member's ID), `ND9GOR` (CM's region of residence), and `ND9BMI` (CM's BMI).
+
+```{r}
+#| code-fold: true
+#| code-summary: "Reveal the solution"
+#| output: false
+ncds_55y_mini <- glue("{ncds_fld}/55y/ncds_2013_derived.dta") %>%
+  read_dta() %>%
+  select(id = NCDSID, region = ND9GOR, bmi = ND9BMI)
+```
+
+2.  Use `filter()` to retain individuals from London (`ND9GOR == 7`) or the South East (`ND9GOR == 8`) and who have above average BMI across these regions. How many individuals meet these criteria? Note, negative values also indicate missingness in the NCDS.
+
+```{r}
+#| code-fold: true
+#| code-summary: "Reveal the solution"
+#| output: false
+ncds_55y_mini %>%
+  filter(region %in% 7:8) %>%
+  filter(bmi >= 0) %>%
+  filter(bmi > mean(bmi)) %>%
+  nrow() # Counts rows
+```
+
+### `dplyr::mutate()`
+
+The `mutate()` function is used to create new - or overwrite existing - columns in a `tibble`. The new column can be a function of other columns, and can be used to make other columns within the same function call. Below we create two new columns for age-squared and BMI multiplied by age-squared. Unlike `filter()`, `mutate()` works sequentially.
+
+```{r}
+#| eval: false
+mcs_17y_mini %>%
+  mutate(age_sq = GCMCS7AG^2,
+         bmi_x_age_sq = GCBMIN7*age_sq)
+```
+
+A helpful function to use within the `mutate()` function is `ifelse()`. The value `ifelse()` returns depends on whether a Boolean expression is `TRUE` or `FALSE` for a given observation. Below we create two new variables, `bmi` and `obese`. The latter contains recodes negative values in `GCBMIN7` as missing and the latter is a binary variable equal to `1` if the individual's BMI is greater than 30, and `0` otherwise.
+
+```{r}
+#| eval: false
+mcs_17y_mini %>%
+  mutate(bmi = ifelse(bmi >= 0, GCBMIN7, NA),
+         obese = ifelse(bmi >= 30, 1, 0)) %>%
+  select(GCBMIN7, bmi, obese)
+```
+
+Note, `NAs` are propagated through `ifelse()` (i.e., if `bmi` is `NA`, then `obese` will also be `NA`).
+
+More complex decision rules can be implemented with the `dplyr::case_when()` function. This sets the value for an element depending on which of a series of conditions is met. We can use this can to create a BMI category variable **and** handle the negative value missing codes correctly.
+
+```{r}
+mcs_17y_mini %>%
+  mutate(
+    bmi_cat_raw = case_when(
+      GCBMIN7 < 0 ~ NA,
+      GCBMIN7 < 18.5 ~ "Underweight",
+      GCBMIN7 >= 18.5 & GCBMIN7 < 25 ~ "Normal weight",
+      GCBMIN7 >= 25 & GCBMIN7 < 30 ~ "Overweight",
+      GCBMIN7 >= 30 ~ "Obese",
+      TRUE ~ NA
+    )
+  ) %>%
+  select(GCBMIN7, bmi_category)
+```
+
+The last line in the `case_when()` function (`TRUE ~ NA`) handles any cases missed by the preceding conditions, setting them to `NA`. It is actually not necessary here as `case_when()` sets elements meeting no conditions to `NA` by default.
+
+`mutate()` adds columns or modifies existing columns and retains the rest. To keep only the new or modified columns, use the `transmute()` function instead.
+
+### `dplyr::summarise()`
+
+As the name suggests, `summarise()` is used to summarise data within a `tibble`. It returns a single row of data and discards other variables.[^03_introduction_tidyverse-2] Below we use `summarise()` to return the mean BMI in the dataset setting the `mean()` argument `na.rm = TRUE` to ignore missing values. Notice how we can use the pipe within the `summarise()` function call.[^03_introduction_tidyverse-3]
+
+[^03_introduction_tidyverse-2]: It is possible to return more than one row of data, but this is not normal usage and will throw a warning, recommending using `dplyr::reframe()` instead.
+
+[^03_introduction_tidyverse-3]: An issue with using `ifelse()` or `case_when()` to recode negative values as `NA` is that they do not consistently retain the variable metadata, which can create issues with (e.g.) labelled variables (such as BMI category). In [Chapter @sec-data_munging], we will see how to use the `labelled` package to clean such data appropriately.
+
+```{r}
+mcs_17y_mini %>%
+  summarise(mean_bmi = ifelse(GCBMIN7 >= 0, GCBMIN7, NA) %>%
+              mean(na.rm = TRUE))
+```
+
+Multiple variables can be produced in the same `summarise()` function call. Like `mutate()`, these are evaluated sequentially. Given this, one must be mindful of the current state of a column if it is used in multiple places within `summarise()`.
+
+```{r}
+mcs_17y_mini %>%
+  mutate(bmi = ifelse(GCBMIN7 >= 0, GCBMIN7, NA)) %>%
+  drop_na(bmi) %>%
+  summarise(mean_bmi = mean(bmi),
+            min_bmi = min(bmi),
+            max_bmi = max(bmi))
+```
+
+### `dplyr::group_by()`
+
+`group_by()` is used to split a `tibble` into groups, so that calculations are carried in each group separately. `group_by()` is easier to explain by example. Below I group `mcs_17y_mini` by `GCOBFLG7` to get the man BMI within each BMI category. The results is a single `tibble` with one row for each BMI category.
+
+```{r}
+mcs_17y_mini %>%
+  group_by(GCOBFLG7) %>%
+  summarise(mean_bmi= ifelse(GCBMIN7 >= 0, GCBMIN7, NA) %>%
+              mean())
+```
+
+It is possible to group by multiple variables. To ungroup a grouped `tibble`, use the `ungroup()` function. `summarise()` will automatically 'peel off' the last grouping variable, so `group_by(GCOBFLG7) %>% summarise()` returns an ungrouped `tibble`. Other behaviours can be specified with the `.groups` argument.
+
+### `dplyr::count()`
+
+Another function that is used to summarise a dataset is `count()`. As the name suggests, the function counts the number of observations for each combination of values for the specified variables. Below we count the number of individuals in each BMI category, according to integer age.
+
+```{r}
+mcs_17y_mini %>%
+  mutate(age_int = floor(GCMCS7AG)) %>%
+  count(age_int, GCOBFLG7, name = "n_obs")
+```
+
+Weights for each observation can be specified using the `wt` argument and `add_count()` can be used to add counts to an existing `tibble` without summarising it down. If one simply wants the set of distinct values in a `tibble`, one can use the `distinct()` function instead.
+
+```{r}
+mcs_17y_mini %>%
+  distinct(GCOBFLG7)
+```
+
+### `dplyr::arrange()`
+
+Sometimes, one may wish to sort the rows of a `tibble` according to the values of one or more columns. This can be achieved using the `arrange()` function. Below we arrange by age, and within age categories, by BMI.
+
+```{r}
+mcs_17y_mini %>%
+  transmute(bmi = ifelse(GCBMIN7 >= 0, GCBMIN7, NA),
+            age = ifelse(GCMCS7AG >=0, GCMCS7AG, NA)) %>%
+  arrange(age, bmi)
+```
+
+By default, observations are sorted into ascending order. To use descending order instead, use the `desc()` wrapper function.
+
+```{r}
+mcs_17y_mini %>%
+  transmute(bmi = ifelse(GCBMIN7 >= 0, GCBMIN7, NA)) %>%
+  arrange(desc(bmi))
+```
+
+We can use `arrange()` with the `slice()` function to extract specific rows. (`slice()` is like `filter()` but positional integers are used rather than Boolean expressions.) Both `slice()` and `filter()` can also be used in grouped `tibbles`. Below we extract three rows with highest BMI scores per BMI category.
+
+```{r}
+mcs_17y_mini %>%
+  mutate(bmi = ifelse(GCBMIN7 >= 0, GCBMIN7, NA)) %>%
+  drop_na(bmi) %>%
+  group_by(GCOBFLG7) %>%
+  arrange(desc(bmi)) %>%
+  slice(1:3) %>%
+  ungroup() %>%
+  select(GCOBFLG7, bmi)
+```
+
+#### Task II
+
+1.  Using the NCDS 55y derived variable dataset you loaded above, calculate the mean and standard deviation BMI within each region. Recode negative values to missing and remove these before calculation.
+
+```{r}
+#| code-fold: true
+#| code-summary: "Reveal the solution"
+#| output: false
+ncds_55y_mini %>%
+  mutate(bmi = ifelse(bmi >= 0, bmi, NA)) %>%
+  drop_na(bmi) %>%
+  group_by(region) %>%
+  summarise(mean_bmi = mean(bmi),
+            sd_bmi = sd(bmi)) %>%
+  ungroup()
+```
+
+2.  One definition of an outlier is a value more than 3 SD outside the mean. Count the number of outliers in each region. How many outliers does the region with the second highest proportion of observations that are outliers have?
+
+```{r}
+#| code-fold: true
+#| code-summary: "Reveal the solution"
+#| output: false
+
+ncds_55y_mini %>%
+  mutate(bmi = ifelse(bmi >= 0, bmi, NA)) %>%
+  drop_na(bmi) %>%
+  group_by(region) %>%
+  mutate(
+    mean_bmi = mean(bmi),
+    sd_bmi = sd(bmi),
+    outlier = ifelse(bmi < (mean_bmi - 3*sd_bmi) |
+                       bmi > (mean_bmi + 3*sd_bmi), 1, 0)
+  ) %>%
+  summarise(
+    n_total = n(),
+    n_outliers = sum(outlier),
+    prop_outliers = n_outliers / n_total
+  ) %>%
+  arrange(desc(prop_outliers)) %>%
+  slice(3)
+```
+
+### `purrr::map()`
+
+Often, you will need to apply the same operation to a similar set of objects - for instance, you may wish to load multiple datasets, to clean several variables in the same way, or to run many regression models (e.g., varying the outcomes or sets of covariates). Writing this out for each object separately is time-consuming, error-prone and not adaptable to changes.
+
+The `purrr` package (a core `tidyverse` package) provides a suite of functions for repeating yourself in `R`. The main function `map()` takes two arguments: a set of objects one wishes to repeat a function for, and the function to be repeated. `map()` function calls can be written in a [few different ways](https://purrr.tidyverse.org/reference/map.html), but here we will predominantly use 'lambda' notation. Below, we use `map()` to open three MCS datasets and to calculate the number of rows in each.
+
+```{r}
+c("mcs1_cm_derived.dta",
+  "mcs1_family_derived.dta",
+  "mcs1_parent_derived.dta") %>%
+  map(~ glue("{mcs_fld}/0y/{.x}") %>%
+        read_dta() %>%
+        nrow())
+```
+
+In this `map()` call, `.x` stands as a placeholder for current value of the object being looped over. When passed a vector, `map()` loops over each element of the vector in turn, so in first case, `.x = "mcs1_cm_derived.dta"`, in the second case, `.x = "mcs1_family_derived.dta"`, and in the third case, `.x = "mcs1_parent_derived.dta"`. Each time, `map()` took the current value of `.x`, inserted it into the `glue()` function, read in the relevant dataset, and calculated the number of rows.
+
+For `tibbles`, `map()` loops over columns. It is worth testing the function to determine how it loops over the input you are using - `map(.x, ~ .x)` will return the inputs back, whatever they are.
+
+`map()` always returns a list. If the input is named, the output will be named, too. There are variants of `map()` that return other object types. For instance:
+
+-   `map_dbl()` returns a numeric vector
+-   `map_int()` returns an integer vector
+-   `map_chr()` returns a character vector
+-   `map_lgl()` returns a logical vector
+-   `map_dfr()` returns a `tibble` appending the results together by row (with `dplyr::bind_rows()`).
+-   `map_dfr()` returns a `tibble` joining the results together by column (with `dplyr::bind_cols()`).
+
+`map()` only loops over a single input. `map2()` (and its variants) loop over two inputs, side by side. Its syntax is similar to `map()` but uses two placeholders, `.x` and `.y` (i.e., `map2(.x, .y, ~ f(.x, .y))`). `pmap()` (and its variants) generalises this further to multiple inputs. Instead of `.x` or `.y` as placeholders, it uses `..1`, `..2`, and so on. `pmap()` takes a list of inputs as its first argument (`pmap(list(..1, ..2, ...), ~ f(..1, ..2, ...)`).
+
+`purrr` also contains other useful functions, including `keep()`, `discard()` and `reduce()`, which we will use later in this course.
+
+#### Task III
+
+1.  Using a relevant variant of `map_*()`, identify the number of MCS cohort members interviewed each sweep by opening the `mcsx_cm_interview.dta` datasets and counting the number of rows, outputted to an integer vector. To help, we provide a dictionary to find the folder for a given sweep (e.g., the 6th sweep was at age 14y).
+
+```{r}
+mcs_fups <- c(0, 3, 5, 7, 11, 14, 17)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Reveal the solution"
+#| output: false
+
+map_int(
+  1:7,
+  ~ glue("{mcs_fld}/{mcs_fups[.x]}y/mcs{.x}_cm_interview.dta") %>%
+    read_dta() %>%
+    nrow()
+)
+```
+
+## Putting It All Together
+
+We have intimated at some of the complexity that can be achieved with the `tidyverse` by piping individual functions together. Below, we chain several to identify cohort members who have appeared in each sweep of the MCS and find the difference in mean BMI between sweeps 6 and 7 among this balanced panel, in less than twenty lines of code. We use a `tidyselect` helper, `matches()`, to select some columns based on a regular expression - used alongside `col_select()`, this loads a matching variable if it is available, and doesn't crash if not. We delay discussing `matches()` and regular expressions until later chapters.
+
+```{r}
+map_dfr(
+  1:7,
+  ~ glue("{mcs_fld}/{mcs_fups[.x]}y/mcs{.x}_cm_derived.dta") %>%
+    read_dta(col_select = c("MCSID", matches("^([A-G]CNUM00|GCBMIN7|FCBMIN6)$"))) %>%
+    rename(CNUM = matches("^[A-G]CNUM00$")),
+  .id = "wave"
+) %>%
+  add_count(MCSID, CNUM) %>%
+  filter(n == 7) %>%
+  mutate(bmi = case_when(
+      FCBMIN6 >= 0 ~ FCBMIN6,
+      GCBMIN7 >= 0 ~ GCBMIN7
+    )
+  ) %>%
+  drop_na(bmi) %>%
+  group_by(wave) %>%
+  summarise(mean_bmi = mean(bmi)) %>%
+  mutate(diff_mean_bmi = mean_bmi - lag(mean_bmi))
+```
+
+## Further Reading
+
+-   [R for Data Science](https://r4ds.had.co.nz/) by Hadley Wickham, an accessible overview of the `tidyverse` ecosystem for data scientific tasks.
+-   The [tidyverse website](https://www.tidyverse.org/), which contains links to documentation, and vignettes for all `tidyverse` packages, as well as a blog.
+-   [Posit cheatsheets](https://posit.co/resources/cheatsheets/) - concise reference guides for `tidyverse` packages and functions.
+-   The [Data Science Online Learning Community (formerly R4DS)](https://dslc.io/), who run book clubs and have a Slack channel where you can ask for advice. They also run a weekly [***TidyTuesday***](https://github.com/rfordatascience/tidytuesday/blob/main/README.md) event where they post a dataset which people then work on. Some of the solutions people post are very impressive. YouTube contains several screencasts showing how participants worked with the data.

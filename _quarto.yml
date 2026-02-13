@@ -2,14 +2,14 @@ project:
   type: book
 
 book:
-  title: "Textbook"
+  title: "R for Longitudinal Data Analysis"
   author: "Liam Wright"
   date: "1/26/2026"
   chapters:
-    - index.qmd
-    - intro.qmd
-    - summary.qmd
-    - references.qmd
+    - 00_preface.qmd
+    - 01_introduction_course.qmd
+    - 01_introduction_tidyverse.qmd
+    - 99_backmatter_references.qmd
 
 bibliography: references.bib
 
@@ -19,5 +19,5 @@ format:
   pdf:
     documentclass: scrreprt
 
-editor: visual
+editor: source
 

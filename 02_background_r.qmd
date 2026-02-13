@@ -1,0 +1,361 @@
+# Background on `R` {#sec-background_r}
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In this chapter, we provide background on some aspects of `R` that are pertinent to longitudinal data analyses (LDA). A more detailed introduction to `R` is provided in the Appendix (XX-LINK).
+
+## Vectorisation and Recycling
+
+`R` is a vectorised language. This means that operations are applied to entire vectors of data at once, rather than one element at a time in sequence. This makes coding in `R` very efficient. Below, we add two vectors together, element-wise:
+
+```{r}
+c(1, 2, 3, 4, 5) + c(2, 4, 6, 1, 2)
+```
+
+Many functions in `R` use recycling. This means that if vectors of different lengths are used in an operation, the shorter vector is repeated until it matches the length of the longer vector, even if the longer vector is not a multiple of the shorter one.
+
+```{r}
+c(1, 2, 3) + c(1, 3)
+```
+
+Here, `c(1, 3)` is recycled to `c(1, 3, 1)` to match the length of `c(1, 2, 3)`. Because this behaviour can be quite surprising, several `tidyverse` functions do not permit recycling, except where the shorter vector has length 1.
+
+Unlike, say, `Stata`, in `R`, one can hold many objects (bits of data) in memory at once, stored separately. The main data structures you will use in `R` are *vectors*, *lists*, and *data.frames* (and `tibbles`, the `tidyverse` variant of `data.frames`).
+
+## Data Structures
+
+**Vectors** are sets of values of the same 'atomic' type (e.g., integer, double, character, logical).
+
+-   `double`: Numbers with ability to store decimal places (e.g. `c(2.49, 1, 3/2)`)
+-   `integer`: A round number. Denoted using the `L` operator (e.g. `c(1L, 54L, 800L)`) .
+-   `character`: Strings, such as "Hello" and "My name is Liam".
+    -   Strings are surrounded by single (`'`) or double (`"`) quote marks and can contain quote marks too (e.g. `c("Bye", 'Hi', 'He said "Hello"')`)
+-   `logical`: *Boolean* values `TRUE` or `FALSE`
+-   `complex`: Have limited use, and we will not come across them in this course.
+
+If you try to combine different types of data into a vector, `R` will coerce them to the same type.
+
+```{r}
+c(1, "two", TRUE)
+```
+
+The atomic type of a vector can be determined using the `typeof()` function or confirmed using the `is.type()` set of functions.
+
+```{r}
+typeof(1:3)
+is.integer(1:3)
+is.double(1:3)
+is.numeric(1:3) # Both integer and double are 'numeric'
+```
+
+**Lists** are collections of objects that can collectively be of different types and have different lengths. Lists can also contain other lists and so can be used to represent nested data structures.
+
+```{r}
+list(
+  c(1, 2, 3),
+  c("a", "b"),
+  c(1, "two", TRUE), # Observe: coerced to a character vector
+  list(1, "two", TRUE, c(4, 5, 6))
+)
+```
+
+`data.frames` are two dimensional rectangular structures (like spreadsheets or Stata datasets) with columns and rows. `data.frames` are in fact a special type of list where the columns are sub-objects and the rows are the values at the same position across each of the sub-objects. To be a `data.frame`, all columns must have the same length (otherwise the `data.frame` wouldn't be rectangular). Because they are just special lists, `data.frames` columns can be other lists (termed *list-columns*), allowing for nested data structures.
+
+```{r}
+head(iris) # An example data.frame
+```
+
+## Subsetting
+
+Subsetting is the process of pulling elements from objects. In `R`, there are several ways to subset data structures, depending on the object type and the desired outcome.
+
+Vectors can be subsetted using square brackets ('`[ ]`') after the object name, with vectors of integers, logical values or names specified to extract elements. This process creates a new vector. Names and integers can be repeated so the 'subsetted' vector is than the original one.
+
+```{r}
+ages <- c("Gary" = 10, "Bertie" = 20, "Peter" = 30)
+ages[c(3, 2, 1, 1)]
+ages[c(TRUE, FALSE, TRUE)]
+ages[c("Bertie", "Gary")]
+```
+
+The single square brackets can also be used to subset lists. As with vectors, this in fact creates a new list with the specified elements.
+
+```{r}
+my_list <- list(
+  numbers = c(1, 2, 3),
+  letters = c("a", "b", "c"),
+  mixed = list(1, "two", TRUE)
+)
+my_list[c(3, 1)]
+```
+
+Lists can also be subsetted using double square brackets (`[[ ]]`) to extract single elements. This returns the actual object stored at that position, rather than a list containing that object. The same behaviour can be obtained using the `$` operator with the name of the element one wishes to extract. (Note, depending on the data type, the `$` operator allows partial name matching.)
+
+```{r}
+my_list[[2]] # Returns a vector
+my_list$letters
+my_list$lett # Partial matching.
+```
+
+In Advanced R, Hadley Wickham ([2023](https://adv-r.hadley.nz/subsetting.html#subset-single)) likens a list to a train engine pulling carriages. `[ ]` takes the carriages and attaches them to a new engine, while `[[ ]]` detaches a carriage from the train.
+
+Like `lists`, `data.frames` can be subsetted in several ways. The double-square brackets and `$` operators extract single columns, while single-square brackets (`object[vector]`) return a `data.frame` containing the specified column(s).
+
+```{r}
+my_df <- data.frame(
+  name = c("Gary", "Bertie", "Peter"),
+  age = c(10, 20, 30),
+  score = c(90, 85, 101),
+  nationality = factor(c("English", "Scottish", "English"))
+)
+my_df[[2]] # Extracts the 'age' column as a vector
+my_df["age"] # New data.frame only containing 'age' column
+```
+
+A further option is to use the `data.frame[rows, columns]` syntax to extract specific rows and columns.
+
+```{r}
+my_df[3:2, c("name", "score")] # Extracts first two rows of 'name' and 'score' columns
+my_df[, c("name", "score")] # Extracts all rows of 'name' and 'score' columns
+```
+
+Note, `data.frames` have a peculiar feature where if only one column is specified in the `[, ]` notation then values are returned as a vector, rather than a (single column) `data.frame`. As this can lead to unanticipated behaviour, the `tibble`, which builds upon the `data.frame`, does not do this:
+
+```{r}
+library(tibble)
+my_tibble <- as_tibble(my_df)
+my_df[, "age"] # Returns a vector
+my_tibble[, "age"] # Returns a tibble
+```
+
+Subsetting operations can be strung together, with the output of one subsetting operation being subsetted further. `R` reads these operations from left to right.
+
+```{r}
+my_list[["mixed"]][[2]]
+```
+
+Why am I telling you all this? Well, subsetting is important in general for cleaning data and working with results. More concretely, subsetting can also be used to create *dictionaries* that will allow us to use presentable names for variables, rather than as stored in a dataset itself. For instance,
+
+```{r}
+variable_dict <- c(age = "Age of Participant", score = "Test Score")
+paste("The Average", variable_dict["score"], "is", mean(my_df$score))
+```
+
+## Constructing Logical and Integer Vectors and the Missing Value
+
+Above we subsetted the `ages` vector using a logical vector (`ages[c(TRUE, FALSE, TRUE)]`). Usually one would not construct logical vectors by hand. Instead, these can be constructed by applying logical operations to vectors.
+
+-   `==`: Equal to
+-   `!=`: Not equal to
+-   `<`: Less than
+-   `>`: Greater than
+-   `<=`: Less than or equal to
+-   `>=`: Greater than or equal to
+-   `%in%`: Element of (e.g., `ages %in% c(10, 30)`)
+-   `between(x, lower, upper)`: `x >= lower` and `x <= upper`
+
+For instance:
+
+```{r}
+ages[ages == 25]
+ages[ages >= 20]
+ages[ages %in% c(10, 30)]
+```
+
+Logical vectors can be combined using the `&` (AND) or `|` (OR) operators. The rules for these are: `TRUE & TRUE == TRUE`, `TRUE & FALSE == FALSE`, `TRUE | FALSE == TRUE`, and `FALSE | FALSE == FALSE`. These operators are vectorised, so they operate element-wise, and are read left to right. They can be combined to create more complex logical vectors, with parentheses to control the order of operations.
+
+```{r}
+ages[ages >= 28 | (ages <= 23 & ages != 20)]
+```
+
+The `!` (`NOT`) operator can be used to negate a logical vector. For instance, `!(ages >= 20)` is the same as `ages < 20`.
+
+`R`'s missing value `NA` is treated literally as "unknown", so logical operations involving `NA` return `NA` (*is an unknown value greater than 5? Well, that is unknown!*). An exception to this is the `%in%` operator which always returns vectors of `TRUE` or `FALSE` (i.e., `NA` is treated as a value: `NA %in% c(1, NA) == TRUE`). Missing values from a vector can be dropped using `na.omit()`. To identify `NA` values, the `is.na()` function can be used.
+
+```{r}
+ages_na <- c(ages, Dave = NA)
+ages_na > 20
+ages_na[ages_na > 20]
+ages_na[na.omit(ages_na > 20)] # Omits NAs
+ages_na[ages_na %in% c(10, NA)]
+ages_na[is.na(ages_na)]
+```
+
+Three functions that can help create integer vectors are `which()`, `match()`, `seq()`.
+
+-   `which(logical_vector)`: Returns the indices of `TRUE` values in a logical vector.
+-   `match(vector, table)`: Returns a vector of the positions of (first) matches of a `vector` in another. The function returns `NA` for non-matches.
+-   `seq(from, to, by)`: Generates a sequence of numbers from `from` to `to`, incrementing by `by`.
+
+```{r}
+which(ages >= 20)
+match(ages, c(30, 10, 40))
+seq(0, 10, by = 2)
+```
+
+### Task I
+
+1.  Subset the `my_list` object above to create a new list that contains only the third and first elements (in that order) of the `letters` sub-object.
+
+```{r}
+#| code-fold: true
+#| code-summary: "Reveal the solution"
+#| output: false
+my_list$letters[c(3, 1)]
+```
+
+2.  Get the name and age of the person with the highest score in `my_df`.
+
+```{r}
+#| code-fold: true
+#| code-summary: "Reveal the solution"
+#| output: false
+my_df[which(my_df$score == max(my_df$score)), c("name", "age")]
+```
+
+## Attributes and Generic Functions
+
+In `R`, objects can have *attributes* - metadata that provide additional information about the object. We have used one such attribute already: `name`. We used this above by providing key-value pairs when creating objects (e.g., the column names `name`, `age` and `score` in `my_df`.
+
+Another common attribute is `class`. As discussed, data structures in `R` have a specific type (`list`, `character`, `logical`, etc.), but more complex structures can be built on these by specifying their class. For instance, `data.frames` have the `list` *type* (call `typeof(my_df)`) but the `data.frame` *class*. `factor` vectors (used to store categorical data in `R`) are in fact of the `integer` type (call `typeof(my_df$nationality)`) but have the `factor` class along with another another attribute, `levels`, which determines the labels (and their order) attached to the integers.
+
+An object's attributes can be viewed using the `attributes()` function. Specific attributes can be extracted using the `attr()` function (e.g., `attr(my_df, "class")`). For common attributes, helper functions to access these attributes exist - e.g., `names()`, `class()`, `levels()`, and `dim()` (dimensions).[^02_background_r-1] One important feature of these functions is that they can be used to *set* attributes as well as *get* them.
+
+[^02_background_r-1]: Note, `data.frames` (but not `tibbles`) can have names for rows, which are stored in the `row.names` attribute.The `names` attribute stores column names.
+
+```{r}
+attr(my_df, "names") # Get column names
+names(my_df) <- c("Participant_Name", "Participant_Age", "Test_Score", "Nationality") # Set column names
+my_df
+```
+
+An important concept in `R` is that of *generic functions*. Generic functions are functions that behave differently depending on the class of the object they are applied to. For instance, the `summary()` function produces different outputs when applied to a `data.frame` or to an `lm` object (the result of fitting a linear model).
+
+```{r}
+summary(my_df)
+summary(lm(Test_Score ~ Participant_Age, data = my_df))
+```
+
+This code works because `summary()` dispatches to different *methods* depending on the class of the object inputted. One can see the code underlying a function by typing its name without parentheses into the console.
+
+```{r}
+summary
+```
+
+The "method" function that is ultimately used will have a name of the form `function_name.class_name()`. For instance, the `summary` method for `data.frames` is `summary.data.frame()`, while that for linear models it is `summary.lm()`.
+
+```{r}
+summary.data.frame(my_df)
+```
+
+Sometimes an object may have multiple classes. In this case, `R` will search for methods in the order classes are specified. For instance, `tibbles` have `tbl_df`, `tbl` and `data.frame` classes. When `summary()` is applied to a `tibble`, it first looks for a `summary.tbl_df()` method, and if not found, then looks for `summary.tbl()` then `summary.data.frame()` methods instead.
+
+```{r}
+class(my_tibble)
+```
+
+Often method functions are hidden and not directly loaded into the global environment *namespace* (the set of names associated with objects) - more on namespaces and environments in the next section.
+
+## Packages, Functions and Environments
+
+As `R` come bundled with only a limited set of functionality, more functionality can be added using *packages*. Packages are collections of function and (less frequently) data that typically revolve around a set of tasks - for instance, the [`twilio` R package](https://github.com/seankross/twilio) can be used to send SMS messages using the Twilio API (helpful if you have a long analysis to run and want to be informed when it is finished). Packages need installing (using `install.packages("package_name")`) but also loading into `R` (`library(package_name)`) to run in a specific session.
+
+Because `R` is open-source, anyone can develop or contribute a package. As packages are developed independently, they sometimes do not work together well. For instance, the output of one package's functions may need reformatting before it can be used in another package's functions. This decentralised development can also mean that two packages use the same name for entirely different functions. For instance, both the `dplyr` (part of the `tidyverse`) and `MASS` packages have a function called `select()`. The order in which packages are loaded determines which function is available for immediate use. The most recently loaded package takes precedence - in `R` parlance, it *masks* the other one.
+
+Masking means care must be taken when loading packages. One can nevertheless ensure that a specific package's function is used by prefixing the function name with the package name and two colons (`::`) or by explicitly saving the specific function into the environment.
+
+```{r}
+#| error: false
+library(dplyr)
+library(MASS) # Masks dplyr::select()
+select(my_df, "Test_Score")
+select <- dplyr::select # Ensures dplyr::select() is used in next line
+select(my_df, "Test_Score")
+```
+
+Note, the double colon (`::`) operator can also be used to access functions without the package being loaded into the environment. Packages often also contain "non-exported" functions - usually functions that are only used internally within the package and that are not loaded into the *namespace* when the package is loaded. The triple colon (`:::`) operator can be used to access these "non-exported" functions. As mentioned above, this includes many "method" functions.
+
+Given the issue of name conflicts, how do packages work reliably? This question also arises when considering the objects used internally within functions - for instance, the `mean()` function uses an object called `x` internally, but this is a common name that could easily conflict with user-defined objects. The answer to the question is that functions have their own *environments*, collections of objects (variables and functions) with associated names that `R` can access. Environments are hierarchical, meaning that if R cannot find an object in the current environment, it will look in the environment’s *parent environment*, and, if that fails, the parent environment of that, and so on. The parent environment of a function is the environment in which the function was defined. The environment when working at the `R` console is known as the *global environment*. The global environment, which is the environment where user-defined objects and functions are stored, is the parent environment of the functions created in that environment. Below the global environment are the environments of loaded packages (in reverse order of their loading), followed by the "Base" environment, which contains the core `R` functions, and which are loaded automatically when `R` opens.
+
+What this means is that when a function is called, `R` searches for it - and any objects used in the function - in the calling environment first and then down the heirarchy. So, if another `MASS` function calls `select()`, it will reliably call `MASS::select()`, even if `dplyr` is loaded later. Further, if the package uses (or creates) an object called (e.g.) `x`, it will be the object `x` within the function environment (or lower down the hierarchy), rather than any object `x` in the global environment.
+
+Below, we create a strange function, `add_1()`, that adds 1 to an object `y`, which isn't defined in the function but is defined in the global environment, which is the parent of the function environment. and stores this in an the object `x`, which shares the name of an object already defined in the global environment. Notice that (a) `add_1()` returns 16 as `y = 15` in the global environment, (b) the object `x` in the global environment remains unchanged (`x = 3`), and (c) `add_1()` does not error, despite `z` not being inputted when the function is called - this is because `R` uses *lazy evaluation* and `z` is not called in the function body.
+
+```{r}
+#| error: false
+x <- 3
+y <- 15
+add_1 <- function(z){
+  x <- y + 1
+  return(x)
+}
+add_1()
+x
+```
+
+`add_1()` shows the three elements of functions in `R`. Specifically, functions have a name (`add_1`), a set of arguments (inputs; `z`), and a body containing the code that is performed by the function (`x <- y + 1; return(x)`). Note, default values can be given to arguments in the function definition (e.g., `z = 1`). Some function pass on arguments to other functions or take an indeterminate number of arguments - for instance, the `c()` function can create vectors from any number of inputs. Functions like this use the `...` syntax for some arguments.
+
+We will write a lot of functions in this course. The aim is to try to write these general enough that they cover all the situations they will be used in. In general, the more arguments, the more flexibility a function may have.
+
+### Task 2
+
+1.  What value will be returns by `add_x_and_y()` below? Explain why.
+
+```{r}
+y <- 1
+
+add_y <- function(x){
+  x + y
+}
+
+add_x_and_y <- function(){
+  y <- 15
+  add_y(x = 3)
+}
+```
+
+2.  What value will be returned by `add_y_and_z()` below? Explain why?
+
+```{r}
+y <- 1
+
+add_y_and_z <- function(){
+  add_z <- function(z){
+    y + z
+  }
+  y <- 15
+  add_z(z = 3)
+}
+```
+
+## Control Flow
+
+XX-ADD SECTION.
+
+## `.Rproj` and Environment Variables
+
+An `.Rproj` file is a project file used by `RStudio` to manage and organize `R` projects. Double-clicking on an `.Rproj` file will open `RStudio` and set the working directory to the location of the project. This is useful for keeping all files related to a specific project in one place. It also means that relative, rather than absolute, file paths can be used when reading and writing files, which is better for security and reproducibility.
+
+You may wish to keep some files separate to the project folder - for instance, it makes sense to have one copy of raw data, if it will be used in multiple projects. As these files will be stored separately, you won't be able to use relative file paths to open them and - again for data security reasons - you may not wish to specify full file paths in the code you create (and share). A solution to this is to use *environment variables*. Environment variables are key-value pairs that are loaded into `R` on start-up from `.Renviron` files.
+
+`R` will automatically look for a `.Renviron` file in the working directory (i.e., the project folder) and in the user's home directory. You can create a `.Renviron` file in your project folder to store environment variables specific to that project. In this course, we will use environment variables to store file paths to the NCDS and MCS datasets. This way, we can keep the actual file paths for these datasets hidden.
+
+You can create and edit a project `.Renviron` file within your working directory using the `usethis::edit_r_environ("project")` function. `.Renviron` files are plain text files where each line contains a key-value pair in the format `KEY=VALUE`. Environment variables can then be called within the `R` session using `Sys.getenv("KEY")` function.
+
+```{r}
+mcs_fld <- Sys.getenv("mcs_fld")
+ncds_fld <- Sys.getenv("ncds_fld")
+```
+
+Please edit your `.Renviron` file now to include lines for `mcs_fld` and `ncds_fld`. These should point at the top directories from which the sweep-specific data folders are stored - i.e., the folder that looks as below:
+
+![MCS data directory that should be pointed to in `.Renviron` file](images/mcs-sweep_folders.png)
+
+## Further Reading
+
+-   [Hands-On Programming with R](https://rstudio-education.github.io/hopr/) by Garrett Grolemund, a nice introduction to `R` from a programming perspective.
+-   [Advanced R](https://adv-r.hadley.nz/) by Hadley Wickham, a highly technical overview of the `R` language.

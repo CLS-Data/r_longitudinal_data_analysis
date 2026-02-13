@@ -1,0 +1,65 @@
+# Calculating Descriptive Statistics {#sec-descriptives}
+
+The last chapter showed code to create cleaned MCS and NCDS datasets. In this chapter, we will use this data to calculate descriptive statistics. The purpose of calculating these descriptives will be two-fold: first, to check the data are as expected (and if not, to use this information to perform further data cleaning), and secondly, to understand the characteristics of the data (e.g., missing data) which will allow us - and the readers of our research - to interpret any analyses correct. The packages we will use are:
+
+```{r}
+#| warning: false
+
+library(tidyverse)
+library(labelled)
+library(naniar)
+library(flextable)
+library(officer)
+```
+
+Let's load the data:
+
+```{r}
+df_mcs <- readRDS("data/mcs_clean.Rds")
+lookfor(df_mcs)
+
+df_ncds <- readRDS("data/ncds_clean.Rds")
+lookfor(df_ncds)
+```
+
+Both are long datasets, with one row per person sweep. Note, to make using both datasets easier together, most of the variable names in each dataset are the same, including `iid` (the individual identifier) - to construct this for the MCS, we combine the `MCSID` and `CNUM00` values into a single string.
+
+
+
+## Descriptive Statistics
+
+
+## Assessing Attrition
+
+
+
+XX-OUTLINE:
+
+-   DESCRIPTIVES PRODUCED FOR ONESELF; DESCRIPTIVES FOR REPORTING
+
+-   NANIAR? (NOTE DESCRIPTIVES DONE FOR ONE'S SELF; DESCRIPTIVES FOR REPORTING)
+
+-   UNIT TESTS? NANIAR?
+
+-   DESCRIPTIVES
+
+-   CORRELATIONS (CORRELATE::CORRR())
+
+-   ATTRITION AND STATISTICAL TESTS (COMPARING ANALYTICAL VS. ACHIEVED SAMPLE)
+
+-   MANY MODELS APPROACHES (NEST() AND UNNEST())
+
+-   LOOKUPS FOR SCALING VARIABLES CONSISTENTLY.
+
+-   DESCRIPTIVES WITH IMPUTED DATA AND/OR WEIGHTS
+
+-   UNIT TESTS; EDA
+
+-   STATISTICAL TESTS
+
+-   GETTING EVERYTHING INTO TIBBLES (SRVYR)
+
+1.  Packages (DLOOKR, SUMMARYTOOLS, MANUAL), but issues with imputed data
+2.  Working it out manually (why you might want to do this - IMPUTED DATA OR WEIGHTS)
+3.  where(is.factor), pivot_longer(), group_by()
+4.  

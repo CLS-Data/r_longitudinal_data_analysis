@@ -1,0 +1,41 @@
+# Regression Modelling {#sec-regressions}
+
+In this section, we will cover basics of estimating - and working with - regression models with longitudinal data. We will cover two main modelling approaches: (a) repeated cross-sectional regression and (b) growth curve modelling with mixed effects models. Again, the aim is not to cover the statistical theory of these models. Instead, it is to show how to estimate them effectively within `R`.
+
+We will write the code to estimate the repeated cross-sectional regression models using a [*Many Models* approach](https://doi.org/10.31235/osf.io/azvs4), a general coding framework that can be applied to many different types of analysis, such as Specification Curve Analysis ([Simonsohn et al., 2020](https://doi.org/10.1038/s41562-020-0912-z)), Multiverse Analysis ([Steegen et al., 2016](https://doi.org/10.1177/1745691616658637)), and Outcome Wide Epidemiological ([VanderWeele, 2017](https://doi.org/10.1097/EDE.0000000000000641)) designs. Though the [`specr` package](https://doi.org/10.1097/EDE.0000000000000641) exists for performing this type of analysis, it is worth learning how to do this oneself because of the additional flexibility (e.g., one may wish to use multiple imputation and survey weights) and as it is useful for more general coding tasks, too.
+
+When estimating growth curve models, our emphasis will be on *post-estimation* - using the results of models to derive quantities such as predictions, marginal effects, and counterfactual comparisons. A typical feature of growth curve models is that one estimates interactions (for instance, between age and a predictor of interest), and so model coefficients may not be of direct interest or interpretable as the 'effect' of the predictor will be captured by more than one coefficient, the size and standard errors of which depending on how the variable(s) are centered or scaled and not the standard error of some combination of the variables. Further, one may wish to transform the model coefficients onto a more intuitive and interpretable scale (e.g., risk differences from log-odds ratios in logistic models). We will use the [`marginaleffects` package](https://marginaleffects.com/) to perform the post-estimation commands.
+
+XX-OUTLINE:
+
+-   REPEATED CROSS-SECTIONS
+
+-   MANY MODELS
+
+-   THEN MAKE MORE COMPLEX, EXPAND_GRID()
+
+-   MIXED EFFECTS MODELLING WITH AGE INTERACTION
+
+-   FIXED EFFECTS MODEL; WITHIN-BETWEEN MODEL
+
+-   POST-ESTIMATIOB:
+
+    -   MARGINS / GLHT
+
+-   
+
+-   
+
+    ```         
+    ADDING SPLINES
+    ```
+
+-   CENTERING ON TIME
+
+## Further Reading
+
+-   XX-MANY MODELS; ME AND WICKHAM
+-   XX-SPECIFICATION CURVE ANALYSIS
+-   XX-MARGINAL EFFEXTS TEXTBOOK https://marginaleffects.com/; https://osf.io/g4s2a_v1
+-   XX-ROHRER PAPER
+-   XX-SPLINES PAPER

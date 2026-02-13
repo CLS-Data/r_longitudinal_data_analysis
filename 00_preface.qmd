@@ -1,0 +1,43 @@
+# Preface {.unnumbered}
+
+This [Quarto book](https://quarto.org/docs/books/) contains materials to accompany the two-day short course, *R for Longitudinal Data Analysis* run by Liam Wright of the [Centre for Longitudinal Studies (CLS)](https://cls.ucl.ac.uk/) at University College London. Comments and questions about this book can be submitted to the [GitHub repository](https://github.com/CLS-Data/r_longitudinal_data_analysis).
+
+To follow along, you will need to have [R](https://cran.r-project.org/) and [RStudio](https://posit.co/download/rstudio-desktop/) installed on your computer and to possess data from the [National Child Development Study (1958 British Birth Cohort)](http://doi.org/10.5255/UKDA-Series-2000032) and the [Millennium Cohort Study](http://doi.org/10.5255/UKDA-Series-2000031), downloaded from the UK Data Service (in Stata `.dta` format) and arranged into directory structures following the instructions here [here](https://cls-data.github.io/docs/ncds-sweep_folders.html) and [here](https://cls-data.github.io/docs/mcs-sweep_folders.html).
+
+You will also need to install the [`R`](https://cran.r-project.org/bin/windows/base/) programming language, as well as [`RStudio`](https://posit.co/download/rstudio-desktop/), an integrated development environment (IDE) for `R`. The following `R` packages are used on the course. XX-BELOW NEEDS CHANGING
+
+```{r}
+#| label: pkg-list
+#| echo: false
+
+pkgs <- c(
+  "lme4",
+  "marginaleffects",
+  "tidyverse",
+  "broom.mixed",
+  "modelr"
+)
+
+# Versions (NA if not installed)
+versions <- vapply(pkgs, function(p) {
+  if (requireNamespace(p, quietly = TRUE)) as.character(packageVersion(p)) else NA_character_
+}, FUN.VALUE = character(1))
+
+pkg_table <- data.frame(
+  package = pkgs,
+  version = versions,
+  installed = !is.na(versions)
+)
+
+knitr::kable(pkg_table, caption = "Packages used in this book (and detected versions).")
+```
+
+These packages can be downloaded with the following code:
+
+```{r}
+#| label: session-info
+#| echo: false
+
+session_info <- sessionInfo()
+
+```
