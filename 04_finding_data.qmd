@@ -1,8 +1,8 @@
-# Data Discovery
+# Data Discovery  {#sec-data_discovery}
 
 A *sine qua non* of longitudinal research is working out what variables are available in a given study, what their values indicate, and in which data files the variables are stored. This can be a surprisingly time-consuming process, but can be made more efficient using `R`. In this chapter, we will look at three packages for exploring data files: `codebookr`,`labelled` and `summarytools`. We will also look at `stringr` for working with character vectors.
 
-Again, data are in Stata (`.dta`) format, so we will load them using the `read_dta()` function from `haven` package. Let's load the `tidyverse` and `haven` packages, as well as `codebook`, `labelled`, `summarytools` and `glue`, the latter of which we'll use to construct file paths. Let's also load the cohort member derived variable dataset from Sweep 7 (17y) of the MCS:
+The raw data are in Stata (`.dta`) format, so we will load them using the `read_dta()` function from the `haven` package. Let's load the `tidyverse` and `haven` packages, as well as `codebook`, `labelled`, `summarytools` and `glue`, the latter of which we'll use to construct file paths. Let's also load the cohort member derived variable dataset from Sweep 7 (17y) of the MCS:
 
 ```{r}
 #| warning: false
@@ -36,13 +36,13 @@ Below is a screenshot of the results. You can open the generated Word document t
 
 ![Codebook for MCS Sweep 7 (17y) Cohort Member Derived Variable Dataset](images/mcs7_cm_derived_codebook.png)
 
-The resulting `.docx` contains information on each variable including metadata such as variable labels, value labels, and basic descriptive statistics (e.g., mean, standard deviation, min, max, number of missing values). UKDS files typically come bundled with data dictionaries, but these can be limited (for instance, not including descriptive statistics), and `codebookr` outputs can be better to work with.
+The resulting `.docx` contains information on each variable including metadata such as variable labels, value labels, and basic descriptive statistics (e.g., mean, standard deviation, min, max, number of missing values). UKDS files typically come bundled with data dictionaries, but these can be limited (for instance, not including descriptive statistics), and so `codebookr` outputs can be better to work with.
 
 There is some customisation possible within the `codebook()` function - see the help file (`?codebook`) for more information. Note, `codebook()` can take a while to run, especially for larger datasets.
 
 ### Task I
 
-1. Create a codebook for the NCDS Sweep 9 (55y) derived variable dataset (`55y/ncds_2013_derived.dta`). Identify variables related to the cohort member's weight.
+> Create a codebook for the NCDS Sweep 9 (55y) derived variable dataset (`55y/ncds_2013_derived.dta`). Identify variables related to the cohort member's weight.
 
 ```{r}
 #| code-fold: true
@@ -57,7 +57,7 @@ print(ncds_55y_codebook, "outputs/ncds_55y_derived_codebook.docx")
 
 An issue with the `codebook()` output is that, being outside `R`, one cannot search through it programmatically using `R` functions. The `lookfor()` function from the `labelled` package provides such functionality. `labelled` is not part of the `tidyverse`, but does follow its design philosophy.
 
-`lookfor()` has a simple interface - you provide a `data.frame` (or `tibble`) and a search string or set of search strings. The function then identifies variables that match these strings, searching not just in the variable names, but also in variable and value labels. For instance, to find variables related to "overweight" in `mcs_cm_derived_17y`, we can enter the following:
+`lookfor()` has a simple interface - you provide a `data.frame` (or `tibble`) and a search string or set of search strings. The function then identifies variables that match any of these strings, searching not just in the variable names, but also in variable and value labels. For instance, to find variables related to "overweight" in `mcs_cm_derived_17y`, we can enter the following:
 
 ```{r}
 lookfor(mcs_cm_derived_17y, "overweight")
@@ -75,7 +75,7 @@ lookfor(mcs_cm_derived_17y, "overweight") %>%
 
 You will notice this output returns two columns that are `lists` (the *list-columns* `levels` and `value_label`). We will return to list-columns later.
 
-The `lookfor()` function uses *regular expressions* for search strings. Regular expressions are a compact way of specifying patterns in text. The syntax can be hard to remember as well as to read. Guides are available online, and ChatGPT can be especially helpful here. Nevertheless, the most useful rules are worth committing to memory because you will use them a lot:
+The `lookfor()` function uses *regular expressions* for search strings. Regular expressions are a compact way of specifying patterns in text. The syntax can be hard to remember as well as to read. Guides are available online, and ChatGPT can be especially helpful here. Nevertheless, the most useful rules are worth committing to memory because they get used a lot:
 
 - The `^` and `$` symbols are used to anchor the start and the end of a string respectively. For instance, `^age` matches any string that starts with "age", while `age$` matches any string that ends with "age". `^age$` matches any string that is exactly "age".
 - The `.` symbol matches any single character. For instance, `a.e` matches "age", "axe", "are", etc.
@@ -85,19 +85,23 @@ The `lookfor()` function uses *regular expressions* for search strings. Regular 
 - The `[]` symbols are used to specify a set of characters. `[0-9]` matches any digit, `[a-z]` matches any lowercase letter, `[A-Z]` matches any uppercase letter, and `[aeiou]` matches any lowercase vowel. The `[^]` syntax can be used to specify a set of characters to exclude. For instance, `[^0-9]` matches any character that is not a digit.
 - The `\\d`, `\\s`, and `\\w` symbols are shorthand for digits, whitespace and 'word characters' (digits, letters, or underscores), respectively.
 
-Regular expressions are also used within the `stringr` package. `str_detect(label, "IOTF")` above returned a logical vector equal `TRUE` where the variable label contained "IOTF".
+Regular expressions are also used within the `stringr` package. For instance, `str_detect(label, "IOTF")` above returned a logical vector equal `TRUE` where the variable label contained "IOTF".
 
-XX-LABELLED FUNCTIONS FOR GETTING ATTRIBUTES.
+Note, the `labelled` package also contains several helper functions for getting or setting attributes from `labelled` data. This includes:
+
+- `var_labels()` to extract variable labels for a `tibble` or from a vector.
+- `set_variable_labels()` to set variable labels for a `tibble`.
+- `val_labels()` to extract value labels.
 
 ### Task II
 
-1. Find variables related to obesity or BMI in the `mcs_cm_derived_17y` dataset. Consider that the variable label may use related but different terms.
+> Find variables related to obesity or BMI in the `mcs_cm_derived_17y` dataset. Consider that the variable label may use related but different terms to these exact expressions.
 
 ```{r}
 #| output: false
 #| code-fold: true
 #| code-summary: "Reveal the solution"
-lookfor(mcs_cm_derived_17y, "obese|body|bmi") # Multiple terms to capture variations
+lookfor(mcs_cm_derived_17y, "obese|mass|bmi") # Multiple terms to capture variations
 ```
 
 2. Open the NCDS Sweep 9 (55y) "flatfile" (`55y/ncds_2013_flatfile.dta`) and find variables related to weight or height.
@@ -122,7 +126,7 @@ mcs_17y_summary <- dfSummary(mcs_cm_derived_17y)
 stview(mcs_17y_summary)
 ```
 
-`dfSummary()` is useful alongside  `lookfor()` as it can help inform data cleaning. However `dfSummary()` is limited with labelled data because it does not display value labels for continuous variables (which can include values that are in fact missing codes; e.g., negative numbers). Several alternatives to `dfSummary()` exist which also have limitations with labelled data, including `skimr::skim()` and `dlookr::diagnose_web_report()`. `dplyr::count()` is also very useful with labelled data as labels are presented within `tibble` printed outputs.
+`dfSummary()` is useful alongside  `lookfor()` as it can help inform data cleaning. However `dfSummary()` is limited with labelled data because it does not display value labels for continuous variables (which can include values that are in fact missing codes; e.g., negative numbers). Several alternatives to `dfSummary()` exist which also have limitations with labelled data, including `skimr::skim()` and `dlookr::diagnose_web_report()`. `dplyr::count()` is very useful with labelled data as labels are presented within `tibble` printed outputs.
 
 ```{r}
 mcs_cm_derived_17y %>%
@@ -153,7 +157,7 @@ In the next chapter, we will see how to apply the `negative_to_na()` function ac
 
 So far, we have used `lookfor()` to find variables within a single dataset. However, in practice, we may wish to look across all datasets at once - e.g., to work out relevant files with a sweep or work out which sweeps a variable has been collected. So now let's create a comprehensive data dictionary combining all MCS data files using `lookfor()` with `map()`.
 
-The first step is to create a set of file paths to files we will be calling `lookfor()` on. We can do this using the Base `R` function `list.files()`, putting this into a `tibble` where it will be easier to use. We specify the `pattern` argument to only return files with a `.dta` extension, and the `recursive = TRUE` argument to search through subdirectories too.
+The first step is to create a set of file paths to files we will be calling `lookfor()` on. We can do this using the Base `R` function `list.files()`, putting this into a `tibble` where it will be easier to use. We specify the `pattern` argument to only return files with a `.dta` extension, and the `recursive = TRUE` argument to search through sub-directories, too.
 
 ```{r}
 tibble(file = list.files(path = mcs_fld, 
@@ -161,7 +165,7 @@ tibble(file = list.files(path = mcs_fld,
                          recursive = TRUE))
 ```
 
-Next, we can load the datasets and apply `lookfor()`. As noted, `map()` returns lists and `tibbles` can contain list-columns, so we can call `map()` within a `mutate()` call to create a new column of `lookfor()` results. To avoid unecessarily loading too much data, we can use the `n_max = 1` argument in `read_dta()` to just read the first row. We also set the argument `encoding = "latin1"` as `read_dta()` can sometimes fail without this. We also filter out any file paths from the "UKDS" subdirectory as these are repetitive of what we need: the [code](https://cls-data.github.io/docs/ncds-sweep_folders.html) to rearrange the data files makes a copy of each data file.
+Next, we can load the datasets and apply `lookfor()` to them. As noted, `map()` returns lists and `tibbles` can contain list-columns, so we can call `map()` within a `mutate()` call to create a new column of `lookfor()` results. To avoid unecessarily loading too much data, we can use the `n_max = 1` argument in `read_dta()` to just read the first row. We also set the argument `encoding = "latin1"` as `read_dta()` can sometimes fail without this. We also filter out any file paths from the "UKDS" subdirectory as these are repetitive of what we need: the [code](https://cls-data.github.io/docs/ncds-sweep_folders.html) to rearrange the data files makes a copy of each data file.
 
 ```{r}
 mcs_data_dict <- tibble(path = list.files(path = mcs_fld,
@@ -207,7 +211,7 @@ mcs_dict_clean %>%
 
 ### Task III
 
-1. Find variables related to height and weight using `mcs_dict_clean`. In which sweeps was weight collected from MCS parents?
+> Find variables related to height and weight using `mcs_dict_clean`. In which sweeps was weight collected from MCS parents?
 
 ```{r}
 #| output: false
@@ -219,7 +223,7 @@ mcs_dict_clean %>%
          str_detect(file, "parent"))
 ```
 
-2. Create a data dictionary for all NCDS files. In which sweeps was information on diabetes collected?
+> Create a data dictionary for all NCDS files. In which sweeps was information on diabetes collected?
 
 ```{r}
 #| output: false
@@ -260,12 +264,12 @@ mcs_dict_clean %>%
   chop(variable)
 ```
 
-Note, these variables aren't helpful on their own because they need to be loaded with identifier variables to make sure the data can be ascribed to an individual. In the next step, we load the data using `read_dta()` using the `col_select` argument, and adding relevant identifier variables.
+Note, these variables aren't helpful on their own because they need to be loaded with identifier variables to make sure the data can be ascribed to an observational unit (e.g., a cohort member). In the next step, we load the data using `read_dta()`, specifying the `col_select` argument, including relevant identifier variables.
 
 ```{r}
 load_from_dict <- function(fld, file, variables){
   glue("{mcs_fld}/{fld}/{file}") %>%
-    read_dta(col_select = c("MCSID", matches("CNUM00"), all_of(variables)))
+    read_dta(col_select = c("MCSID", matches("^.CNUM00$"), all_of(variables)))
 }
 
 mcs_dict_clean %>%
@@ -286,7 +290,7 @@ We will return to `tidyselect` helpers in the next chapter.
 
 ### Task IV
 
-1. Adapt the `load_from_dict()` function to load NCDS variables related to height in the Age 55y sweep. `NCDSID` is the cohort member identifier in the NCDS. In some datasets, it is in upper case. In others, lower case. Bonus: try to make the function flexible enough that it can work with both MCS and NCDS data dictionaries.
+> Adapt the `load_from_dict()` function to load NCDS variables related to height in the Age 55y sweep. `NCDSID` is the cohort member identifier in the NCDS. In some datasets, it is in upper case. In others, lower case. **Bonus:** try to make the function flexible enough that it can work with both MCS and NCDS data dictionaries.
 
 ```{r}
 #| output: false
@@ -307,7 +311,3 @@ ncds_data_dict %>%
   chop(variable) %>%
   mutate(data = pmap(list(fld, file, variable), load_from_dict_v2))
 ```
-
-## Putting It All Together
-
-XX-FIND VARIABLES FOR HEIGHT, WEIGHT, AND COGNITIVE ABILITY, SEX, AND AGE IN ALL SWEEPS OF MCS.

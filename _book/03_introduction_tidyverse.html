@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; An Introduction to the tidyverse – R for Longitudinal Data Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./04_finding_data.html" rel="next">
+<link href="./02_background_r.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./03_introduction_tidyverse.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">An Introduction to the <code>tidyverse</code></span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">R for Longitudinal Data Analysis</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_introduction_course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_background_r.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Background on <code>R</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_introduction_tidyverse.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">An Introduction to the <code>tidyverse</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_finding_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Discovery</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_data_preparation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_interlude_cleaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Interlude: Data Cleaning</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-tidyverse-philosophy" id="toc-the-tidyverse-philosophy" class="nav-link active" data-scroll-target="#the-tidyverse-philosophy"><span class="header-section-number">3.1</span> The <code>tidyverse</code> Philosophy</a>
+  <ul class="collapse">
+  <li><a href="#incrementalism-and-the-pipe" id="toc-incrementalism-and-the-pipe" class="nav-link" data-scroll-target="#incrementalism-and-the-pipe"><span class="header-section-number">3.1.1</span> Incrementalism (and the <code>%&gt;%</code> pipe)</a></li>
+  <li><a href="#tidy-data" id="toc-tidy-data" class="nav-link" data-scroll-target="#tidy-data"><span class="header-section-number">3.1.2</span> Tidy Data</a></li>
+  <li><a href="#a-warning-continuous-development" id="toc-a-warning-continuous-development" class="nav-link" data-scroll-target="#a-warning-continuous-development"><span class="header-section-number">3.1.3</span> A Warning: Continuous Development</a></li>
+  <li><a href="#task-i" id="toc-task-i" class="nav-link" data-scroll-target="#task-i"><span class="header-section-number">3.1.4</span> Task I</a></li>
+  </ul></li>
+  <li><a href="#some-useful-tidyverse-functions" id="toc-some-useful-tidyverse-functions" class="nav-link" data-scroll-target="#some-useful-tidyverse-functions"><span class="header-section-number">3.2</span> Some Useful <code>tidyverse</code> Functions</a>
+  <ul class="collapse">
+  <li><a href="#glueglue" id="toc-glueglue" class="nav-link" data-scroll-target="#glueglue"><span class="header-section-number">3.2.1</span> <code>glue::glue()</code></a></li>
+  <li><a href="#havenread_dta" id="toc-havenread_dta" class="nav-link" data-scroll-target="#havenread_dta"><span class="header-section-number">3.2.2</span> <code>haven::read_dta()</code></a></li>
+  <li><a href="#tibbletibble" id="toc-tibbletibble" class="nav-link" data-scroll-target="#tibbletibble"><span class="header-section-number">3.2.3</span> <code>tibble::tibble()</code></a></li>
+  <li><a href="#dplyrselect" id="toc-dplyrselect" class="nav-link" data-scroll-target="#dplyrselect"><span class="header-section-number">3.2.4</span> <code>dplyr::select()</code></a></li>
+  <li><a href="#dplyrfilter" id="toc-dplyrfilter" class="nav-link" data-scroll-target="#dplyrfilter"><span class="header-section-number">3.2.5</span> <code>dplyr::filter()</code></a></li>
+  <li><a href="#dplyrmutate" id="toc-dplyrmutate" class="nav-link" data-scroll-target="#dplyrmutate"><span class="header-section-number">3.2.6</span> <code>dplyr::mutate()</code></a></li>
+  <li><a href="#dplyrsummarise" id="toc-dplyrsummarise" class="nav-link" data-scroll-target="#dplyrsummarise"><span class="header-section-number">3.2.7</span> <code>dplyr::summarise()</code></a></li>
+  <li><a href="#dplyrgroup_by" id="toc-dplyrgroup_by" class="nav-link" data-scroll-target="#dplyrgroup_by"><span class="header-section-number">3.2.8</span> <code>dplyr::group_by()</code></a></li>
+  <li><a href="#dplyrcount" id="toc-dplyrcount" class="nav-link" data-scroll-target="#dplyrcount"><span class="header-section-number">3.2.9</span> <code>dplyr::count()</code></a></li>
+  <li><a href="#dplyrarrange" id="toc-dplyrarrange" class="nav-link" data-scroll-target="#dplyrarrange"><span class="header-section-number">3.2.10</span> <code>dplyr::arrange()</code></a></li>
+  <li><a href="#purrrmap" id="toc-purrrmap" class="nav-link" data-scroll-target="#purrrmap"><span class="header-section-number">3.2.11</span> <code>purrr::map()</code></a></li>
+  </ul></li>
+  <li><a href="#putting-it-all-together" id="toc-putting-it-all-together" class="nav-link" data-scroll-target="#putting-it-all-together"><span class="header-section-number">3.3</span> Putting It All Together</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading"><span class="header-section-number">3.4</span> Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-intro_tidyverse" class="quarto-section-identifier"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">An Introduction to the <code>tidyverse</code></span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="the-tidyverse-philosophy" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="the-tidyverse-philosophy"><span class="header-section-number">3.1</span> The <code>tidyverse</code> Philosophy</h2>
+<p>The <code>tidyverse</code> is a collection of packages that cover most of the central tasks of data science, from opening data files, to cleaning variables, producing descriptive and inferential statistics, and presenting results in tables and plots. The <code>tidyverse</code> is developed by <a href="https://tidyverse.org/">Hadley Wickham and colleagues at Posit (the developers of <code>RStudio</code>)</a>. The main <code>tidyverse</code> packages can be installed using the <code>install.packages("tidyverse")</code> function. Calling <code>library(tidyverse)</code> loads the “core” <code>tidyverse</code> packages, a subset of those installed by <code>install.packages("tidyverse")</code>. The “core” <code>tidyverse</code> packages are <code>ggplot2</code>, <code>dplyr</code>, <code>tidyr</code>, <code>readr</code>, <code>purrr</code>, <code>tibble</code>, <code>stringr</code>, <code>forcats</code>, and <code>lubridate</code>. Collectively, these cover the most common data science tasks, but we will need to load a few extra, as and when. Note, some of the core packages also load specific functions from other <code>tidyverse</code> packages (notably the <code>magrittr %&gt;%</code> <em>pipe</em> operator; see next section).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidyverse")</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code>tidyverse</code> packages work seamlessly together because they follow a <a href="https://design.tidyverse.org/">common design philosophy</a>. As this philosophy is public and well-documented, other developers can write packages that fit within the <code>tidyverse</code> ecosystem (and do). The two main features of the <code>tidyverse</code> philosophy are incrementalism and <em>tidy data</em>.</p>
+<section id="incrementalism-and-the-pipe" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="incrementalism-and-the-pipe"><span class="header-section-number">3.1.1</span> Incrementalism (and the <code>%&gt;%</code> pipe)</h3>
+<p><code>tidyverse</code> functions are generally designed to do one thing. If a function requires data to be prepared in a specific way, it is typically expected this will be done prior using separate functions. <code>tidyverse</code> functions have simple descriptive ‘verb’ as names - for instance, <code>select()</code> to choose columns from a <code>tibble</code>, <code>filter()</code> to retain specific rows, and <code>mutate()</code> to add or edit columns. This single-purpose philosophy makes it easier to read and write <code>tidyverse</code> code as decomposes complex processes into a sequence of relatively simple steps.</p>
+<p>To facilitate incrementalism, the <code>tidyverse</code> makes heavy use of the <em>pipe</em> (<code>%&gt;%</code>) operator (from <code>magrittr</code>). The pipe works as follows: it takes the object produced on its left hand side and puts it into the first argument of the function on its right hand side. This is best explained by example:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>) <span class="sc">%&gt;%</span> <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2</code></pre>
+</div>
+</div>
+<p>In this command, <code>R</code> first creates the vector <code>c(1, 2, 3)</code> then puts it into the first argument of the <code>mean()</code> function.</p>
+<p>Pipes can be chained together. For instance:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="st">"is the mean value"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "2 is the mean value"</code></pre>
+</div>
+</div>
+<p>A series of pipe operations can be read as “do this, then do this, then do this…”. Observe that the above is easier to read than:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="fu">mean</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)), <span class="st">"is the mean value"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>To be compatible with the pipe operator, <code>tidyverse</code> functions are designed to take the data to be operated on as their first argument. Note, sometimes (particularly when using non-<code>tidyverse</code> functions), the relevant argument is not the first. In which case, one can use the dot (<code>.</code>) placeholder within the function call to indicate where the piped object should go.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> For instance:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="st">"The mean value is"</span>, .)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "The mean value is 2"</code></pre>
+</div>
+</div>
+</section>
+<section id="tidy-data" class="level3" data-number="3.1.2">
+<h3 data-number="3.1.2" class="anchored" data-anchor-id="tidy-data"><span class="header-section-number">3.1.2</span> Tidy Data</h3>
+<p>The second main feature of the <code>tidyverse</code> philosophy is <em>tidy data</em>. As noted, most <code>tidyverse</code> functions are designed to take data as their first input and many output data, too. <code>tidyverse</code> functions generally operate on <code>tibbles</code>, with the expectation they are structured in a <em>tidy</em> way. Tidy data is data where each variable is in its own column, each observation is in its own row, and each value is in its own cell - in LDA settings, this generally means “long format”, with one row per person-sweep, though we will see other structures in the course, too. Tidy data is useful because it work works well with <code>R</code>’s vectorised structure. More on <em>tidy data</em> can be read in Wickham (<a href="https://doi.org/10.18637/jss.v059.i10">2014</a>).</p>
+</section>
+<section id="a-warning-continuous-development" class="level3" data-number="3.1.3">
+<h3 data-number="3.1.3" class="anchored" data-anchor-id="a-warning-continuous-development"><span class="header-section-number">3.1.3</span> A Warning: Continuous Development</h3>
+<p>The <code>tidyverse</code> is under continuous development, and the developers are predisposed to tinker, withdrawing or retiring functions that no longer fit with their (developing) philosophy. They are also opinionated, choosing to restrict functions to encourage safe practices (for instance, in the last chapter, we saw how <code>tibbles</code> do not use recycling of vectors of length greater than 1). It is advisable to keep up to date with changes to the <code>tidyverse</code>. The <a href="https://www.tidyverse.org/blog/">tidyverse blog</a> is a good place to start.</p>
+</section>
+<section id="task-i" class="level3" data-number="3.1.4">
+<h3 data-number="3.1.4" class="anchored" data-anchor-id="task-i"><span class="header-section-number">3.1.4</span> Task I</h3>
+<blockquote class="blockquote">
+<p>How could the following command be written using the (<code>%&gt;%</code>) pipe?</p>
+</blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"The sum of unique values in c(1, 3, 3, 1) is"</span>, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sum</span>(<span class="fu">unique</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">1</span>))))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="st">"The sum of unique values in c(1, 3, 3, 1) is"</span>, .)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+<section id="some-useful-tidyverse-functions" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="some-useful-tidyverse-functions"><span class="header-section-number">3.2</span> Some Useful <code>tidyverse</code> Functions</h2>
+<p>There are several <code>tidyverse</code> functions we will use repeatedly in this course. We’ll introduce these here, and discuss more advanced ways of using them in later sessions.</p>
+<section id="glueglue" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="glueglue"><span class="header-section-number">3.2.1</span> <code>glue::glue()</code></h3>
+<p>Above we constructed a string from <code>R</code> objects using <code>paste()</code>. The <code>glue</code> package (a non-core <code>tidyverse</code> package) provides multiple functions for constructing strings, but with more user-friendly interfaces. The package’s main function <code>glue()</code> uses <em>curly braces</em> (<code>{}</code>) to indicate where <code>R</code> objects should be inserted into a string. For instance:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glue)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glue</span>(<span class="st">"The mean of 1 to 10 is {mean(1:10)}"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The mean of 1 to 10 is 5.5</code></pre>
+</div>
+</div>
+<p><code>glue()</code> syntax is also used in multiple other functions in the <code>tidyverse</code>. For instance, we will use when reshaping data from wide-to-long and from long-to-wide.</p>
+</section>
+<section id="havenread_dta" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="havenread_dta"><span class="header-section-number">3.2.2</span> <code>haven::read_dta()</code></h3>
+<p><code>haven</code> (a non-core <code>tidyverse</code> package) contains functions for reading data from <code>Stata</code>, <code>SPSS</code>, and <code>SAS</code>. The <code>read_dta()</code> function reads Stata (<code>.dta</code>) files into <code>R</code> as <code>tibbles</code>. The function uses the same syntax as the <code>read_*()</code> functions from <code>readr</code> (a <em>core</em> <code>tidyverse</code> package), which are used to read delimited text (e.g., <code>.csv</code> files). Below, we use <code>read_dta()</code> to read in the cohort member derived variable data from MCS Sweep 7 (17y):</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>mcs_fld <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"mcs_fld"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ncds_fld <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"ncds_fld"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"{mcs_fld}/17y/mcs7_cm_derived.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_dta</span>()</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>mcs_17y</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,952 × 31
+   MCSID   GCNUM00 GCMCS7AG GCOVWGT7 GCOBESE7 GCUNDWU7 GCOVWTU7 GCOBESU7 GCBMIN7
+   &lt;chr&gt;   &lt;dbl+l&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+l&gt;
+ 1 M10516L 1 [1st… 17.6     24.8     29.8     17.0     23.8     26.1     21.3   
+ 2 M28150P 1 [1st… 17.5     24.7     29.7     16.9     23.8     26.1     16.4   
+ 3 M26490Y 1 [1st… 17.5     24.7     29.7     16.9     23.8     26.1     20.7   
+ 4 M13264X 1 [1st… 17.7     24.8     29.8     17.0     23.9     26.2     20.3   
+ 5 M24364K 1 [1st… 17.5     24.7     29.7     16.9     23.8     26.1     25.3   
+ 6 M12242M 1 [1st… 17.7     24.9     29.9     16.8     24.3     26.8     24.0   
+ 7 M30742E 1 [1st… 17.8     24.9     29.9     16.8     24.4     26.8     22.8   
+ 8 M27447Z 1 [1st… 17.4     24.8     29.8     16.7     24.2     26.7     25.7   
+ 9 M19758Q 1 [1st… 17.8     24.9     29.9     17.1     23.9     26.3     22.8   
+10 M32681S 1 [1st… 17.5     24.8     29.8     16.8     24.3     26.7     31.1   
+# ℹ 10,942 more rows
+# ℹ 22 more variables: GCOBFLG7 &lt;dbl+lbl&gt;, GCUK90O7 &lt;dbl+lbl&gt;,
+#   GEMOTION_C &lt;dbl+lbl&gt;, GCONDUCT_C &lt;dbl+lbl&gt;, GHYPER_C &lt;dbl+lbl&gt;,
+#   GPEER_C &lt;dbl+lbl&gt;, GPROSOC_C &lt;dbl+lbl&gt;, GEBDTOT_C &lt;dbl+lbl&gt;,
+#   GEMOTION &lt;dbl+lbl&gt;, GCONDUCT &lt;dbl+lbl&gt;, GHYPER &lt;dbl+lbl&gt;, GPEER &lt;dbl+lbl&gt;,
+#   GPROSOC &lt;dbl+lbl&gt;, GEBDTOT &lt;dbl+lbl&gt;, GDCKESSL &lt;dbl+lbl&gt;,
+#   GDCOPEN &lt;dbl+lbl&gt;, GDCCONSC &lt;dbl+lbl&gt;, GDCEXTRAV &lt;dbl+lbl&gt;, …</code></pre>
+</div>
+</div>
+<p>Note, <code>read_dta()</code> imports variable metadata into attributes using the <code>labelled</code> class. <code>read_dta()</code> also has several arguments that can be used to control how data are imported, which we will look at in later chapters.</p>
+</section>
+<section id="tibbletibble" class="level3" data-number="3.2.3">
+<h3 data-number="3.2.3" class="anchored" data-anchor-id="tibbletibble"><span class="header-section-number">3.2.3</span> <code>tibble::tibble()</code></h3>
+<p>As discussed, <code>tibbles</code> are the <code>tidyverse</code>’s version of <code>data.frames</code>. They differ from <code>data.frames</code> in a few key ways:</p>
+<ul>
+<li>They do not convert character vectors to factors by default.</li>
+<li>They do not allow partial matching of column names when using the <code>$</code> operator.</li>
+<li>They have a cleaner <code>print()</code> method that shows only the first 10 rows and as many columns as fit on the screen.</li>
+<li>They do not use recycling of vectors of length greater than 1 when assigning values to columns.</li>
+<li>Subsetting a <code>tibble</code> with <code>[rows, columns]</code> syntax always returns a <code>tibble</code></li>
+</ul>
+<p><code>tibbles</code> can be created from scratch using the <code>tibble</code> function and <code>data.frames</code> can be converted to <code>tibbles</code> using the <code>as_tibble()</code> function. A nice characteristic of the <code>tibble</code> function is that columns just created can be used to create other columns within the same function call.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> x<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">z =</span> y <span class="sc">+</span> <span class="dv">2</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+      x     y     z
+  &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+1     1     1     3
+2     2     4     6
+3     3     9    11</code></pre>
+</div>
+</div>
+<p>The <code>tibble</code> package contains a few other helpful functions, including:</p>
+<ul>
+<li><code>tribble()</code>: for creating small <code>tibbles</code> in a row-wise fashion.</li>
+<li><code>enframe()</code> and <code>deframe()</code>: for converting named vectors or lists to <code>tibbles</code> and vice-versa.</li>
+<li><code>as_tibble_row()</code>: for converting vectors to single-row <code>tibbles</code>.</li>
+<li><code>lst</code>: for creating lists using just-created sub-objects similar to <code>tibble()</code>.</li>
+</ul>
+</section>
+<section id="dplyrselect" class="level3" data-number="3.2.4">
+<h3 data-number="3.2.4" class="anchored" data-anchor-id="dplyrselect"><span class="header-section-number">3.2.4</span> <code>dplyr::select()</code></h3>
+<p><code>select()</code> keeps (or drops) specified columns from a <code>tibble</code>. The code below keeps the columns <code>MCSID</code> (family identifier), <code>GCNUM00</code> (the within-family cohort member [CM] identifier), <code>GCMCS7AG</code> (CM’s age), <code>GCBMIN7</code> (CM’s raw BMI), and <code>GCOBFLG7</code> (CM’s BMI category according to age- and sex-adjusted adjusted IOTF cut-offs).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="ot">&lt;-</span> mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, GCNUM00, GCMCS7AG, GCBMIN7, GCOBFLG7)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,952 × 5
+   MCSID   GCNUM00                             GCMCS7AG  GCBMIN7   GCOBFLG7     
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl+lbl&gt; &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;    
+ 1 M10516L 1 [1st Cohort Member of the family] 17.6      21.3      0 [Not overw…
+ 2 M28150P 1 [1st Cohort Member of the family] 17.5      16.4      0 [Not overw…
+ 3 M26490Y 1 [1st Cohort Member of the family] 17.5      20.7      0 [Not overw…
+ 4 M13264X 1 [1st Cohort Member of the family] 17.7      20.3      0 [Not overw…
+ 5 M24364K 1 [1st Cohort Member of the family] 17.5      25.3      1 [Overweigh…
+ 6 M12242M 1 [1st Cohort Member of the family] 17.7      24.0      0 [Not overw…
+ 7 M30742E 1 [1st Cohort Member of the family] 17.8      22.8      0 [Not overw…
+ 8 M27447Z 1 [1st Cohort Member of the family] 17.4      25.7      1 [Overweigh…
+ 9 M19758Q 1 [1st Cohort Member of the family] 17.8      22.8      0 [Not overw…
+10 M32681S 1 [1st Cohort Member of the family] 17.5      31.1      2 [Obese]    
+# ℹ 10,942 more rows</code></pre>
+</div>
+</div>
+<p>Columns can be dropped with the minus (‘<code>-</code>’) symbol.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>GCMCS7AG)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,952 × 4
+   MCSID   GCNUM00                             GCBMIN7   GCOBFLG7               
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;              
+ 1 M10516L 1 [1st Cohort Member of the family] 21.3      0 [Not overweight (inc…
+ 2 M28150P 1 [1st Cohort Member of the family] 16.4      0 [Not overweight (inc…
+ 3 M26490Y 1 [1st Cohort Member of the family] 20.7      0 [Not overweight (inc…
+ 4 M13264X 1 [1st Cohort Member of the family] 20.3      0 [Not overweight (inc…
+ 5 M24364K 1 [1st Cohort Member of the family] 25.3      1 [Overweight]         
+ 6 M12242M 1 [1st Cohort Member of the family] 24.0      0 [Not overweight (inc…
+ 7 M30742E 1 [1st Cohort Member of the family] 22.8      0 [Not overweight (inc…
+ 8 M27447Z 1 [1st Cohort Member of the family] 25.7      1 [Overweight]         
+ 9 M19758Q 1 [1st Cohort Member of the family] 22.8      0 [Not overweight (inc…
+10 M32681S 1 [1st Cohort Member of the family] 31.1      2 [Obese]              
+# ℹ 10,942 more rows</code></pre>
+</div>
+</div>
+<p>More complex selection of columns can be achieved using <a href="https://tidyselect.r-lib.org/reference/index.html"><code>tidyselect</code> <em>helpers</em></a>. We will learn more about these in <a href="05_data_preparation.html" class="quarto-xref">Chapter&nbsp;<span>5</span></a>.</p>
+<p>Columns can be renamed within <code>select()</code> using <code>new_name = old_name</code> notation. If we just wish to rename columns or move them, we can use the <code>rename()</code> or <code>relocate()</code> functions. Extracting a single column (equivalent to <code>$</code> or <code>[[ ]]</code>) can be achieved with <code>pull()</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">fid =</span> MCSID, <span class="at">pid =</span> GCNUM00, GCMCS7AG, GCBMIN7, GCOBFLG7) <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">age =</span> GCMCS7AG, <span class="at">bmi =</span> GCBMIN7, <span class="at">bmi_cat_iotf =</span> GCOBFLG7) <span class="sc">%&gt;%</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(pid, <span class="at">.before =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="co"># To put pid as first column</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(age, <span class="at">.after =</span> <span class="fu">last_col</span>()) <span class="sc">%&gt;%</span> <span class="co"># To put age as last column</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(bmi) <span class="co"># To extract a single column </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The <code>rename_with()</code> function can be used to rename columns <em>en masse</em> by applying functions to column names. We will see this in <a href="05_data_preparation.html" class="quarto-xref">Chapter&nbsp;<span>5</span></a>.</p>
+</section>
+<section id="dplyrfilter" class="level3" data-number="3.2.5">
+<h3 data-number="3.2.5" class="anchored" data-anchor-id="dplyrfilter"><span class="header-section-number">3.2.5</span> <code>dplyr::filter()</code></h3>
+<p>What <code>select()</code> is to columns, <code>filter()</code> is to rows. Passing Boolean expressions or logical vectors to the <code>filter()</code> function returns the rows for which the expressions are <code>TRUE</code> (i.e.&nbsp;it filters <strong><em>in</em></strong>). Filtering <strong><em>out</em></strong> can be achieved with <code>filter_out()</code>, or by negating the logical expressions. <code>NA</code>’s are discarded.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(GCMCS7AG <span class="sc">&gt;=</span> <span class="dv">18</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 91 × 5
+   MCSID   GCNUM00                             GCMCS7AG  GCBMIN7        GCOBFLG7
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;      &lt;dbl+lb&gt;
+ 1 M31492K 1 [1st Cohort Member of the family] 18        20.6            0 [Not…
+ 2 M34163H 1 [1st Cohort Member of the family] 18.1      20.8            0 [Not…
+ 3 M29032N 1 [1st Cohort Member of the family] 18        -1 [Not appli… -1 [Not…
+ 4 M26917E 1 [1st Cohort Member of the family] 18        -1 [Not appli… -1 [Not…
+ 5 M14234V 1 [1st Cohort Member of the family] 18        -1 [Not appli… -1 [Not…
+ 6 M30614X 1 [1st Cohort Member of the family] 18        -1 [Not appli… -1 [Not…
+ 7 M11913Z 1 [1st Cohort Member of the family] 18        -1 [Not appli… -1 [Not…
+ 8 M22737L 1 [1st Cohort Member of the family] 18        -1 [Not appli… -1 [Not…
+ 9 M34724U 1 [1st Cohort Member of the family] 18.2      18.9            0 [Not…
+10 M34596E 1 [1st Cohort Member of the family] 18        24.3            0 [Not…
+# ℹ 81 more rows</code></pre>
+</div>
+</div>
+<p>Multiple statements can be passed to <code>filter()</code> and <code>filter_out()</code> using multiple arguments. These are evaluated at the same time, rather than sequentially, so are equivalent to writing <code>statement_1 &amp; statement_2 &amp; ...</code>. Thus the following gives the same result - <code>mean(GCBMIN7)</code> is evaluated before any filtering is done:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(GCMCS7AG <span class="sc">&gt;=</span> <span class="dv">18</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>         GCBMIN7 <span class="sc">&gt;</span> <span class="fu">mean</span>(GCBMIN7))</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(GCBMIN7 <span class="sc">&gt;</span> <span class="fu">mean</span>(GCBMIN7),</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>         GCMCS7AG <span class="sc">&gt;=</span> <span class="dv">18</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>If you want to ensure the statements are evaluated sequentially, you can chain multiple <code>filter()</code> calls together using the pipe operator.</p>
+<p>To combine multiple statements with an <code>OR</code>, the “<code>|</code>” operator or <code>when_any()</code> function can be used. Below we get individuals who are either age 18 or older or have above average BMI.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(GCBMIN7 <span class="sc">&gt;</span> <span class="fu">mean</span>(GCBMIN7) <span class="sc">|</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>           GCMCS7AG <span class="sc">&gt;=</span> <span class="dv">18</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">when_any</span>(GCBMIN7 <span class="sc">&gt;</span> <span class="fu">mean</span>(GCBMIN7),</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                  GCMCS7AG <span class="sc">&gt;=</span> <span class="dv">18</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Note, this code is not quite right because the MCS <code>.dta</code> files use negative values for missing data (e.g., <code>-1 = "Not Applicable"</code>), and these values have been used when calculating <code>mean(GCBMIN7)</code>. Later, we will see ways of handling these negative values appropriately, but one solution is simply to filter out the offending rows. Note, one special type of <code>filter()</code> operation is to retain rows with observed (i.e., non-<code>NA</code>) values for specific columns. This can be achieved using the <code>drop_na()</code> function.</p>
+<section id="task-ii" class="level4" data-number="3.2.5.1">
+<h4 data-number="3.2.5.1" class="anchored" data-anchor-id="task-ii"><span class="header-section-number">3.2.5.1</span> Task II</h4>
+<blockquote class="blockquote">
+<p>Load the NCDS Sweep 10 (55y) derived variable file (<code>ncds_2013_derived.dta</code>) into <code>R</code>. Use <code>select()</code> to create a smaller <code>tibble</code> with the following columns, also renaming the columns to sometime more descriptive: <code>NCDSID</code> (cohort member’s ID), <code>ND9GOR</code> (CM’s region of residence), and <code>ND9BMI</code> (CM’s BMI).</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>ncds_55y_mini <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"{ncds_fld}/55y/ncds_2013_derived.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_dta</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">id =</span> NCDSID, <span class="at">region =</span> ND9GOR, <span class="at">bmi =</span> ND9BMI)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<blockquote class="blockquote">
+<p>Use this data, use <code>filter()</code> to retain individuals from London (<code>ND9GOR == 7</code>) or the South East (<code>ND9GOR == 8</code>) and who have above average BMI across these two regions. How many individuals meet these criteria? Note, negative values also indicate missingness in the NCDS.</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ncds_55y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(region <span class="sc">%in%</span> <span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(bmi <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(bmi <span class="sc">&gt;</span> <span class="fu">mean</span>(bmi)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>() <span class="co"># Counts rows</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+<section id="dplyrmutate" class="level3" data-number="3.2.6">
+<h3 data-number="3.2.6" class="anchored" data-anchor-id="dplyrmutate"><span class="header-section-number">3.2.6</span> <code>dplyr::mutate()</code></h3>
+<p>The <code>mutate()</code> function is used to create new - or overwrite existing - columns in a <code>tibble</code>. The new column can be a function of other columns, and can be used to make other columns within the same function call. Below we create two new columns for age-squared and BMI multiplied by age-squared. Unlike <code>filter()</code>, <code>mutate()</code> works sequentially.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_sq =</span> GCMCS7AG<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">bmi_x_age_sq =</span> GCBMIN7<span class="sc">*</span>age_sq)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>A helpful function to use within the <code>mutate()</code> function is <code>ifelse()</code>. The value <code>ifelse()</code> returns depends on whether a Boolean expression is <code>TRUE</code> or <code>FALSE</code> for a given observation. Below we create two new variables, <code>bmi</code> and <code>obese</code>. The former contains the values of <code>GCBMIN7</code> with negative values recorded as missing. The latter is a binary variable equal to <code>1</code> if the individual’s BMI is greater than 30, and <code>0</code> otherwise.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bmi =</span> <span class="fu">ifelse</span>(bmi <span class="sc">&gt;=</span> <span class="dv">0</span>, GCBMIN7, <span class="cn">NA</span>),</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">obese =</span> <span class="fu">ifelse</span>(bmi <span class="sc">&gt;=</span> <span class="dv">30</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(GCBMIN7, bmi, obese)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Note, <code>NAs</code> are propagated through <code>ifelse()</code> (i.e., if <code>bmi</code> is <code>NA</code>, then <code>obese</code> will also be <code>NA</code>).</p>
+<p>More complex decision rules can be implemented with the <code>dplyr::case_when()</code> function. This sets the value for an element depending on which of a series of conditions is met. We can use this can to create a BMI category variable <strong>and</strong> handle the negative value missing codes correctly.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">bmi_category =</span> <span class="fu">case_when</span>(</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>      GCBMIN7 <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="cn">NA</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>      GCBMIN7 <span class="sc">&lt;</span> <span class="fl">18.5</span> <span class="sc">~</span> <span class="st">"Underweight"</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>      GCBMIN7 <span class="sc">&gt;=</span> <span class="fl">18.5</span> <span class="sc">&amp;</span> GCBMIN7 <span class="sc">&lt;</span> <span class="dv">25</span> <span class="sc">~</span> <span class="st">"Normal weight"</span>,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>      GCBMIN7 <span class="sc">&gt;=</span> <span class="dv">25</span> <span class="sc">&amp;</span> GCBMIN7 <span class="sc">&lt;</span> <span class="dv">30</span> <span class="sc">~</span> <span class="st">"Overweight"</span>,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>      GCBMIN7 <span class="sc">&gt;=</span> <span class="dv">30</span> <span class="sc">~</span> <span class="st">"Obese"</span>,</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(GCBMIN7, bmi_category)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,952 × 2
+   GCBMIN7   bmi_category 
+   &lt;dbl+lbl&gt; &lt;chr&gt;        
+ 1 21.3      Normal weight
+ 2 16.4      Underweight  
+ 3 20.7      Normal weight
+ 4 20.3      Normal weight
+ 5 25.3      Overweight   
+ 6 24.0      Normal weight
+ 7 22.8      Normal weight
+ 8 25.7      Overweight   
+ 9 22.8      Normal weight
+10 31.1      Obese        
+# ℹ 10,942 more rows</code></pre>
+</div>
+</div>
+<p>The last line in the <code>case_when()</code> function (<code>TRUE ~ NA</code>) handles any cases missed by the preceding conditions, setting them to <code>NA</code>. It is actually not necessary here as <code>case_when()</code> sets elements meeting no conditions to <code>NA</code> by default.</p>
+<p><code>mutate()</code> adds columns or modifies existing columns and retains the rest. To keep only the new or modified columns, use the <code>transmute()</code> function instead.</p>
+</section>
+<section id="dplyrsummarise" class="level3" data-number="3.2.7">
+<h3 data-number="3.2.7" class="anchored" data-anchor-id="dplyrsummarise"><span class="header-section-number">3.2.7</span> <code>dplyr::summarise()</code></h3>
+<p>As the name suggests, <code>summarise()</code> is used to summarise data within a <code>tibble</code>. It returns a single row of data and discards other variables.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Below we use <code>summarise()</code> to return the mean BMI in the dataset setting the <code>mean()</code> argument <code>na.rm = TRUE</code> to ignore missing values. Notice how we can use the pipe within the <code>summarise()</code> function call.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_bmi =</span> <span class="fu">ifelse</span>(GCBMIN7 <span class="sc">&gt;=</span> <span class="dv">0</span>, GCBMIN7, <span class="cn">NA</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mean</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+  mean_bmi
+     &lt;dbl&gt;
+1     23.3</code></pre>
+</div>
+</div>
+<p>Multiple variables can be produced in the same <code>summarise()</code> function call. Like <code>mutate()</code>, these are evaluated sequentially. Given this, one must be mindful of the current state of a column if it is used in multiple places within <code>summarise()</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bmi =</span> <span class="fu">ifelse</span>(GCBMIN7 <span class="sc">&gt;=</span> <span class="dv">0</span>, GCBMIN7, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(bmi) <span class="sc">%&gt;%</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_bmi =</span> <span class="fu">mean</span>(bmi),</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">min_bmi =</span> <span class="fu">min</span>(bmi),</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_bmi =</span> <span class="fu">max</span>(bmi))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  mean_bmi min_bmi max_bmi
+     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1     23.3    11.0    49.4</code></pre>
+</div>
+</div>
+</section>
+<section id="dplyrgroup_by" class="level3" data-number="3.2.8">
+<h3 data-number="3.2.8" class="anchored" data-anchor-id="dplyrgroup_by"><span class="header-section-number">3.2.8</span> <code>dplyr::group_by()</code></h3>
+<p><code>group_by()</code> is used to greated a <em>grouped</em> <code>tibble</code> where operations calculations are carried in each group of rows separately. <code>group_by()</code> is perhaps easier to explain by example. Below I group <code>mcs_17y_mini</code> by <code>GCOBFLG7</code> to get the mean BMI within each BMI category. The results is a single <code>tibble</code> with one row for each BMI category.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(GCOBFLG7) <span class="sc">%&gt;%</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_bmi=</span> <span class="fu">ifelse</span>(GCBMIN7 <span class="sc">&gt;=</span> <span class="dv">0</span>, GCBMIN7, <span class="cn">NA</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mean</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 2
+  GCOBFLG7                                    mean_bmi
+  &lt;dbl+lbl&gt;                                      &lt;dbl&gt;
+1 -1 [Not applicable]                             NA  
+2  0 [Not overweight (including underweight)]     20.8
+3  1 [Overweight]                                 26.7
+4  2 [Obese]                                      33.6</code></pre>
+</div>
+</div>
+<p>It is possible to group by multiple variables. To ungroup a grouped <code>tibble</code>, use the <code>ungroup()</code> function. By default, <code>summarise()</code> ‘peels off’ the last grouping variable, so <code>group_by(GCOBFLG7) %&gt;% summarise()</code> returns an ungrouped <code>tibble</code>. Other behaviours can be specified with the <code>.groups</code> argument.</p>
+<p>Not, where an operation in <code>mutate()</code> returns a single value, the value is automatically recycled across rows. <code>mutate()</code> can therefore be used to create group-level variables. One important LDA model is the <em>Random Effects Within Between</em> (REWB; <a href="https://doi.org/10.1007/s11135-018-0802-x">Bell et al., 2019</a>) model, which includes both within-unit (person differences) and between-unit (person averaged) variables. Below we use <code>mutate()</code> with <code>group_by()</code> to create both.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID) <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">bmi =</span> <span class="fu">ifelse</span>(GCBMIN7 <span class="sc">&gt;=</span> <span class="dv">0</span>, GCBMIN7, <span class="cn">NA</span>),</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">bmi_between =</span> <span class="fu">mean</span>(bmi, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">bmi_within =</span> bmi <span class="sc">-</span> bmi_between</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, GCBMIN7, bmi, bmi_within, bmi_between)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,952 × 5
+   MCSID   GCBMIN7     bmi bmi_within bmi_between
+   &lt;chr&gt;   &lt;dbl+lbl&gt; &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;
+ 1 M10516L 21.3       21.3          0        21.3
+ 2 M28150P 16.4       16.4          0        16.4
+ 3 M26490Y 20.7       20.7          0        20.7
+ 4 M13264X 20.3       20.3          0        20.3
+ 5 M24364K 25.3       25.3          0        25.3
+ 6 M12242M 24.0       24.0          0        24.0
+ 7 M30742E 22.8       22.8          0        22.8
+ 8 M27447Z 25.7       25.7          0        25.7
+ 9 M19758Q 22.8       22.8          0        22.8
+10 M32681S 31.1       31.1          0        31.1
+# ℹ 10,942 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="dplyrcount" class="level3" data-number="3.2.9">
+<h3 data-number="3.2.9" class="anchored" data-anchor-id="dplyrcount"><span class="header-section-number">3.2.9</span> <code>dplyr::count()</code></h3>
+<p>Another function that is used to summarise a dataset is <code>count()</code>. As the name suggests, the function counts the number of observations for each combination of values for the specified variables. Below we count the number of individuals in each BMI category, according to integer age.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age_int =</span> <span class="fu">floor</span>(GCMCS7AG)) <span class="sc">%&gt;%</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(age_int, GCOBFLG7, <span class="at">name =</span> <span class="st">"n_obs"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 13 × 3
+   age_int GCOBFLG7                                    n_obs
+     &lt;dbl&gt; &lt;dbl+lbl&gt;                                   &lt;int&gt;
+ 1      -1 -1 [Not applicable]                           222
+ 2      16 -1 [Not applicable]                           215
+ 3      16  0 [Not overweight (including underweight)]  1875
+ 4      16  1 [Overweight]                               498
+ 5      16  2 [Obese]                                    271
+ 6      17 -1 [Not applicable]                          1052
+ 7      17  0 [Not overweight (including underweight)]  4713
+ 8      17  1 [Overweight]                              1300
+ 9      17  2 [Obese]                                    715
+10      18 -1 [Not applicable]                            40
+11      18  0 [Not overweight (including underweight)]    40
+12      18  1 [Overweight]                                 8
+13      18  2 [Obese]                                      3</code></pre>
+</div>
+</div>
+<p>By default, each row is counted as one observation, but weights for each row can be specified using the <code>wt</code> argument. <code>add_count()</code> can be used to add counts to an existing <code>tibble</code> without summarising it down (i.e., <code>count()</code> is analogous to <code>summarise()</code>, <code>add_count()</code> is analogous to <code>mutate()</code>). If one simply wants the set of distinct values in a <code>tibble</code>, the <code>distinct()</code> function can be used instead.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(GCOBFLG7)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 1
+  GCOBFLG7                                   
+  &lt;dbl+lbl&gt;                                  
+1  0 [Not overweight (including underweight)]
+2  1 [Overweight]                            
+3  2 [Obese]                                 
+4 -1 [Not applicable]                        </code></pre>
+</div>
+</div>
+</section>
+<section id="dplyrarrange" class="level3" data-number="3.2.10">
+<h3 data-number="3.2.10" class="anchored" data-anchor-id="dplyrarrange"><span class="header-section-number">3.2.10</span> <code>dplyr::arrange()</code></h3>
+<p>Sometimes, one may wish to sort the rows of a <code>tibble</code> according to the values of one or more columns. This can be achieved using the <code>arrange()</code> function. Below we arrange by age, and within age categories, by BMI.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">bmi =</span> <span class="fu">ifelse</span>(GCBMIN7 <span class="sc">&gt;=</span> <span class="dv">0</span>, GCBMIN7, <span class="cn">NA</span>),</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">age =</span> <span class="fu">ifelse</span>(GCMCS7AG <span class="sc">&gt;=</span><span class="dv">0</span>, GCMCS7AG, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(age, bmi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,952 × 2
+     bmi   age
+   &lt;dbl&gt; &lt;dbl&gt;
+ 1  17.3  16.1
+ 2  26.4  16.1
+ 3  17.7  16.2
+ 4  18.9  16.2
+ 5  20.4  16.2
+ 6  20.5  16.2
+ 7  21.6  16.2
+ 8  26.4  16.2
+ 9  26.7  16.2
+10  27.6  16.2
+# ℹ 10,942 more rows</code></pre>
+</div>
+</div>
+<p>By default, observations are sorted into ascending order. To use descending order instead, use the <code>desc()</code> wrapper function.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">bmi =</span> <span class="fu">ifelse</span>(GCBMIN7 <span class="sc">&gt;=</span> <span class="dv">0</span>, GCBMIN7, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(bmi))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,952 × 1
+     bmi
+   &lt;dbl&gt;
+ 1  49.4
+ 2  46.8
+ 3  46.8
+ 4  46.3
+ 5  45.9
+ 6  45.6
+ 7  45.4
+ 8  44.9
+ 9  44.9
+10  44.6
+# ℹ 10,942 more rows</code></pre>
+</div>
+</div>
+<p>We can use <code>arrange()</code> with the <code>slice()</code> function to extract specific rows. (<code>slice()</code> is like <code>filter()</code> but positional integers are used rather than Boolean expressions.) Both <code>slice()</code> and <code>filter()</code> can also be used in grouped <code>tibbles</code>. Below we extract three rows with highest BMI scores per BMI category.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bmi =</span> <span class="fu">ifelse</span>(GCBMIN7 <span class="sc">&gt;=</span> <span class="dv">0</span>, GCBMIN7, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(bmi) <span class="sc">%&gt;%</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(GCOBFLG7) <span class="sc">%&gt;%</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(bmi)) <span class="sc">%&gt;%</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(GCOBFLG7, bmi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 2
+   GCOBFLG7                                      bmi
+   &lt;dbl+lbl&gt;                                   &lt;dbl&gt;
+ 1 -1 [Not applicable]                          22.0
+ 2  0 [Not overweight (including underweight)]  25.0
+ 3  0 [Not overweight (including underweight)]  24.9
+ 4  0 [Not overweight (including underweight)]  24.9
+ 5  1 [Overweight]                              29.9
+ 6  1 [Overweight]                              29.8
+ 7  1 [Overweight]                              29.7
+ 8  2 [Obese]                                   49.4
+ 9  2 [Obese]                                   46.8
+10  2 [Obese]                                   46.8</code></pre>
+</div>
+</div>
+<section id="task-iii" class="level4" data-number="3.2.10.1">
+<h4 data-number="3.2.10.1" class="anchored" data-anchor-id="task-iii"><span class="header-section-number">3.2.10.1</span> Task III</h4>
+<blockquote class="blockquote">
+<p>Using the NCDS 55y derived variable dataset you loaded above, calculate the mean and standard deviation BMI within each region. Recode negative values to missing and remove these before calculation.</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>ncds_55y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bmi =</span> <span class="fu">ifelse</span>(bmi <span class="sc">&gt;=</span> <span class="dv">0</span>, bmi, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(bmi) <span class="sc">%&gt;%</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(region) <span class="sc">%&gt;%</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_bmi =</span> <span class="fu">mean</span>(bmi),</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">sd_bmi =</span> <span class="fu">sd</span>(bmi)) <span class="sc">%&gt;%</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<blockquote class="blockquote">
+<p>One definition of an outlier is a value more than 3 SD outside the mean. Count the number of outliers in each region. How many outliers does the region with the second highest proportion of observations that are outliers have?</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>ncds_55y_mini <span class="sc">%&gt;%</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bmi =</span> <span class="fu">ifelse</span>(bmi <span class="sc">&gt;=</span> <span class="dv">0</span>, bmi, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(bmi) <span class="sc">%&gt;%</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(region) <span class="sc">%&gt;%</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_bmi =</span> <span class="fu">mean</span>(bmi),</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_bmi =</span> <span class="fu">sd</span>(bmi),</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">outlier =</span> <span class="fu">ifelse</span>(bmi <span class="sc">&lt;</span> (mean_bmi <span class="sc">-</span> <span class="dv">3</span><span class="sc">*</span>sd_bmi) <span class="sc">|</span></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>                       bmi <span class="sc">&gt;</span> (mean_bmi <span class="sc">+</span> <span class="dv">3</span><span class="sc">*</span>sd_bmi), <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_total =</span> <span class="fu">n</span>(),</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_outliers =</span> <span class="fu">sum</span>(outlier),</span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">prop_outliers =</span> n_outliers <span class="sc">/</span> n_total</span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(prop_outliers)) <span class="sc">%&gt;%</span></span>
+<span id="cb51-17"><a href="#cb51-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+<section id="purrrmap" class="level3" data-number="3.2.11">
+<h3 data-number="3.2.11" class="anchored" data-anchor-id="purrrmap"><span class="header-section-number">3.2.11</span> <code>purrr::map()</code></h3>
+<p>Often, you will need to apply the same operation to a similar set of objects - for instance, you may wish to load multiple datasets, to clean several variables in the same way, or to run many regression models (e.g., varying the outcomes or sets of covariates). Writing this out for each object separately is time-consuming, error-prone and not adaptable to changes.</p>
+<p>The <code>purrr</code> package (a core <code>tidyverse</code> package) provides a suite of functions for repeating yourself in <code>R</code>. The main function <code>map()</code> takes two arguments: a set of objects one wishes to repeat a function for, and the function to be repeated. <code>map()</code> function calls can be written in a <a href="https://purrr.tidyverse.org/reference/map.html">few different ways</a>, but in this course we will predominantly use ‘lambda’ notation. Below, we use <code>map()</code> to open three MCS datasets and to calculate the number of rows in each.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="st">"mcs1_cm_derived.dta"</span>,</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"mcs1_family_derived.dta"</span>,</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"mcs1_parent_derived.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"{mcs_fld}/0y/{.x}"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">read_dta</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nrow</span>()</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+[1] 18786
+
+[[2]]
+[1] 18540
+
+[[3]]
+[1] 33884</code></pre>
+</div>
+</div>
+<p>In this <code>map()</code> call, <code>.x</code> stands as a placeholder for current value of the object being looped over. When passed a vector, <code>map()</code> loops over each element of the vector in turn, so in first case, <code>.x = "mcs1_cm_derived.dta"</code>, in the second case, <code>.x = "mcs1_family_derived.dta"</code>, and in the third case, <code>.x = "mcs1_parent_derived.dta"</code>. Each time, <code>map()</code> takes the current value of <code>.x</code>, inserts it into the <code>glue()</code> function, reads in the relevant dataset, and calculates the number of rows.</p>
+<p>For <code>tibbles</code>, <code>map()</code> loops over columns. If you unsure how <code>map()</code> splits a particular object, <code>map(.x, ~ .x)</code> will return the inputs back, split whichever way they have been.</p>
+<p><code>map()</code> always returns a list. If the input is named, the output will be named, too. There are variants of <code>map()</code> that return other object types. For instance:</p>
+<ul>
+<li><code>map_dbl()</code> returns a numeric vector</li>
+<li><code>map_int()</code> returns an integer vector</li>
+<li><code>map_chr()</code> returns a character vector</li>
+<li><code>map_lgl()</code> returns a logical vector</li>
+<li><code>map_dfr()</code> returns a <code>tibble</code> appending the results together by row (with <code>dplyr::bind_rows()</code>).</li>
+<li><code>map_dfr()</code> returns a <code>tibble</code> joining the results together by column (with <code>dplyr::bind_cols()</code>).</li>
+</ul>
+<p><code>map()</code> only loops over a single input. <code>map2()</code> (and its variants) loop over two inputs, side by side. Its syntax is similar to <code>map()</code> but uses two placeholders, <code>.x</code> and <code>.y</code> (i.e., <code>map2(.x, .y, ~ f(.x, .y))</code>). <code>pmap()</code> (and its variants) generalise this still further to multiple inputs. Instead of <code>.x</code> or <code>.y</code> as placeholders, it uses <code>..1</code>, <code>..2</code>, and so on. <code>pmap()</code> takes a list of inputs as its first argument (<code>pmap(list(..1, ..2, ...), ~ f(..1, ..2, ...)</code>).</p>
+<p><code>purrr</code> also contains other useful functions, including <code>reduce()</code>, which we will see later in this course.</p>
+<section id="task-iv" class="level4" data-number="3.2.11.1">
+<h4 data-number="3.2.11.1" class="anchored" data-anchor-id="task-iv"><span class="header-section-number">3.2.11.1</span> Task IV</h4>
+<blockquote class="blockquote">
+<p>Using a relevant variant of <code>map_*()</code>, identify the number of MCS cohort members interviewed each sweep by opening the <code>mcsx_cm_interview.dta</code> datasets and counting the number of rows, outputted to an integer vector. To help, we provide a dictionary to find the folder for a given sweep (e.g., the 6th sweep was at age 14y).</p>
+</blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>mcs_fups <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">11</span>, <span class="dv">14</span>, <span class="dv">17</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_int</span>(</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>,</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{mcs_fups[.x]}y/mcs{.x}_cm_interview.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>()</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+</section>
+<section id="putting-it-all-together" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="putting-it-all-together"><span class="header-section-number">3.3</span> Putting It All Together</h2>
+<p>We have intimated at some of the complexity that can be achieved with the <code>tidyverse</code> by piping individual functions together. Below, we chain several to identify cohort members who have appeared in each sweep of the MCS and find to the difference in mean BMI between sweeps 6 and 7 among this balanced panel, using less than twenty lines of code. We use a <code>tidyselect</code> helper, <code>matches()</code>, to select some columns based on a regular expression - used alongside <code>col_select()</code>, this loads a variable if it matches the regular expression, and doesn’t crash if not matching variables are found. We delay discussing <code>matches()</code> and regular expressions until later chapters.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dfr</span>(</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>,</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{mcs_fups[.x]}y/mcs{.x}_cm_derived.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="fu">matches</span>(<span class="st">"^([A-G]CNUM00|GCBMIN7|FCBMIN6)$"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">CNUM =</span> <span class="fu">matches</span>(<span class="st">"^[A-G]CNUM00$"</span>)),</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">"wave"</span></span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(MCSID, CNUM) <span class="sc">%&gt;%</span></span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">==</span> <span class="dv">7</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bmi =</span> <span class="fu">case_when</span>(</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>    FCBMIN6 <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">~</span> FCBMIN6,</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>    GCBMIN7 <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">~</span> GCBMIN7</span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(bmi) <span class="sc">%&gt;%</span></span>
+<span id="cb56-16"><a href="#cb56-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(wave) <span class="sc">%&gt;%</span></span>
+<span id="cb56-17"><a href="#cb56-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_bmi =</span> <span class="fu">mean</span>(bmi)) <span class="sc">%&gt;%</span></span>
+<span id="cb56-18"><a href="#cb56-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff_mean_bmi =</span> mean_bmi <span class="sc">-</span> <span class="fu">lag</span>(mean_bmi))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  wave  mean_bmi diff_mean_bmi
+  &lt;chr&gt;    &lt;dbl&gt;         &lt;dbl&gt;
+1 6         21.3         NA   
+2 7         23.2          1.86</code></pre>
+</div>
+</div>
+</section>
+<section id="further-reading" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="further-reading"><span class="header-section-number">3.4</span> Further Reading</h2>
+<ul>
+<li><a href="https://r4ds.had.co.nz/">R for Data Science</a> by Hadley Wickham, an accessible overview of the <code>tidyverse</code> ecosystem for data scientific tasks.</li>
+<li>The <a href="https://www.tidyverse.org/">tidyverse website</a>, which contains links to documentation, and vignettes for all <code>tidyverse</code> packages, as well as a blog.</li>
+<li><a href="https://posit.co/resources/cheatsheets/">Posit cheatsheets</a> - concise reference guides for <code>tidyverse</code> packages and functions.</li>
+<li>The <a href="https://dslc.io/">Data Science Online Learning Community (formerly R4DS)</a>, who run book clubs and have a Slack channel where you can ask for advice. They also run a weekly <a href="https://github.com/rfordatascience/tidytuesday/blob/main/README.md"><strong><em>TidyTuesday</em></strong></a> event where they post a dataset which people then work on. Some of the solutions people post are very impressive. YouTube contains several screencasts showing how participants worked with the data.</li>
+</ul>
+
+
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>As of version 4.1.0, a native pipe (<code>|&gt;</code>) has been available with Base <code>R</code>. This works similarly to the <code>magrittr</code> pipe, albeit with <a href="https://tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/">some differences</a>, so we use the <code>%&gt;%</code> pipe here. Note, <code>magrittr</code> also has a number of <a href="https://magrittr.tidyverse.org/reference/index.html">other pipes</a> that can be quite useful.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>It is possible to return more than one row of data, but this is not normal usage and will throw a warning, recommending using <code>dplyr::reframe()</code> instead.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>An issue with using <code>ifelse()</code> or <code>case_when()</code> to recode negative values as <code>NA</code> is that they do not consistently retain the variable metadata, which can create issues with (e.g.) labelled variables (such as BMI category). In <a href="05_data_preparation.html" class="quarto-xref">Chapter&nbsp;<span>5</span></a>, we will see how to use the <code>labelled</code> package to clean such data appropriately.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./02_background_r.html" class="pagination-link" aria-label="Background on `R`">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Background on <code>R</code></span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./04_finding_data.html" class="pagination-link" aria-label="Data Discovery">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Discovery</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

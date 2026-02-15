@@ -1,0 +1,92 @@
+# Unit Testing {#sec-unit_tests}
+
+
+## Data Checks
+
+```{r}
+library(tidyverse)
+library(haven)
+library(glue)
+library(labelled)
+library(magrittr)
+library(skimr)
+library(naniar)
+library(testthat)
+```
+
+XX-NECESSARY - FORMAL/INFORMAL
+
+### Descriptive Checks with `skimr::skim()`
+The code in [Chapter @sec-interlude] included only light cleaning, so it behooves us check if this was sufficient. We can do this by calculating descriptive statistics and checking again what we might expect, or by writing *unit tests* - code snippets to ensure our data has certain properties.
+
+Let's start by using the `skimr::skim()` function which was mentioned, though not used, in Chapter XX on finding data. `skim()` calculates descriptive statistics variable in a tibble and even prints histograms of numeric variables to the console. Though not a `tidyverse` package, it is well integrated into the `tidyverse` ecosystem - for instance, it can work with grouped `tibbles` and `dplyr` functions can be used on the output (for instance, to filter outputs which meet certain properties; `filter(numeric.sd > 1)`). 
+
+The MCS and NCDS datasets should contain a mix of time-varying (height, weight and BMI) and time-invariant (sex, ethnic group, parental characteristics) variables (at least as constructed). To check this is the case, we will pass each dataset to the to `skim()` grouping by `fup`. We do not print the output below, given it is long, so please run this code yourself.
+
+```{r}
+df_mcs %>%
+  group_by(fup) %>%
+  skim()
+
+df_ncds %>%
+  group_by(fup) %>%
+  skim()
+```
+
+Notice that for the parental characteristics variables (`(mo|fa)ther_(bmi|edu)`), aggregate descriptive statistics are the same each sweep, which for the time-varying characteristics these differ, as expected. We can also check the time-invariant characteristics do not vary within a person using `dplyr` functions.
+
+```{r}
+df_mcs %>%
+  group_by(iid, fup) %>%
+  summarise(across(matches("sex|mother|father|ethnic_group|verbal|vocab"),
+                   ~ n_distinct(.x)),
+            .groups = "drop") %>%
+  summarise(across(matches("sex|mother|father|ethnic_group|verbal|vocab"),
+                   ~ max(.x))) %>%
+  pivot_longer(everything(),
+               names_to = "variable",
+               values_to = "max_distinct")
+```
+
+`df_mcs %>% mutate(fup = factor(fup) %>% fct_reorder(fup)) %>% gg_miss_fct(fup)` BUT THEN NEED TO WORK OUT IF PRESENT - ADD RESPONSE COLUMN.
+`gg_miss_upset(df_mcs)`
+
+Notice in this `skim()` output, we can see some very implausible numbers, both relatively and in qualitative terms - i.e., both outliers, given a distribution and conceptually implausible values. Let's overwrite this by removing outliers and biological implausible values.
+
+```{r}
+remove_outliers <- function(x){
+  mean_x <- mean(x, na.rm = TRUE)
+  sd_x <- sd(x, na.rm = TRUE)
+  
+  ifelse(between(x, mean_x - 3 * sd_x, mean_x + 3 * sd_x),
+         x, NA)
+}
+
+df_ncds <- ncds_interim %>%
+  group_by(fup) %>%
+  mutate(
+    across(c(height, weight, bmi), remove_outliers),
+    height = ifelse(!between(height, 1.4, 2.3) & fup >= 20, NA, height),
+    bmi = case_when(is.na(height) | is.na(weight) ~ NA,
+                    between(bmi, 13, 50) ~ bmi,
+                    TRUE ~ NA)
+  ) %>%
+  ungroup()
+
+saveRDS(df_ncds, "data/ncds_clean.Rds")
+```
+
+### Formal Tests with `testthat`
+
+We can perform more formal unit tests with the `testthat` package. This package contains a series of function for testing that data are as aniticpated given rules set out by a user, throwing an error if not met - this means that code will not proceed if the test is failed, providing some insurance.
+Here are some key functions in the context of LDA:
+  
+  -   XX
+
+```{r}
+EXAMPLES
+```
+
+### Task I
+
+1. Carry out same but for MCS

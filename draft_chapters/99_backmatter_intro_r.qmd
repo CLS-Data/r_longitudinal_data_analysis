@@ -1,0 +1,839 @@
+# Appendix: An Introduction to R {.unnumbered}
+
+In this Appendix, I am going to provide a brief introduction to the `R` programming language. By the end, you should have a basic understanding of `R`. I also provide links to further resources, which will allow you to dive into `R` in greater depth. `R` has a steeper learning curve than some other languages, such as `Stata`, but it is much, much more powerful (see Figure 1). Do not get discouraged if you find it difficult - everyone does to being with. The effort pays off handsomely in the end.
+
+![Source: Darren Dahly](images/stats_meme.jpg)
+
+# Getting Started
+
+To use `R`, we will be using two pieces of software: `R` and `RStudio`. `R` is the programming language for performing statistical tasks - it is the software that does the computation. `RStudio` is an integrated development environment (IDE) for `R` - it makes using `R` much easier. Your UCL Desktop should have `R` and `RStudio` installed, but if you want to use your own computer, install `R` from [***here***](https://cloud.r-project.org/) and `RStudio` from [***here***](https://rstudio.com/products/rstudio/download/). Both are free and open-source. I’ll discuss what open-source means later.
+
+Once you have both `R` and `RStudio` installed, open `RStudio` by searching for it in the start menu. `RStudio` will automatically connect with an instance of `R` in the background. When you first open RStudio, you should see three panes (see Figure 2): the console pane, the file pane, and the environment pane. Each of these panes contains several tabs - for instance, the environment pane has tabs for environment, history, connections, and tutorial.
+
+![Screenshot of RStudio](images/rstudio_screenshot_01.png)
+
+The `Console` tab (left-side of the window) is where we will input commands. The output of these commands will also be printed to the console. When you open RStudio, the console should already display some information about the version of `R` installed. You can see in Figure 2 that I have version 4.3.1 installed. You may have an earlier version or a later version, but everything should still work fine.
+
+The `Files` tab (lower right) displays information about the folders and files on your computer. The other tabs on this pane are used for: viewing help files (`Help`); displaying plots (`Plots`); rendering documents (`Viewer`); and viewing installed packages (`Packages` - more on this later).
+
+The `Environment` tab (upper right) displays information on data we currently have in memory. We haven’t loaded any data into `R` or produced any other data yet so the tab is currently empty. This will change later on. The `History` tab records the list of commands inputted into the console. We'll ignore the `Connections` tab now as it is rarely used.
+
+There is a fourth pane - the `Script` pane - which currently isn’t open. Scripts are used in `R` to save code so that analyses can be reproduced later. Let’s open a new script now. Click `File -> New File -> R Script` or, alternatively, press `Ctrl+Shift+N`. Once you do this a blank file should appear in the top left of the window. If you want to, you can resize the panes by dragging their borders and you can change the position of panes by clicking `Tools -> Global Options... -> Pane Layout`; I find it easier for the `Script` and `Console` panes to be set side-by-side.
+
+Make sure to save your script frequently so you keep a record of your code. You can save the script by clicking the floppy disk button at the top of the script. Give the file a comprehensible name, such as "`Introduction to R.R`".
+
+Note, the script pane can display other types of file like datasets and [***R Markdown*** (`.Rmd`)](https://rmarkdown.rstudio.com/lesson-1.html) or [***Quarto*** (`.qmd`)](https://quarto.org/docs/get-started/hello/rstudio.html) scripts - the latter two allow you to combine text, code, and output in a single document, which you may find helpful when taking this course. The present document is based off a `.Rmd` file.
+
+# Basics of the `R` language
+
+Let’s start writing some commands into the `R` console. Below is code that I would like you to type into the console. The code is shown in grey boxes in `monospace` font.
+
+First, we’ll start with some basic arithmetic. Next to the "`>`" symbol in the console, type the following commands line by line. Hit `enter` at the end of each line to run the command.
+
+```{r}
+#| results: 'hide'
+3 + 5
+7 - 6
+3*7 # Multiplication
+5/4 # Divide
+2^3 # Exponentiate
+(3+4)/2 # To change precedence to addition over division
+```
+
+I've added comments to the ends of some lines using the `#` character. These comments are not necessary for the code to run: `R` knows the `#` character starts a comment so will ignore whatever comes after it on a given line. Comments are useful for reminding yourself why you did what you did and what you were trying to do. They also help when sharing your work with others. I recommend getting into the habit of adding comments to your code. It will make your life much easier later on.
+
+By now, you should have entered a few commands into the `R` console. I want you to play around a bit by changing some of the commands above. Try combining multiple mathematical operations. Can you explain why the three commands below produce different results?
+
+```{r}
+3 + 5/2 * 8
+3 + 5 /(2 * 8)
+(3 + 5)/2 * 8
+```
+
+Why do the next two lines produce the same result?
+
+```{r}
+(3 + 5)/2 * 8
+(3 + 5) * 8/2
+```
+
+The answer is that some mathemetical operations have precedence over others. Operations in parentheses are carried out first. Multiplication and division have precedence over addition and subtraction, but have the same precedence as each other. In the event of a tie, operations are carried out from left to right.
+
+We should now move on to writing our code into the script. You can type commands directly into the script as above, but to run the code, you need to send the commands to the console. You can do this by clicking on the line you want to run and pressing `Ctrl+Enter` (`Cmd+Enter` on Mac). Watch what happens in the console window when you do this. If you want to send many lines at once, you can highlight multiple lines and then press `Ctrl+Enter`. You should use scripts wherever possible so analyses are self-contained and you can refer back and reproduce what you did.
+
+# Assignment
+
+We’ll often want to store the result produced by a command. We can do this using the assignment operator, "`<-`". Below, we'll create an `R` “object” called `x` which is equal to the value of 2 multiplied by 3 (i.e. 6). Look what happens in the environment pane when you enter the command.
+
+```{r}
+x <- 2*3
+```
+
+You should now see an object `x` with value 6. `R` has computed 2 multiplied 3, returned 6, then saved that value to an object called `x`. We can use `x` in other commands, including computations involving other objects. Run the commands below.
+
+```{r}
+#| results: 'hide'
+
+x^3
+y <- 2 + x
+z <- x/y
+z
+```
+
+Can you explain what is going on? Can you guess what the next line will do?
+
+```{r}
+y <- x*y
+```
+
+Notice that we were able to use the current value of `y` to update its value. Notice, also, that the value of `z` did not change when we changed the value of `y`. `z` is not linked to the current value of `x` and `y`. Rather, it is just equal to what the value of `x` divided by `y` was when `z` was created.
+
+The "`=`" symbol can also be used for assignment, but it is also used to specify name/argument pairs in functions (see next section). For this reason, it is better to use the "`<-`" operator for assignment.
+
+The nice thing about `R` is that if you aren’t sure how something is working, you can experiment to check your understanding. So if you aren’t clear about the above, try inputting some other commands and see whether the results align with your expectations.
+
+# Functions
+
+We’ve only done some very basic operations so far. More complex operations are carried out using *functions*. Below are some very common functions you will come across a lot. Run these and check the output.
+
+```{r}
+#| results: 'hide'
+
+c(1, 2, 3) # Creates a vector of values
+mean(x = c(x, y, z)) # Computes mean of a vector
+str(x) # Displays the structure of an object
+paste("The current value of x is", x) # Pastes objects together into a single string
+rm(y) # Deletes an object from memory
+```
+
+Note, a vector is just a set of values. Vectors are central to the `R` language. I will discuss them again further below.
+
+The basic syntax of `R` functions is `function_name(argument_name_1 = input_1, ..., argument_name_n = input_n)`. It is not necessary to type argument names when using a function. For instance, we used the argument name `x` when running the `mean()` function, but we did not use argument names when using `str()` or `rm()`.
+
+In fact, some functions, such as `c()` and `paste()` above, do not have names for all arguments because they take an indeterminate number of inputs (i.e. you can use `c()` to create vectors of any length). If you don't supply argument names, `R` will interpret arguments *positionally* - that is, the first input will be paired with the first function argument, and so on. To see the arguments of a specific function, view its help file. You can do this by either searching for the function in the `Help` tab (bottom right of the window) or typing `?` followed by the function name into the console (e.g. `?str`).
+
+If you do use argument names when using a function, you can change the order you put inputs into the function. Note, functions can also be nested inside other functions. For example, when running `mean(x = c(x, y, z))` above, we passed a vector created by the `c` function to the `mean` function. We are also able to pass objects we have stored in memory into functions (which we do in lines 3-5 above).
+
+A common problem when inputting functions is to not have included a matching closing parenthesis, "`)`", for an opening parenthesis, "`(`". When this occurs, `R` will expect more code to be inputted before it runs the command. This feature allows you to write commands that run over multiple lines, to aid readability. You will be able to see if this has happened if there is a "`+`" sign at the bottom of the console (see Figure 3). Press `escape` on your keyboard to break out of this, if this happens.
+
+![Non-matching closing brace](images/escape.png)
+
+# Packages
+
+`R` comes packaged with only a limited set of functions. This set of functions is referred to as *Base R*. These functions do not cover many of the tasks we would like to do using `R`, so to increase functionality, we need to write our own bespoke functions or install ***packages***. Packages are collections of functions and other objects, such as data, typically designed around a small set of tasks, some rather niche. For instance, the `twilio` package allows you to send text messages directly from `R`.
+
+Packages are produced by the community of `R` users and are freely available to install. As mentioned, `R` is open source. This means that `R` is free in two senses: *free* as in free beer, and *free* as in free speech ([to use Richard Stallman's ***formulation***](https://www.gnu.org/philosophy/free-sw.en.html)). Anyone can contribute to improving `R` and anyone can take the underlying code and amend it at will to suit their purposes.
+
+Further, anyone with access to a computer and some data can do their own research or replicate existing scientific work, regardless of income or affiliation to a paying institution. This makes `R` far more egalitarian and democratic than other propriety software, such as `Stata`, the versions of which can run in hundreds or thousands of pounds *per year*!
+
+Open-source has two other advantages. First, as it is built on the voluntary contributions of many people, there is a very enthusiastic community you can go to for help. (I provide some links to free resources at the end of this document.) Second, development is not dependent on a single slow-moving organisation. This means you can find `R` packages for a huge array of tasks. For instance, you can use the [***`flametree` package***](https://flametree.djnavarro.net/) to make art in `R` (Figure 4).
+
+![Generative art made using `flametree` package in R](images/flametree.png)
+
+This is what makes `R` wonderful, but it also has drawbacks. As individuals come up with their own solutions independently, many packages do not work together particularly well. Working out how to get the result of one function into another can be time consuming and contributes to the steeper learning curve that `R` has compared with some other languages. Thankfully, there are many forums online (notably `StackOverflow`) where you can look for help on your problems. The latest LLMs are also very adept with `R`.[^99_backmatter_intro_r-1]
+
+[^99_backmatter_intro_r-1]: But two words of caution - LLMs may produce code that runs but does not do what you'd hoped. Using LLMs as a novice makes these mistakes more difficult to spot. Further, used blithely, they will hamper your ability to learn. Your aim should be to learn to use `R` independently. There are benefits to acquiring an algorithmic mindset, including having a sense of what should be possible to achieve with a computer.
+
+Back to packages. To use a package, we need to install it and then load it into `R`. We only need to install a package once, but we need to load the package each session to use it. Let's install the `tidyverse` package and load it. We'll be using this package (or rather, package of packages) a lot throughout the course. Below I introduce the `tidyverse` in further detail. It may take a while to install as it is quite a big package.
+
+```{r}
+#| eval: FALSE
+
+install.packages("tidyverse")
+library(tidyverse)
+```
+
+```{r}
+#| include: FALSE
+#| message: FALSE
+#| warning: FALSE
+
+library(tidyverse)
+```
+
+Another drawback of `R` being open source is that packages may have functions taking the same name. If two loaded packages has homonymous functions, the function in the package loaded most recently takes precedence - it "masks" the other one. `select()`, which is in the `MASS` and `dplyr` packages, is a common culprit here. Packages throw a warning when a function is masked. Masking can be avoided by using the `package_name::function_name()` syntax (e.g., `dplyr::select()`). Otherwise, you need to pay attention to the order in which packages are loaded.[^99_backmatter_intro_r-2] The former is fail-safe but entails more verbose code.
+
+[^99_backmatter_intro_r-2]: `R` also has a triple colon `package_name::function_name()` syntax. This allows users to access 'hidden' package objects whose names are not loaded into the `namespace` when `library(package_name)` is called.
+
+# Data Structures and Data Types
+
+Before discussing the `tidyverse`, I want to introduce three more components of the `R` language: data structures and data types, vectorisation, and subsetting.
+
+## Vectors
+
+The simplest structure for storing data in `R` is the `vector`. We created a numeric vector above using the command `c(1, 2, 3)`. Vectors can only store one type of data at once. There are several data types in R: numeric, integer, character, logical and complex.
+
+-   `double`: Numbers with ability to store decimal places (e.g. `c(2.49, 1, 3/2)`)
+-   `integer`: A round number. Denoted using `L` operator (e.g. `c(1L, 54L, 800L)`).
+-   `characte`\*: Strings, such as "Hello" and "My name is Liam".
+    -   Strings are surrounded by single (`'`) or double (`"`) quote marks (e.g. `c("Bye", 'Hi')`)
+-   `logical`: *Boolean* values `TRUE` or `FALSE`
+-   `complex`: Have limited use, and we will not come across them in this course.
+
+To view the type of a vector, use the `typeof()` function.
+
+```{r}
+typeof(c(1, 2, 3))
+typeof(c(1L, 2L, 3L))
+typeof(c("Hello", 'My name is Liam'))
+```
+
+Another data type we will come across is the `factor`. Factors are used to store categorical data (gender, ethnicity, etc.). They only allow a defined set of categories. These categories are set in the `levels` argument of the `factor()` function. Below, we create a new factor, `age_factor`, using a character vector which contains a value that is not included in the `levels` argument. Look what happens when we display the contents of the factor.
+
+```{r}
+age_vec <- c("18-30", "30-60", "60+", "My name is Liam")
+age_factor <- factor(x = age_vec, levels = c("18-30", "30-60", "60+"))
+age_factor
+```
+
+The last value is `NA`. `NA` is `R`'s missing value. Because `"My name is Liam"` was not in the allowed levels, it was changed to missing when we created the factor.
+
+If you use the `typeof()` function on a factor, you will see that it returns "`integer`". Underlying a factor is really just an integer vector. However, factors have two `attributes` (bits of metadata) that allow them to be interpreted as factors: the `class` atrribute and the `levels` attribute. You can see the attributes of an object using the `attributes()` function. To see the `class` and `levels` attributes directly, you can also use the `class()` and `levels()` functions.
+
+```{r}
+typeof(age_factor)
+attributes(age_factor)
+class(age_factor)
+levels(age_factor)
+```
+
+Compare the output of the next two lines of code. Even though underlying the factor is the same integer values (you can verify this by using the `str()` function or looking at `Environment` tab), the `summary()` function produces different results.
+
+```{r}
+summary(age_factor)
+summary(c(1L, 2L, 3L, NA)) # An integer vector
+```
+
+`summary()` is able to produce different results because `summary()` is a ***generic function***. Generic functions dispatch inputs to specific *methods* depending on the type and attributes of the input. You can confirm this by running `summary` without parentheses in the console - calling a function in this way prints the function code.
+
+```{r}
+summary
+```
+
+So: `summary()` simply calls the `UseMethod()` function for `"summary"`. Behind the scenes `R` finds and executes the relevant function (method) for the input. Methods are usually hidden objects. For instance, calling `summary()` with a `factor` calls `base:::summary.factor()` behind the scenes (`base` is one of the *Base R* packages).
+
+If you want to create a factor that has levels with a natural ordering (e.g., age group), you can create an "ordered" factor to preserve this ordering.
+
+```{r}
+age_factor_ord <- ordered(x = age_vec, levels = c("18-30", "30-60", "60+"))
+# factor(x = age_vec, levels = c("18-30", "30-60", "60+"), ordered = TRUE) also works
+str(age_factor_ord)
+```
+
+Ordered factors make a number of calculations easier to carry out - for instance, basic arithmetic.
+
+```{r}
+age_factor_ord > "30-60"
+```
+
+## Lists
+
+Vectors can only hold one type of data at once: for example, a vector cannot hold both character strings and doubles If you try to use two types of data in a single vector, one type will be *coerced* into another. See what happens when you run the following commands.
+
+```{r}
+#| eval: FALSE
+c(1, FALSE, TRUE)
+c(2949, "Hello")
+```
+
+To store different types of data in a single object, use **lists**. Lists are objects that are made up of other objects, such as vectors or other lists. To create a list, use the `list()` function.
+
+```{r}
+x <- list(c(1, 2, 3), "Hello", c(TRUE, FALSE))
+x
+```
+
+`x` is a list with three elements (or sub-objects): the numeric vector, `c(1,2,3)`, a character vector of length 1, `"Hello"`, and a logical vector, `c(TRUE, FALSE)`. We can name the elements of a list using the function arguments:
+
+```{r}
+x <- list(num = c(1, 2, 3), greeting = "Hello", bool = c(TRUE, FALSE))
+x
+```
+
+Now the three elements of `x` are named `num`, `greeting` and `bool`. You can use the `names()` function to view the names of the elements in a list. This function can also be used to set the names of an existing object.
+
+```{r}
+names(x)
+names(x) <- c("numbers", "welcome", "booleans")
+x
+```
+
+Vectors can also be given names in a similar fashion.
+
+```{r}
+ages <- c(Peter = 28, Mary = 22, John = 29)
+ages
+names(ages) <- c("David", "Fiona", "Philip") # Setting new names
+ages
+```
+
+A special type of list is the `data.frame`. A `data.frame` is a list made up of objects (vectors and/or lists), which all have the same length. A `data.frame` is like a rectangular spreadsheet: every object within the `data.frame` is a column and every element within an object is a cell. The same position across objects makes up a row.
+
+`data.frames` are like `factors` in that they are built upon another data type and contain metadata (`attributes`) to distinguish them for use in generic functions. `data.frames` have the `class` attribute `"data.frame"`.
+
+The main datasets we will use in this module will be stored as `data.frames`.[^99_backmatter_intro_r-3] For now, let's look at the `iris data.frame` that comes bundled with `R`. `iris` is a dataset of measurements from 150 flowers. Run the following lines to look at `iris` object.
+
+[^99_backmatter_intro_r-3]: Or rather, as `tibbles`, a `tidyverse` version of a `data.frame`, which have a few better properties. See below.
+
+```{r}
+str(iris)
+View(iris)
+```
+
+We can see that `iris` contains 5 variables (columns) and 150 observations (rows). Four variables are numeric. One - `Species` - is a factor. We'll return to the `iris` object later.
+
+## Matrices and Arrays
+
+Two other important data structures are matrices and arrays. Matrices and arrays are to vectors what `data.frames` are to lists. They build upon vectors, but have a `dim` attribute which defines the dimensions of the object. Matrices are two-dimensional (rows and columns), while arrays can have a higher number of dimensions. Like vectors, matrices and arrays can contain only one data type.
+
+To create a matrix, use the `matrix()` function. The dimensions are set in the `nrow` or `ncol` arguments.
+
+```{r}
+x <- matrix(1:8, nrow = 2) # ncol not required if nrow is used, and vice versa
+x
+```
+
+The names of a matrix can be viewed or overwritten using the `dimnames()` function. The `dimnames` are a list with vectors for the names of each dimension.
+
+```{r}
+dimnames(x) <- list(c("row_1", "row_2"), c("a", "b", "c", "d"))
+x
+```
+
+# Vectorisation
+
+Vectors are central to the `R` language because `R` is a ***vectorised language*****.** Many `R` functions expect vectors as inputs and return vectors as outputs. For instance, when multiplying two vectors, `R` multiplies elements at the same position, returning another vector as the output.
+
+```{r}
+x <- c(3, 6, 9, 12)
+y <- c(2, 7, 28, 29)
+x*y
+```
+
+In this instance, the two vectors `x` and `y` were the same length. Where vectors are different lengths, most `R` functions will ***recycle*** the shorter vector to the same length of the longer vector. For instance:
+
+```{r}
+x <- c(1, 3)
+y <- c(1, 2, 3, 4)
+x*y
+
+z <- c(5, 6, 7)
+x*z
+```
+
+Notice the warning message when multiplying `x` by `z`. `R` is telling us that the shorter vector (in this case `x`) cannot be fully recycled to the length of the longer vector (in this case `z`) - i.e. 3 is not a multiple of 2. The command still ran, but the message is there to warn of potential mistakes.
+
+# Subsetting
+
+We often want to use only a small part of an object - for instance a single element of a vector or a set of rows and columns from a data frame. To do this, we use ***subsetting***. There are several ways to subset objects, which I outline below.
+
+## Subsetting vectors by position indices
+
+You subset vectors by passing information into square brackets, `[]`, which are typed after the vector's name. There are multiple types of information you can pass, each giving different results. We'll start by subsetting by position.
+
+We can pass a single index or multiple indices to return the elements in those positions. The leftmost position is position 1.
+
+```{r}
+weights <- c(Peter = 78, Mary = 64, John = 92)
+weights
+weights[2] # Subset by position - returns 2
+weights[c(3, 3, 1)] # Subset by position - returns 3, 3, 1
+```
+
+If the position does not exist, `R` will return `NA`.
+
+```{r}
+weights[4]
+```
+
+Passing a negative number will return the vector minus those positions.
+
+```{r}
+weights[-1]
+weights[-c(2, 3)]
+```
+
+A helpful function for subsetting is the `x:y` function. This function creates a vector of integers from `x` to `y`. For instance:
+
+```{r}
+400:404
+weights[1:2]
+weights[3:1]
+```
+
+## Subsetting vectors by name
+
+Vectors can also be subset by name. Using a name that doesn't exist will return `NA`.
+
+```{r}
+weights["Mary"]
+weights[c("John", "Mary")]
+weights["Gary"]
+```
+
+Subsetting can be be used directly on the result of a function. When used with a numeric vector, `summary()` returns a named vector containing descriptive statistics.
+
+```{r}
+summary(weights)
+```
+
+So if we just wanted to see just the median, we could use subsetting as so:
+
+```{r}
+summary(weights)["Median"]
+```
+
+Other forms of subsetting would also work!
+
+## Subsetting vectors using logical vectors
+
+Finally, vectors can be subset using logical vectors (i.e. vectors of `TRUE` and `FALSE`). `R` returns the positions where the logical vector is `TRUE`. Unlike with subsetting by position or name, logical vectors are recycled.
+
+```{r}
+weights[c(FALSE, TRUE, TRUE)]
+```
+
+Here, we get the results for Mary and John but not Peter because `FALSE` was given for the first position.
+
+To use logical vectors, we need a simple way of constructing them. We can do this using **Boolean expressions**. The main Boolean expressions are:
+
+```{r}
+#| eval: FALSE
+
+weights == 64 # Equals to
+weights != 64 # Not equals to
+weights %in% c(78, 64) # Present in vector
+weights < 78 # Less than
+weights <= 78 # Less than or equal to
+weights > 92 # Greater than
+weights >= 92 # Greater than or equal to
+```
+
+Run the commands and check your understanding. Most Boolean expressions will return `NA` for any input that is missing (`%in%` is an exception here).
+
+```{r}
+c(1, 65, NA) == 65
+c(1, 65, NA) %in% 65
+```
+
+The `!` (NOT) operator can be used around expressions to ***negate*** them (`TRUE` becomes `FALSE`, `FALSE` becomes `TRUE`). Compare:
+
+```{r}
+weights > 78
+!(weights > 78)
+```
+
+We add these Boolean expression into the `[]` brackets to subset vectors.
+
+```{r}
+weights[weights <= 78]
+```
+
+Note, the Boolean expression does not have to be about the vector itself.
+
+```{r}
+weights[1:3 > 2]
+```
+
+Boolean expressions can also be chained together using the `&` (`AND`) and `|` (`OR`) operators. For instance:
+
+```{r}
+weights[weights < 70 | weights > 80] # Less than 70 or greater than 80
+weights[weights < 70 & weights > 80]
+```
+
+The second statement above returns a vector of length 0 because none of the Boolean expression elements were `TRUE` (it is impossible to be younger than 70 **and** older than 80).
+
+You may need brackets to ensure the full Boolean statement works as expected. Notice the difference between the two results below.
+
+```{r}
+weights[weights > 80 | weights == 64 & weights < 70 ]
+weights[(weights > 80 | weights == 64) & weights < 70 ]
+```
+
+Can you explain why this occurred? Hint, it is to do with the precedence of the Boolean operators.
+
+## Subsetting Lists
+
+You can also use the square bracket syntax (`[]`) to subset lists. When you use the square brackets to subset lists, `R` returns another list containing just those elements.
+
+```{r}
+info <- list(ages = c(15, 29, 38), status = c("Employed", "Student", "Unemployed"))
+info["ages"]
+info[2]
+info[c(TRUE, FALSE)]
+```
+
+To extract a sub-object from a list, use the `[[]]` or `$` operators. These only return one sub-object at once. The double square brackets, `[[]]`, can be used with position indices or names. The dollar-sign operator, `$`, can only be used with names, though even partial names, so long as they are unique.
+
+```{r}
+info[[2]]
+info[["ages"]]
+info$status
+info$stat # Partial name, though inadvisable approach
+```
+
+Figure 5 makes clearer the distinction between the single square brackets and the double square brackets. Imagining a list as a train with sub-objects as carriages, subsetting with the single square brackets returns another train with the specified carriages attached. The double square brackets and dollar sign operators return just the contents of the specified carriage (i.e. the sub-object itself). The image and analogy are taken from Hadley Wickham's [***Advanced R book***](https://adv-r.hadley.nz/subsetting.html).
+
+![Comparing subset operators](images/subset_train.png)
+
+Subset operations can be chained together. For instance, to extract the third item from the second element of the list `info`, we can use:
+
+```{r}
+info[[2]][3]
+```
+
+Question: why does the following not work?
+
+```{r}
+info[2][3]
+```
+
+Answer: `info[2]` creates a new list of length 1 containing just the second element of `info`. There is no third element in this new list, so `info[2][3]` returns `NULL`.
+
+Additional elements can be added (or overwritten) to lists and vectors using subsetting notation. For instance:
+
+```{r}
+info$salutation <- "Goodbye"
+info
+```
+
+## Subsetting `data.frames`
+
+`data.frames` have an additional way they can be subsetted: `[rows, columns]` syntax. Positional indices, names, and Boolean statements can all be used with this syntax. The following statements all return smaller data frames.
+
+```{r}
+#| eval: FALSE
+
+iris[3:4, 2:1] # Returns rows 3 and 4 of columns 2 and 1.
+iris[c(1, 3), c("Species", "Sepal.Width")]
+iris[iris$Sepal.Width==3.5, c(1, 5)] # Returns rows of columns 1 and 5 where Sepal.Width equal 3.5
+```
+
+If you use `[rows, columns]` syntax and subset a single column, the column itself will be extracted, rather than a smaller `data.frame` returned. This can cause issues, if you aren't careful.
+
+```{r}
+iris[3:4, "Species"]
+```
+
+If you do not specify any rows or columns, all the rows or columns will be returned. For instance:
+
+```{r}
+#| eval: FALSE
+
+iris[, 1:2] # Returns all rows from columns 1 and 2
+iris[c(3, 4, 5), ] # Returns rows 3, 4, and 5 from all columns
+iris[ , ] # Returns the original data frame
+```
+
+The `[rows, columns]` notation is also used to subset matrices and two dimensional arrays. `[rows, columns, ..., dim_n]` is used for higher-dimensional arrays.
+
+# The Working Directory
+
+In this module, we will be working with data from [***Understanding Society (USoc)***](https://www.understandingsociety.ac.uk/), a large annual panel survey of households in the UK. The linked website has extensive documentation on the survey. We will also talk more about the survey throughout the course.
+
+The data are available to download on Moodle. They are also available from the [***UK Data Service***](https://beta.ukdataservice.ac.uk/datacatalogue/studies/study?id=6614).
+
+USoc is organised into many different datasets, predominantly arranged by survey wave. The main dataset for the individual youth questionnaire is name `x_youth.dta`, where `x` is a letter indicated the survey wave (`a` for Wave 1, `b` for Wave 2, etc.).
+
+The data on Moodle are in `Stata` (`.dta`) format. To load the Wave 1 `youth` file (`a_youth.dta`) into `R`, we first need to load the `haven` package. `haven` is one of the `tidyverse` packages and is installed with `install.packages("tidyverse")`. It is not a "core" `tidyverse` package though, so it needs loading explicitly rather than with `library(tidyverse)`.
+
+```{r}
+library(haven)
+```
+
+To load the dataset into `R`, we'll need to provide the `read_dta()` function with the file path of the file. We can input the full (absolute) file path or first set the folder containing the data as our working directory and give a relative file path instead. The working directory is the folder from which `R` will look to load and save files. When you pass `R` a file path, it will look for the file relative to the working directory. The idea is shown graphically in Figure 6 below.
+
+![Filepaths and folder structures](images/folder_structure.png)
+
+Looking at Figure 6, the relative file path of `pic.jpeg`, which is in a subfolder of a subfolder of the working directory, would be `"subfold_1/subfold_2/pic.jpeg"`. The relative path of `essay.docx` would instead by just `"essay.docx"` as it is in the working directory directly. The "`/`" character delineates folders. Note, `R` uses the "`/`" character in file paths, rather than the "`\`" character used by Windows ("`\`" is an escape character in `R`).
+
+Set the folder containing the UKHLS dataset as your working directory. You can use the `Files` tab (bottom right of screen) to navigate to the folder containing the dataset - if you click the three dots, `...`, at the right of that tab, it will open the file explorer so you can choose the correct folder (Figure 7). When you have selected the correct folder, it should appear in the `Files` tab. Next, click the `More` button and select `Set as Working Directory` (Figure 7). This sends the `setwd()` command to the console. Copy and paste this command into your script, so your script is self-contained and includes everything needed to complete this tutorial afresh. (To change working directory, you can use the `setwd()` function directly.)
+
+![Manually setting working directory](images/working_directory.png)
+
+Another way of setting the working directory in the correct place is to create an [***RStudio project***](https://support.posit.co/hc/en-us/articles/200526207-Using-RStudio-Projects). You can make a new project by clicking `File > New Project...`, selecting `Existing Directory` and then navigating to the folder containing the dataset. This will create an `.Rproj` file in the chosen folder. If you double click this file, it will open `RStudio` with the working directory already set. RStudio projects have other benefits (e.g., putting sensitive information in `.Renviron` files that load when the project is opened). I recommend using them.
+
+Now you have the correct working directory, we can load the dataset.
+
+```{r}
+usoc_w1 <- read_dta("a_youth.dta")
+```
+
+This loads to dataset into an object called `usoc_w1`. Use the `str()` function to briefly look at the object
+
+```{r}
+#| eval: FALSE
+
+str(usoc_w1)
+```
+
+I haven't included the output here as it is too big, but you should see that the `str()` function tells us that `usoc_w1` is a `tibble`. A `tibble` is a special type of `data.frame` that enforces particular rules. Importantly, when you subset a single column using the `[rows, columns]` syntax, another `tibble` is returned. `tibbles` also do not allow recycling of vectors, unless the shorter vector is of length 1.
+
+Call `class(usoc_w1)`. What is interesting about the output?
+
+```{r}
+class(usoc_w1)
+```
+
+You'll also see in the `str()` output that the columns each have an attribute, `label`. This attribute tell us what the column measures. Some also have a `labels` attribute, which gives the value labels (most are imported as numerics, `labels` reveals what the numbers correspond to). A useful function for exploring a labelled `data.frame` is the `lookfor()` function from the `labelled` package. `lookfor()` prints variables, their type, labels and values values. You can even make particular searches using [***regular expressions***](https://r4ds.hadley.nz/regexps.html). You should use this function throughout the course to find relevant variables for the tasks.
+
+```{r}
+#| eval: FALSE
+
+install.packages("labelled")
+library(labelled)
+lookfor(usoc_w1)
+lookfor(usoc_w1, "sdq")
+```
+
+Reading the output of the command, notice how many of the variables reserved negative values for different missing values (e.g., `[-8] inapplicable`). Cleaning this dataset will require converting these to `R`'s missing value `NA`.
+
+We'll continue exploring this dataset using some functions from the `tidyverse()`.
+
+# The `tidyverse`
+
+The [***`tidyverse`***](https://www.tidyverse.org/) is a package of packages which contains many popular functions for doing data analysis in `R`. It is developed by Hadley Wickham (a name you'll hear a lot) and colleagues at Posit, the developer of `RStudio`. Popular `tidyverse` packages include `dplyr`, `tidyr`, `purrr` and `ggplot2`: we'll be using quite a few on the course. You should have already loaded the `tidyverse` package. This in fact only loads a subset of "core" `tidyverse` packages; others, like `haven` and `glue` need loading explicitly.
+
+`tidyverse` packages are built around a [***common design philosophy***](https://design.tidyverse.org/unifying.html) and are more intuitive to use than many Base `R` functions. Elements of the `tidyverse` philosophy includes integration with the "pipe" (`%>%`) operator (see below) and storage of data in `tibbles` arranged into a *"tidy"* format (broadly: each variable is a column, each observation is a row; [***Wickham, 2014***](https://doi.org/10.18637/jss.v059.i10)). As the packages follow a common philosophy, `tidyverse` functions work seamlessly together. As the philosophy is public, other developers build packages that fit into the `tidyverse` ecosystem, too.
+
+The `tidyverse` isn't without its drawbacks - especially for big data, it can be slow (compared with e.g., `data.table`), and the developers have a habit of making a lot of changes - but `tidyverse` code is very easy to read and to write. It conveys the code's purpose very clearly.
+
+In this section, I'll introduce some of the main functions from the `tidyverse`. If you want to learn more, there are links to further resources in the final section.
+
+## The Pipe (`%>%`)
+
+The `tidyverse` functions I will introduce are `select()`, `rename()`, `filter()`, `mutate()`, `summarise()`, `group_by()`, and `arrange()`. These come from the `dplyr` package within the `tidyverse`. Before introducing these though, I need to introduce the "pipe" operator, `%>%`, which comes from the `magrittr` package in the `tidyverse`.\[\^4\]
+
+\[\^4\] `magrittr` isn't a core `tidyverse` package, but the `%>%` pipe is loaded by other core packages as it is such a central component of the `tidyverse`. `magrittr` also has a number of [***other pipes***](https://magrittr.tidyverse.org/reference/index.html) that can be quite useful.
+
+The pipe works as follows: it takes the object from its left hand side and puts it into the first argument of the function on its right hand side. This is best explained by example:
+
+```{r}
+c(1, 2, 3) %>% mean()
+```
+
+So, in this command, `R` first created the vector, `c(1, 2, 3)`, then put this into the `mean()` function.
+
+Pipes can be chained together. For instance:
+
+```{r}
+c(1, 2, 3) %>% mean() %>% paste("is the mean value")
+```
+
+You can read a series of pipe operations as "do this, then do this, then do this...". You can see this is easier to read than:
+
+``` r
+paste(mean(c(1,2,3)), "is the mean value")
+```
+
+`RStudio` has a number of clever features. One feature is that it expects code after a pipe. `RStudio` will run lines of code until it finds the end of a command. So, to aid readability, you can write the above function across multiple lines in your script and `RStudio` will know to send all the lines to the console when you hit `Ctrl+Enter` on one of the lines.
+
+```{r}
+c(1, 2, 3) %>% 
+  mean() %>%
+  paste("is the mean value")
+```
+
+Sometimes you might want the object on the left hand side of the pipe to go into an argument other than the first one for the function on the right hand side. In this case, use the "`.`" syntax to refer to the left-hand object. Below, the left-hand object is placed into the second argument of `paste()`.
+
+```{r}
+c(1, 2, 3) %>% 
+  mean() %>%
+  paste("The mean value is", .)
+```
+
+### The Native Pipe (`|>`)
+
+As of version 4.1.0, a native pipe (`|>`) has been made available with Base `R`. This works similarly to the `magrittr` pipe, albeit with some exceptions, including having no "`.`" placeholder operator.[^99_backmatter_intro_r-4] The *R for Data Science* book uses the `|>` pipe, but I've typed `%>%` enough times that I am stuck in the habit, so that is what you will see throughout my section of the course.
+
+[^99_backmatter_intro_r-4]: There are less elegant ways to achieve the same thing with `|>` pipe.
+
+## `select()` and `rename()`
+
+Now we can start learning a few more functions from the `tidyverse`. `select()` keeps certain columns from a `data.frame`. The code below keeps the columns `pidp` (a unique person identifier), `a_hidp` (a wave-specific household identifier), and `a_dvage` (the participants's age) from `usoc_w1`, discarding the rest. (Note, because we haven't assigned the result, we haven't overwritten the original dataset.)
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  select(pidp, a_hidp, a_dvage)
+```
+
+We can also use the minus symbol to state which columns we *don't* want to keep, rather than the ones we do.
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  select(-pidp, -a_hidp)
+```
+
+`select()` can also be used with the `everything()` "helper" function to rearrange the order of columns. Below we move `a_ypsex` (participant sex) to the first column position (`everything()` returns all columns in a `data.frame`). (To see other helper functions, see [***this website***](https://tidyselect.r-lib.org/reference/index.html).)
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  select(a_ypsex, everything())
+```
+
+Alternatively, we could have used the `relocate()` function which solely rearranges columns.
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  relocate(a_ypsex, .before = 1) # To put as first column
+```
+
+We can also use named arguments in the select function to rename columns as we select them.
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  select(household_id = a_hidp)
+```
+
+If you want to just rename a column without dropping other columns, use the `rename()` function.
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  rename(household_id = a_hidp)
+```
+
+## `filter()`
+
+What `select()` is to columns, `filter()` is to rows. Pass Boolean expressions to the `filter()` function to return the rows for which the statements are true.
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  filter(a_sex == 1) # Keep males [1] == male (use lookfor to confirm)
+```
+
+Multiple statements can be passed to the function by using multiple arguments. These are evaluated at the same time, rather than sequentially, so are equivalent to writing `statement_1 & statement_2 & ...`. Thus the following can give the same result:
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  filter(a_sex == 1,
+         a_ypsdqtd_dv > mean(a_ypsdqtd_dv, na.rm = TRUE))
+
+usoc_w1 %>%
+  filter(a_ypsdqtd_dv > mean(a_ypsdqtd_dv, na.rm = TRUE),
+         a_sex == 1)
+```
+
+Above, we are able to write the `filter()` function across several lines as `RStudio` looks for a matching brace.
+
+If you want to combine multiple statements with an `OR`, you'll need to combine them using the "`|`" operator. Below we get individuals who are either age 13 or male.
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  filter(a_sex == 1 | a_dvage == 13)
+```
+
+## `mutate()`
+
+The `mutate()` function is used to create new columns/variables in the `data.frame`. The new variable can be a function of other variables. Below we create two new columns for age-squared and BMI multipled by age-squared. Note, when creating the latter variable, we use the first variable created in the same function call. We are able to do this because, unlike `filter()`, `mutate()` works sequentially.
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  mutate(age_sq = a_dvage^2,
+         sex_x_age_sq = a_ypsex*a_dvage)
+```
+
+A helpful function to use within the `mutate()` function is `ifelse()`. The value `ifelse()` returns depends on whether a Boolean expression is `TRUE` or `FALSE` for a given observation. Below we create a new variable `high_social_media_use` which is equal to `"4+ hours"` if the individual's uses social media 4 or more hours per day in the whole `data.frame`, and `"< 4 hours"` otherwise.
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  mutate(high_social_media_use = ifelse(a_ypnetcht >= 4, 
+                                        "4+ hours",
+                                        "< 4 hours"))
+```
+
+What may be wrong about this variable, given what you know about negative values? You can confirm your suspicions by piping the above code into the `distinct()` or `count()` functions (i.e., `... %>% distinct(a_ypnetcht, high_social_media_use)`).
+
+## `summarise()`
+
+As the name suggests, `summarise()` is used to summarise data within a `data.frame`. It returns a single value and discards the other data in the `data.frame`. Below we use `summarise()` to find the mean Strengths and Difficulties (SDQ, a measure of mental health in young people) score in the dataset. (We use the argument `na.rm = TRUE` to ignore missing values.) Notice how we can use the pipe within the `summarise()` function call.
+
+```{r}
+usoc_w1 %>%
+  summarise(mean_sdq = ifelse(a_ypsdqtd_dv >= 0, a_ypsdqtd_dv, NA) %>%
+              mean(na.rm = TRUE))
+```
+
+Multiple variables can be produced in the same `summarise()` function call. Again, these are evaluated sequentially.
+
+```{r}
+usoc_w1 %>%
+  summarise(mean_sdq = ifelse(a_ypsdqtd_dv >= 0, a_ypsdqtd_dv, NA) %>%
+              mean(na.rm = TRUE),
+            first_age = first(a_dvage)) # First age in data frame
+```
+
+## `group_by()`
+
+`group_by()` is used to split a `data.frame` into groups, so that calculations are carried in each group separately. `group_by()` is easier to explain by example. Below I group `usoc_w1` by `a_ypsex` to get the median total SDQ score (`a_ypsdqtd_dv`) for each sex The results is a single `data.frame` with one row for each sex.
+
+```{r}
+usoc_w1 %>%
+  group_by(a_ypsex) %>%
+  summarise(mean_sdq = ifelse(a_ypsdqtd_dv >= 0, a_ypsdqtd_dv, NA) %>%
+              mean(na.rm = TRUE))
+```
+
+## `arrange()`
+
+The last function I'll show is `arrange()`, which is used to sort rows. Let's rearrange by sex (`a_ypsex`) and age (`a_dvage`).
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  arrange(a_ypsex, a_dvage)
+```
+
+By default, observations are sorted into ascending order. To use descending order instead, use the `desc()` wrapper function. The following sorts the `data.frame` in order of decreasing age.
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  arrange(desc(a_dvage))
+```
+
+We can use `arrange()` with the `slice()` function to extract specific rows. (`slice()` is like `filter()` but you give it positional indices rather than Boolean expressions.) Below we extract five rows with highest SDQ scores. Note there are ties, so this will not be all rows with the highest score.
+
+```{r}
+#| eval: FALSE
+
+usoc_w1 %>%
+  arrange(desc(a_ypsdqtd_dv)) %>%
+  slice(1:5)
+```
+
+This only touches upon what can be done with the `tidyverse`. We'll use the `tidyverse` more through the course. Links to further information on the `tidyverse` is also shown in the next section.
+
+# Further Resources
+
+There is a huge amount of free resources for learning `R`, including courses, books, blogs, and videos. YouTube is a great place to start, as is the `learnr` package, which teaches you directly within `RStudio` (Tutorial pane). [***Hands-On Programming with R***](https://rstudio-education.github.io/hopr/) by Garrett Grolemund is a nice introduction to `R` from a programming perspective. To learn more about the `tidyverse`, read Hadley Wickham and colleagues' book [***R for Data Science***](https://r4ds.had.co.nz/). The [***tidyverse***](https://www.tidyverse.org/packages/) website is also good and includes many "vignettes" to show you how to use specific functions. `RStudio` also produce quick-reference [***cheatsheets***](https://rstudio.com/resources/cheatsheets/) for many popular packages.
+
+There used to be an active Twitter community centered around the ***#rstats*** hashtag; this appears to have moved over to Mastadon, though doesn't seem as vibrant. The [***Data Science Online Learning Community*** (formerly R4DS)](https://dslc.io/) run book clubs and have a Slack channel where you can ask for advice. They also run a weekly [***TidyTuesday***](https://github.com/rfordatascience/tidytuesday/blob/main/README.md) event where they post a dataset which people then work on. Some of the results are extraordinary and, helpfully, people post their code. Even if you don't participate, it's a good opportunity to see what is possible with `R` and to learn from others.
+
+If you have a specific question, chances are it has already been answered on the forum [***StackOverflow***](https://stackoverflow.com/). StackOverflow is usually the first website to appear when you search for `R` help on Google (sometimes it's Reddit, but that typically means something has gone awry). You can also ask questions to LLMs, but I can't emphasise enough that (a) code can run without error while being wrong and (b) relying on LLMs will hamper your learning, not just about the specifics of the `R` language (i.e., what a particular function does) but also in acquiring an algorithmic mindset that can helps with learning statistical methods (e.g., cross-validation and hyperparameter optimisation - important data science skills).
+
+While there is lots of help online, the only way you'll cement your knowledge is to practice and to experiment to check your understanding. Don't be afraid to break things - all you need to remember is not to overwrite original data. Don't be discouraged ~~if~~ when you find it hard to begin with. This is everyone's experience. It will gradually start to make more sense over time.

@@ -6,7 +6,7 @@
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-In [Chapter @sec-intro_tidyverse], we saw the main functions of the `tidyverse`. In this chapter, we will explore advanced uses of these, as well as introduce functions for merging and reshaping `tibbles`, key steps in LDA. The aim is to make analysis-ready datasets in as efficient a manner as possible.
+In [Chapter @sec-intro_tidyverse], we saw the main functions of the `tidyverse`. In this chapter, we will explore advanced uses of these functions, as well as introduce further functions for merging and reshaping `tibbles`, key steps in LDA. The aim is to make analysis-ready datasets in as efficient a manner as possible.
 
 The packages we will use are:
 
@@ -57,13 +57,13 @@ mcs_17y %>%
   select(!matches("^GCWWO"))
 ```
 
-`tidyselect` helpers can be used in many functions in the `tidyverse` beyond `select()`. For instance, they can be used to specify columns in `drop_na()`, in the `col_select = ...` argument of `read_dta()`, the `.cols = ...` argument of `rename_with()`, and in `across()` (more on which below).
+`tidyselect` helpers can be used in many functions in the `tidyverse` beyond `select()`. For instance, they can be used to specify columns in `drop_na()`, in the `col_select = ...` argument of `read_dta()`, in the `.cols = ...` argument of `rename_with()`, and in `across()` (more on which below).
 
-`tidyselect` helpers are not just useful for selecting raw variables en masse, but can also be used with cleaned variables too. This is made easier if care is taken to name cleaned variables consistently. For instance, naming BMI variables in a 'wide' dataset in a consistent way (e.g., `bmi_03`, `bmi_05`, ..., `bmi_17`) allows one to use `matches("^bmi_\\d\\d$")` to select them. Later, we will use vectors that specify control variables to be used in regression models and select them with `all_of()`.
+`tidyselect` helpers are not just useful for selecting raw variables *en masse*, but can also be used with cleaned variables too. This is made easier if care is taken to name cleaned variables consistently. For instance, naming BMI variables in a 'wide' dataset in a consistent way (e.g., `bmi_03`, `bmi_05`, ..., `bmi_17`) allows one to use a simple regular expression (`matches("^bmi_\\d\\d$")`) to select them. Later, we will use vectors that specify control variables to be used in regression models and select them with `all_of()`.
 
 ### `dplyr::rename_with()`
 
-Variables can be renamed en masse using `rename_with()`. `rename_with()` applies a function to each variable name in turn. Functions can be specified using the lambda notation we used in [Chapter @sec-intro_tidyverse] with `purrr:map()`. The [`stringr` package](https://stringr.tidyverse.org/) contains several functions that can be used inside `rename_with`, including `str_replace()` (to replace part of a string with another string), `str_remove()` (to remove part of a string), `str_to_lower()` (to put strings in lower case), and `str_sub()` (to extract characters between specified positions in a string; e.g., `str_sub(x, 2, -2)` extracts the second to penultimate letters of `x`). `glue::glue()` can also be handy. Here are some examples:
+Variables can be renamed *en masse* using `rename_with()`. `rename_with()` applies a function to each variable name in turn. Functions can be specified using the lambda notation we used in [Chapter @sec-intro_tidyverse] with `purrr:map()`. The [`stringr` package](https://stringr.tidyverse.org/) contains several functions that can be used inside `rename_with`, including `str_replace()` (to replace part of a string with another string), `str_remove()` (to remove part of a string), `str_to_lower()` (to put strings in lower case), and `str_sub()` (to extract characters between specified positions in a string; e.g., `str_sub(x, 2, -2)` extracts the second to penultimate letters of `x`). `glue::glue()` can also be handy. Here are some examples:
 
 ```{r}
 #| output: false
@@ -75,13 +75,11 @@ mcs_17y %>%
               .cols = -c(mcsid, cnum00))
 ```
 
-Notice the line `rename_with(str_to_lower)` - when just a function name is specified, the column name will be placed in the first argument of that function. This syntax can also be used in `purrr::map()`.
-
-`rename_with(~ str_remove(.x, "^G"))` is an essential preparatory step if one wishes to append data from different sweeps of the MCS together.
+Notice the line `rename_with(str_to_lower)` - when just a function name is specified, the column will be placed in the first argument of that function. This syntax can also be used in `purrr::map()`. Note, `rename_with(~ str_remove(.x, "^G"))` is an essential preparatory step if one wishes to append data from different sweeps of the MCS together.
 
 ### Task I
 
-1.  Open the age 50y and 62y main interview files (`ncds_2008_followup.dta` and `ncds10_age62_main_interview.dta`, respectively). Use `tidyselect` helpers to select every derived variable in these datasets.
+>  Open the age 50y and 62y main interview files (`ncds_2008_followup.dta` and `ncds10_age62_main_interview.dta`, respectively). Use `tidyselect` helpers to select every derived variable in these datasets.
 
 ```{r}
 #| output: false
@@ -103,7 +101,7 @@ ncds_62y %>%
   select(ncdsid, matches("nd10"))
 ```
 
-2.  Consider how to rename the variables in both datasets so that they could be appended together.
+>  Consider how to rename the variables in both datasets so that they could be appended together.
 
 ```{r}
 #| output: false
@@ -129,7 +127,7 @@ harmonise_names(ncds_62y)
 
 ### `dplyr::across()`
 
-`across()` allows one to apply a function to multiple variables in turn. It is most typically used in `mutate()` to transform multiple variables in the same way. A key use of `across()` in LDA is to replace negative values representing missing codes with `R`'s `NA` missing value. In [Chapter @sec-intro_tidyverse], we used `ifelse()` to recode negative values, but this drops variable metadata (e.g., value labels) that we may wish to keep. To recode missing values while retaining other metadata, we can use functionality from the `labelled` package as in the `negative_to_na()` function below, while we apply to all labelled variables (`where(is.labelled)`) using `across()`.
+`across()` allows one to apply a function to multiple variables in turn. It is most typically used in `mutate()` to transform multiple variables in the same way. A key use of `across()` in LDA is to replace negative values representing missing codes with `R`'s `NA` missing value. In [Chapter @sec-intro_tidyverse], we used `ifelse()` to recode negative values, but this drops variable metadata (e.g., value labels) that we may wish to keep. To recode missing values while retaining other metadata, we can use functionality from the `labelled` package as in the `negative_to_na()` function below. We apply this to all labelled variables (`where(is.labelled)`) using `across()`.
 
 ```{r}
 negative_to_na <- function(x){
@@ -164,7 +162,7 @@ mcs_17y %>%
 
 ### Some Helpful Functions for Labelled Data
 
-Sometimes, in longitudinal datasets, some positive values can also indicate missingness, particularly in the context of a specific analysis. For instance, some self-complete items in the Sweep 7 of the MCS use positive values for responses that could be considered missing (e.g., "Don't know" or "Prefer not to say"). Specific values can be replaced with `NA` using the code below. This code also uses `haven::as_factor()`, which converts `labelled` vectors to factors using the value labels as levels.
+Sometimes, in longitudinal datasets, certain positive values can indicate missingness, particularly in the context of a specific analysis. For instance, some self-complete items in the Sweep 7 of the MCS use positive values for responses that could be considered missing (e.g., "Don't know" or "Prefer not to say"). Specific values can be replaced with `NA` using the code below. This code also uses `haven::as_factor()`, which converts `labelled` vectors to factors using the value labels as levels.
 
 ```{r}
 values_to_na <- function(x, values){
@@ -179,7 +177,7 @@ mcs_17y %>%
   count(GCCGHE00, self_rated_health)
 ```
 
-After replacing missing value codes with `NA`, a `labelled` vector may not actually contain any value labels - e.g., where it is a continuous variable, like height. One operation you may wish to perform en masse then is to replace negative values with `NA` and to convert any variables with remaining value labels to factor variables or to remove the labelled class, otherwise, using `haven::zap_labels()`. This can be achieved as below:
+After replacing missing value codes with `NA`, a `labelled` vector may not actually contain any value labels - e.g., where it is a continuous variable, like height. One operation you may wish to perform *en masse* then is to replace negative values with `NA` and to convert any variables with remaining value labels to factor variables or to otherwise remove the labelled class (which can be done using `haven::zap_labels()`). This can be achieved as below:
 
 ```{r}
 fix_labels <- function(x){
@@ -198,7 +196,7 @@ mcs_17y %>%
                   fix_labels()))
 ```
 
-After cleaning data, it is good practice to add a descriptive label to each variable to make clear what each represents ([Vable et al., 2021](https://doi.org/10.1093/aje/kwab092)). The `labelled` package contains the `set_variable_labels()` function to do this. The typical syntax uses `column = "label"` syntax, but a named vector can instead be passed via the `.labels` argument. By default, setting the label for a variable that isn't present in the `tibble` will throw an error. This can be changed by setting the argument `.strict = FALSE` - this may be helpful when working with many datasets, each of which may not contain the exact same columns.
+After cleaning data, it is good practice to add a descriptive label to each variable to make clear what they represent ([Vable et al., 2021](https://doi.org/10.1093/aje/kwab092)). The `labelled` package contains the `set_variable_labels()` function to do this. The typical syntax uses `column = "label"` syntax, but a named vector can instead be passed via the `.labels` argument. By default, setting the label for a variable that isn't present in the `tibble` will throw an error. This can be changed by setting the argument `.strict = FALSE` - this may be helpful when working with many datasets, each of which may not contain the exact same columns.
 
 ```{r}
 mcs_17y %>%
@@ -218,7 +216,7 @@ mcs_17y %>%
 
 ### `dplyr::if_any()` / `dplyr::if_all()`
 
-`if_any()` and `if_all()` are similar to `across()` in that they apply a function to multiple variables at once. They differ in that the function aggregates the results to return a logical vector. `if_any()` returns `TRUE` if the function returns `TRUE` for any of the variables, while `if_all()` returns `TRUE` if the function returns `TRUE` for all of the variables. `if_any()` and `if_all()` are most typically used in `filter()`, but can also be used in `mutate()`. Both `if_any()` and `if_all()` are vectorised.
+`if_any()` and `if_all()` are similar to `across()` in that they apply a function to multiple variables at once. They differ in that the function aggregates the results to return a single logical vector. Both `if_any()` and `if_all()` are vectorised. `if_any()` returns `TRUE` if the function returns `TRUE` for any of the variables, while `if_all()` returns `TRUE` if the function returns `TRUE` for all of the variables. `if_any()` and `if_all()` are most typically used in `filter()`, but can also be used in `mutate()`.
 
 ```{r}
 mcs_17y %>%
@@ -234,7 +232,7 @@ mcs_17y %>%
 
 ### `dplyr::pick()`
 
-Sometimes we may want to perform a function using several columns simultaneously - for instance, for a mental health measure, to sum the values across several columns into a total Likert score. Base `R` contains several functions for carrying out row-wise operations, such as `pmin()`, `pmax()`, `rowSums()` and `rowMeans()`, but these functions are not by themselves pipe-friendly as they use `data.frames` or `tibbles` as inputs and operate over it all, which may be more columns than one wants, outputting a single vector. `pick()` allows one to specify the correct columns for these functions and place them within a pipe. In essence, `pick()` takes the current `tibble` and temporarily creates another which has just the columns specified. `tidyselect` helpers can be used to specify columns.[^05_data_preparation-1]
+Sometimes we may want to perform a function using several columns simultaneously - for instance, for a mental health measure, to sum the values across several columns into a total Likert score. Base `R` contains several functions for carrying out row-wise operations, including `pmin()`, `pmax()`, `rowSums()` and `rowMeans()`, but these functions are not pipe-friendly as, although they use `data.frames` or `tibbles` as inputs, they operate on every column (which may include more columns than one wants) and output a single vector, rather than a transformed `tibble`. `pick()` instead allows one to specify the correct columns to put into these functions and place them within a pipe. In essence, `pick()` takes the current `tibble` and temporarily creates another which has just the columns specified. `tidyselect` helpers can be used to specify columns.[^05_data_preparation-1]
 
 [^05_data_preparation-1]: Row-wise operations can also be carried out using `dplyr::rowwise()` and `dplyr::c_across()`. `rowwise()` is a special case of `group_by()`, and groups each row in a `tibble` separately. `c_across()` combine multiple columns together into a single object (e.g., a single vector), which may be necessary to use some functions. See the [`dplyr` article on row-wise operations](https://dplyr.tidyverse.org/articles/rowwise.html) for more detail.
 
@@ -247,7 +245,7 @@ mcs_17y %>%
 
 ### Task II
 
-1.  Open the Age 55y NCDS main interview file (`ncds_2013_flatfile.dta`). Create a CASP-6 Quality of Life score, where higher values indicate better quality of life. To construct this score take the mean item response and set to the score to missing if the cohort member has four or more items missing (hint: `rowSums(is.na(df)` calculate the number of missing values in a row). Be aware of how each item is coded when answering this question.
+>  Open the Age 55y NCDS main interview file (`ncds_2013_flatfile.dta`). Create a CASP-6 Quality of Life score, where higher values indicate better quality of life. To construct this score take the mean item response and set to the score to missing if the cohort member has four or more items missing (hint: `rowSums(is.na(df)` calculate the number of missing values in a row). Be aware of how each item is coded when answering this question.
 
 ```{r}
 #| output: false
@@ -275,9 +273,9 @@ ncds_55y %>%
   ungroup()
 ```
 
-XX-`naniar::n_miss_row()` - mention naniar is useful in general
+Note, the `naniar` package contains multiple functions for working with missing data, including `n_miss_row()`, which is equivalent to `rowSums(is.na(df))`.
 
-2. Sweep 6 (14y) of the MCS included several cognitive assessments, including a 20-item vocabularly test. Answers to the individual items are contained in the variables `FCCMCOGA` to `FCCMCOGT` within the `mcs6_cm_cognitive_assessment.dta` file. The value label indicates which answer is correct. Load the data and create a variable for a cohort member's total score on the test as the number of correct items. Only give a score to an individual if they attempt one or more items.
+> Sweep 6 (14y) of the MCS included several cognitive assessments, including a 20-item vocabularly test. Answers to the individual items are contained in the variables `FCCMCOGA` to `FCCMCOGT` within the `mcs6_cm_cognitive_assessment.dta` file. The value label indicates which answer is correct. Load the data and create a variable for a cohort member's total score on the test as the number of correct items. Only give a score to an individual if they attempt one or more items.
 
 ```{r}
 #| output: false
@@ -312,7 +310,7 @@ mcs_14y_cog %>%
 
 ## Writing Functions to Clean Data
 
-As has been discussed, cleaning data is often a repetitive process in LDA: we may need to clean the same variables in the same way across different sweeps. In this case, to make our code efficient and less error-prone, we can write bespoke functions. Below is a function that cleans height and weight data and derives BMI in each of sweeps 3-7 in the MCS. As we saw in Chapter XX-FINDING, height and weight are contained in the variables `X-XX` and `X-XX` in each of these sweeps (where `X` is a letter denoting sweep). This makes the cleaning predictable.
+As has been discussed, cleaning data is often a repetitive process in LDA: we may need to clean the same variables in the same way across different sweeps. In this case, to make our code efficient and less error-prone, we can write bespoke functions. Below is a function that cleans height and weight data and derives BMI in each of sweeps 3-7 in the MCS. As we saw in [Chapter @sec-data_discovery], height and weight are contained in the variables `XCHTCM00` and `XCWTCM00` in each of these sweeps (or `XCHTCMA0` and `XCWTCMA0` for Sweep 5). This makes the cleaning predictable.
 
 ```{r}
 mcs_fups <- c(0, 3, 5, 7, 11, 14, 17)
@@ -338,13 +336,13 @@ clean_bmi <- function(sweep){
 map(3:7, ~ clean_bmi(.x))
 ```
 
-Notice the use of the `!!` (bang-bang) operator in `mutate(..., fup = !!fup)`. This is a form of ["quasiquotation"](https://adv-r.hadley.nz/quasiquotation.html) that allows one to use the value of an external object (e.g., `fup <- mcs_fups[sweep]`) in a `tibble` rather than the column (if they share the same name). We will return to this in \[Chapter @sec-regressions\].
+Notice the use of the `!!` (bang-bang) operator in `mutate(..., fup = !!fup)`. This is a form of ["quasiquotation"](https://adv-r.hadley.nz/quasiquotation.html) that allows one to use the value of an external object (e.g., `fup <- mcs_fups[sweep]`) in a `tibble` rather than the column (if they share the same name). We will return to this in a later chapter.
 
 ## Combining `tibbles`
 
-A key step in LDA is combining different datasets together - e.g., from different sweeps. This can be done by merging - placing the data in wide format - or by appending - placing the data in long format. We will start by discussing merging and then discuss appending.
+A key step in LDA is combining different datasets together - e.g., from different sweeps. This can be done by merging (placing the data in wide format) or by appending (placing the data in long format). We will start by discussing merging and then move on to appending.
 
-To make the process easier to understand, we will use small datasets from sweeps 6 & 7, containing data on height (`(F|G)CHTCM00`) and weight (`(F|G)CWTCM00`) from three cohort members (`MCSIDs`: `M10020R`, `M10025W`, and `M10002P`) who appeared in sweeps 6 only, 7 only, and both sweeps, respectively. Later, to show how to combine more than two datasets at once, we will add in data from the same individuals from Sweep 5, which they each appeared in.
+To make the process easier to understand, we will use small datasets from sweeps 6 & 7, containing data on height (`(F|G)CHTCM00`) and weight (`(F|G)CWTCM00`) from three cohort members (`MCSIDs`: `M10020R`, `M10025W`, and `M10002P`) who appeared in sweeps 6 only, 7 only, and both sweeps, respectively. Later, to show how to combine more than two datasets at once, we will add in data from the same individuals from Sweep 5, which they all appeared in.
 
 ```{r}
 load_mcs_mini <- function(sweep){
@@ -397,15 +395,15 @@ Given cohort members only appear in datasets if they have been surveyed in that 
 
 > **Question**: what response patterns does appearing in the `tibble` outputted by `full_join()` imply? What about `left_join()` and `right_join()`?
 
-More complicated rules for identifying rows to merge than above can be specified with the `join_by()` helper function. This is unlikely to be needed for most LDA applications, so we do not discuss this further here (an exception is joining overlapping activity history datasets) - see the [`dplyr` website](https://dplyr.tidyverse.org/reference/join_by.html) for more detail.
+More complicated rules for identifying rows to merge than above can be specified with the `join_by()` helper function. This is unlikely to be needed for most LDA applications, so we do not discuss this further here (an exception you may come across is joining overlapping activity history datasets) - see the [`dplyr` website](https://dplyr.tidyverse.org/reference/join_by.html) for more detail.
 
 #### Merging 2+ `tibbles` with `purrr::reduce()`
 
 What if we want to merge more than two datasets together - for instance, merge all seven sweeps of the MCS? Writing out each `*_join()` function separately would be cumbersome. Instead, we can use `purrr::reduce()` to chain together successive `*_join()` function calls, aggregating the result.
 
-`reduce()` is similar to `map()` in that repeats a function for each object within an input. But unlike `map()`, `reduce()` uses two objects at a time, with the result fed back into the next function call. Specifically, `reduce()` takes an object, applies a function, `f`, to the first two element and then takes the result and inputs it into `f` along with the next element of the inputted object, repeating this until the object is object. For instance, specifying `inner_join()` in `reduce()` with a list of three `tibbles` will perform `inner_join()` on the first two, and then perform `inner_join()` on the result with the third `tibble`.
+`reduce()` is similar to `map()` in that repeats a function for each object within an input. But unlike `map()`, the result from an iteration back into the next iteration. Specifically, `reduce()` takes an object, applies a function, `f`, to the first two element and then takes the result and inputs it into `f` along with the next element of the inputted object, repeating this until the object is exhausted. For instance, specifying `inner_join()` in `reduce()` with a list of three `tibbles` will perform `inner_join()` on the first two, and then perform `inner_join()` on the result from that with the third `tibble`.
 
-The syntax for `reduce()` is similar to `map2()` where `.x` and `.y` refer to the first and second elements of the list, respectively, or to the result and to the next element of the list). Below we perform an `inner_join()` on data from sweeps 5-7. Note, as the `XCNUM00` joining keys differ depending on which sweeps are being merged, we need to slightly alter the code used above to account for this.[^05_data_preparation-2]
+The syntax for `reduce()` is similar to `map2()` where `.x` and `.y` refer to the first and second elements of the list, respectively, or to the result and to the next element of the list. Below we perform an `inner_join()` on data from sweeps 5-7. Note, as the `XCNUM00` joining keys differ depending on which sweeps are being merged, we need to slightly alter the code used above to account for this.[^05_data_preparation-2]
 
 [^05_data_preparation-2]: It is possible to seed `reduce()` with an initial `.x` value using the `.init` argument. This strategy can make sense for some transformations.
 
@@ -445,11 +443,11 @@ anti_join(mcs_14y_mini,
 
 Again, rows that are retained after a specific filtering `*_join()` imply a particular response pattern.
 
-> **Question**: What response pattern does `semi_join()` imply? What about `anti_join()`?
+> **Question**: What response pattern does `semi_join()` above imply? What about `anti_join()`?
 
 ### Appending `tibbles` with `dplyr::bind_rows()`
 
-We have seen how the mutating `*_join()` functions can be used to merge `tibbles` together in wide format. Appending data with `bind_rows()` allows us to place data in long format. `bind_rows()` is simple - it takes a set of `tibbles` and then stacks these in the order they are specified. If the inputs are named, the `.id` argument can be used to populate a column in the outputted `tibble` that identifies the input `tibble` a given row came from. The input `tibbles` can be specified separately or combined in a list.
+We have seen how the mutating `*_join()` functions can be used to merge `tibbles` together in wide format. Appending data with `bind_rows()` allows us to place data in long format. `bind_rows()` is simple - it takes a set of `tibbles` and then stacks these in the order they are specified. If the inputs are named, the `.id` argument can be used to populate a column in the outputted `tibble` identifying the input `tibble` a given row came from. The input `tibbles` can be specified separately or combined in a list.
 
 ```{r}
 # Two equivalent approaches.
@@ -509,7 +507,28 @@ Notice that `bind_rows()` outputs rows for all observations in the input `tibble
 
 ### Task III
 
-1.  It is often more efficient to append raw data together and then clean the data. Amend the `clean_bmi()` code above to append the data from Sweeps 3-7 and then clean the output.
+>   Merge the Age 50y, 55y and 62y NCDS datasets together, with `*_join()` and `reduce()`. Use `_join()` functions such that (a) anyone who appeared in any of the three sweeps is retained, (b) anyone who appeared in all three sweeps is retain, and (c) anyone who appeared in the Age 62y sweep is retained. How many rows are in each?
+
+```{r}
+#| output: false
+#| code-fold: true
+#| code-summary: "Reveal the solution"
+
+ncds_list <- list( # Just to focus on main ID variable
+  ncds_50y %>% select(NCDSID),
+  ncds_55y %>% select(NCDSID),
+  ncds_62y %>% select(NCDSID = ncdsid)
+)
+
+reduce(ncds_list, ~ full_join(.x, .y, by = "NCDSID")) %>%
+  nrow()
+reduce(ncds_list, ~ inner_join(.x, .y, by = "NCDSID")) %>%
+  nrow()
+reduce(ncds_list, ~ right_join(.x, .y, by = "NCDSID")) %>%
+  nrow()
+```
+
+>  It is often more efficient to append raw data together and then clean the data. Amend the `clean_bmi()` code above to append the data from Sweeps 3-7 and then clean the output.
 
 ```{r}
 #| output: false
@@ -529,14 +548,17 @@ load_anthro <- function(sweep){
     mutate(sweep = !!sweep)
 }
 
-task3_solution <- map_dfr(3:7, load_anthro %>%
-  mutate(cnum = as.integer(cnum),
-         height = negative_to_na(height_raw) %>%
+task3_solution <- map_dfr(
+  3:7, 
+  ~ load_anthro(.x) %>%
+    mutate(cnum = as.integer(cnum),
+           height = negative_to_na(height_raw) %>%
              as.numeric(),
            weight = negative_to_na(weight_raw) %>%
              as.numeric(),
            bmi = weight / ( (height / 100) ^ 2)) %>%
-  select(MCSID, cnum, sweep, height, weight, bmi)
+    select(MCSID, cnum, sweep, height, weight, bmi)
+)
 
 task3_solution
 ```
@@ -605,7 +627,7 @@ df_mini_wide %>%
 
 The resulting `tibble` has 9 rows - 3 for each cohort member (1 for each cohort member x sweep combination). This includes rows for sweeps a cohort member did not even appear in.
 
-The above code shows how to reshape raw data, but the same principles apply to clean data to. With that in mind, when cleaning data, one should use consistent naming schemes for variables to make reshaping simpler. Using underscores (`_`) in variable names and placing sweep or follow-up age as a suffix is particularly helpful.
+The above code shows how to reshape raw data, but the same principles apply to clean data, too. With that in mind, when cleaning data, one should use consistent naming schemes for variables to make reshaping simpler. Using underscores (`_`) in variable names and placing sweep or follow-up age as a suffix is particularly helpful.
 
 ```{r}
 rename_col <- function(var_name){
@@ -628,7 +650,7 @@ df_mini_wide %>%
 
 #### Task IV
 
-1.  Change `names_to = c(".value", "sweep_letter")` in the code above and run. Before looking at the output, predict what the resulting dataset will look like. What will the columns names be? How many rows of data will there be in the output? Can you think of a purpose of data in this format? (Hint: consider could be achieved with `group_by()`).
+>  Change `names_to = c(".value", "sweep_letter")` in the code above and run. Before looking at the output, predict what the resulting dataset will look like. What will the columns names be? How many rows of data will there be in the output? Can you think of a purpose of data in this format? (Hint: consider what could be achieved with `group_by()`).
 
 ```{r}
 #| output: false
@@ -703,11 +725,11 @@ df_long_mini %>%
   )
 ```
 
-Notice in the output that we have one row per cohort member and a `NA` value for the columns for sweeps they may not have even responded in. `pivot_wider()` makes [implicit missing values explicit](https://r4ds.hadley.nz/missing-values.html).
+Notice in the output that we have one row per cohort member and a `NA` value for the columns for sweeps they may not have even responded in. In other words, `pivot_wider()` makes [implicit missing values explicit](https://r4ds.hadley.nz/missing-values.html).
 
 #### Task V
 
-1.  Take the output of the solution to Task III and reshape the weight and BMI columns to wide format, discarding height. Keep rows for only those individuals who appeared in all sweeps.
+>  Take the output of the solution to Task III and reshape the weight and BMI columns to wide format, discarding height. Keep rows for only those individuals who appeared in all sweeps.
 
 ```{r}
 #| output: false
@@ -718,7 +740,7 @@ task3_solution %>%
   add_count(MCSID, cnum) %>%
   filter(n == 5) %>%
   pivot_wider(
-       id_cols = c(MCSID, cnum),
+    id_cols = c(MCSID, cnum),
     names_from = sweep,
     values_from = c(weight, bmi),
     names_glue = "{.value}_{sweep}",
@@ -733,7 +755,7 @@ We'll finish with a few functions that are helpful when cleaning long data.
 
 While `pivot_wider()` makes implicit values explicit, `bind_rows()` does not. It is possible to create missing rows when data are in long format by using `tidyr::complete()`. This function is straightforward - you pass it a `tibble` and then specify the columns one wishes to get every combination for (here the ID and time variables). By default, other columns will be filled with `NA` values in the newly created rows. This behaviour can be overridden using the `fill` argument. 
 
-One issue with MCS data is that ID columns are spread over two variables. This creates issues if you have multiple values of `CNUM00` in the data. We can avoid the problem by first *uniting* (`unite()`) the ID columns then separating (`separate()`) them after using `complete()`.
+One issue with MCS data is that ID columns are spread over two variables. Making all combinations of `MCSID` and `CNUM00` creates `CNUM00 == 2` values for each `MCSID`, even if they are singleton families. This problem can be avoided first *uniting* (`unite()`) the ID columns then separating (`separate()`) them after using `complete()`.
 
 ```{r}
 df_long_mini %>%
@@ -744,6 +766,8 @@ df_long_mini %>%
            sep = "_",
            convert = TRUE)
 ```
+
+Alternatively, one can use the `panelr::balance_panel()` function (not part of the `tidyverse`), though this requires converting a `tibble` to and from the `panel` class used by that package (`as_panel(...) %>% balance_panel() %>% unpanel()`).
 
 ### `tidyr::fill()`
 
@@ -759,7 +783,7 @@ df_long_mini %>%
   ungroup()
 ```
 
-Of course, this assumption of invariance in height is invalid here, given the data are from adolescence, not adulthood.
+(Note, this assumption of invariance in height is invalid here, given the MCS data are from adolescence, not adulthood.)
 
 ### Some `dplyr` Helpers
 
@@ -781,7 +805,7 @@ df_long_mini %>%
     next_fup = lead(fup),
     observation = row_number()
   ) %>%
-  ungroup()ZA`
+  ungroup()
 
 df_long_mini %>%
   group_by(MCSID, CNUM00) %>%
@@ -795,6 +819,40 @@ df_long_mini %>%
   )
 ```
 
-## Putting It All Together
+Note, care must be taken when using the `lag()`, `lead()`, `first()` and `last()` functions with an unbalanced panel or irregularly space intervals between sweeps, as (e.g.) in the case of `lag()`, this function does not respect time and instead, identifies the preceding value based on row order.
 
-XX-MENTION INTERLUDE
+### Task VI
+
+> Load the NCDS Age 42-44y biomedical survey dataset (`ncds42-4_biomedical_eul.dta`). Clean the height variable `htres` and append the data with the cleaned height data (`DVHT50`) from the Age 50y sweep (`ncds_2008_followup.dta`). Use `complete()` and `fill()` to create a height value for every individual who appears in either sweep, then reshape the dataset to wide format.
+
+```{r}
+#| output: false
+#| code-fold: true
+#| code-summary: "Reveal the solution"
+
+ncds_44y <- glue("{ncds_fld}/42y-44y Biomedical/ncds42-4_biomedical_eul.dta") %>%
+  read_dta(col_select = c(ncdsid, htres))
+
+lookfor(ncds_44y, "htres")
+lookfor(ncds_50y, "DVHT50")
+
+ncds_44y %>%
+  mutate(fup = 44,
+         height = negative_to_na(htres) / 100) %>%
+  select(ncdsid, fup, height) %>%
+  bind_rows(
+    ncds_50y %>%
+      mutate(fup = 50) %>%
+      select(ncdsid = NCDSID,
+             fup,
+             height = DVHT50)
+  ) %>%
+  complete(ncdsid, fup) %>%
+  arrange(ncdsid, fup) %>%
+  group_by(ncdsid) %>%
+  fill(height, .direction = "downup") %>%
+  ungroup() %>%
+  pivot_wider(names_from = fup,
+              values_from = height,
+              names_glue = "height_{fup}")
+```

@@ -4,12 +4,20 @@ project:
 book:
   title: "R for Longitudinal Data Analysis"
   author: "Liam Wright"
-  date: "1/26/2026"
+  date: "2/15/2026"
   chapters:
-    - 00_preface.qmd
+    - index.qmd
     - 01_introduction_course.qmd
-    - 01_introduction_tidyverse.qmd
-    - 99_backmatter_references.qmd
+    - 02_background_r.qmd
+    - 03_introduction_tidyverse.qmd
+    - 04_finding_data.qmd
+    - 05_data_preparation.qmd
+    - 06_interlude_cleaning.qmd
+    # - 07_unit_testing.qmd
+    # - 08_descriptive_statistics.qmd
+    # - 09_regression_analyses.qmd
+    # - 10_presenting_results.qmd
+    # - 99_backmatter_intro_r.qmd
 
 bibliography: references.bib
 

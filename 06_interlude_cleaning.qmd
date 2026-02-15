@@ -2,18 +2,21 @@
 
 The following chapters cover analysis and require cleaned data. Here we will prepare two datasets (one for MCS, one for NCDS) allowing us to assess the association between childhood/adolescent cognitive ability and body mass index (BMI). These datasets will include BMI at each sweep in which it is measured, as well multiple measures of cognitive ability and a set of control variables (age of BMI measurement, sex, mother's and father's education, mother and father's BMI, and ethnicity). More detail on the various cognitive measures are described in Moulton et al.'s ([2024](https://closer.ac.uk/cross-study-data-guides/cognitive-measures-guide/)) excellent report on the measurement of cognition in the British birth cohorts.
 
+The code below uses the functions that we have seen in previous chapters. Some small mistakes are left in, as in the next chapter we see functionality for checking that data conforms to expectations. The code is not fully commented as yet, but will be annotated further in due course.
+
+The packages we will use are:
+
 ```{r}
+#| warning: false
+
 library(tidyverse)
 library(haven)
 library(glue)
 library(labelled)
 library(magrittr)
-library(skimr)
-library(naniar)
-library(testthat)
 ```
 
-XX-HELPERS 
+We also define some "helpers" that will be used to clean both the NCDS and MCS data.
 
 ```{r}
 mcs_fld <- Sys.getenv("mcs_fld")
@@ -29,8 +32,6 @@ values_to_na <- function(x, values){
   user_na_to_na(x)
 }
 ```
-
-XX-HOW THIS IS DONE
 
 ## NCDS
 
@@ -142,7 +143,7 @@ ncds_clean$anthropometrics <- ncds_raw$anthropometrics %>%
   select(-height_20)
 
 ## d. Combine Cleaned Data ----
-ncds_interim <- reduce(ncds_clean, ~ left_join(.x, .y, by = "ncdsid")) %>%
+df_ncds <- reduce(ncds_clean, ~ left_join(.x, .y, by = "ncdsid")) %>%
   relocate(fup, .after = ncdsid) %>%
   rename(iid = ncdsid) %>%
   zap_labels() %>%
@@ -387,91 +388,12 @@ df_mcs <- mcs_clean$xwave %>%
 saveRDS(df_mcs, "data/mcs_clean.Rds")
 ```
 
-```{r}
-df_mcs <- readRDS("data/mcs_clean.Rds")
-lookfor(df_mcs)
+## The Cleaned Datasets
 
-df_ncds <- readRDS("data/ncds_clean.Rds")
+```{r}
 lookfor(df_ncds)
+lookfor(df_mcs)
 ```
 
-Both are long datasets, with one row per person sweep. Note, to make using both datasets easier together, most of the variable names in each dataset are the same, including `iid` (the individual identifier) - to construct this for the MCS, we combine the `MCSID` and `CNUM00` values into a single string.
+Both are long datasets, with one row per person sweep. Note, to make using both datasets easier together, most of the variable names in each dataset are the same, including `iid` (the individual identifier) - to construct this for the MCS, we combined the `MCSID` and `CNUM00` values into a single string.
 
-## Data Checks
-
-XX-NECESSARY - FORMAL/INFORMAL
-
-### Descriptive Checks with `skimr::skim()`
-The code in [Chapter @sec-interlude] included only light cleaning, so it behooves us check if this was sufficient. We can do this by calculating descriptive statistics and checking again what we might expect, or by writing *unit tests* - code snippets to ensure our data has certain properties.
-
-Let's start by using the `skimr::skim()` function which was mentioned, though not used, in Chapter XX on finding data. `skim()` calculates descriptive statistics variable in a tibble and even prints histograms of numeric variables to the console. Though not a `tidyverse` package, it is well integrated into the `tidyverse` ecosystem - for instance, it can work with grouped `tibbles` and `dplyr` functions can be used on the output (for instance, to filter outputs which meet certain properties; `filter(numeric.sd > 1)`). 
-
-The MCS and NCDS datasets should contain a mix of time-varying (height, weight and BMI) and time-invariant (sex, ethnic group, parental characteristics) variables (at least as constructed). To check this is the case, we will pass each dataset to the to `skim()` grouping by `fup`. We do not print the output below, given it is long, so please run this code yourself.
-
-```{r}
-df_mcs %>%
-  group_by(fup) %>%
-  skim()
-
-df_ncds %>%
-  group_by(fup) %>%
-  skim()
-```
-
-Notice that for the parental characteristics variables (`(mo|fa)ther_(bmi|edu)`), aggregate descriptive statistics are the same each sweep, which for the time-varying characteristics these differ, as expected. We can also check the time-invariant characteristics do not vary within a person using `dplyr` functions.
-
-```{r}
-df_mcs %>%
-  group_by(iid, fup) %>%
-  summarise(across(matches("sex|mother|father|ethnic_group|verbal|vocab"),
-                   ~ n_distinct(.x)),
-            .groups = "drop") %>%
-  summarise(across(matches("sex|mother|father|ethnic_group|verbal|vocab"),
-                   ~ max(.x))) %>%
-  pivot_longer(everything(),
-               names_to = "variable",
-               values_to = "max_distinct")
-```
-
-`df_mcs %>% mutate(fup = factor(fup) %>% fct_reorder(fup)) %>% gg_miss_fct(fup)` BUT THEN NEED TO WORK OUT IF PRESENT - ADD RESPONSE COLUMN.
-`gg_miss_upset(df_mcs)`
-
-Notice in this `skim()` output, we can see some very implausible numbers, both relatively and in qualitative terms - i.e., both outliers, given a distribution and conceptually implausible values. Let's overwrite this by removing outliers and biological implausible values.
-
-```{r}
-remove_outliers <- function(x){
-  mean_x <- mean(x, na.rm = TRUE)
-  sd_x <- sd(x, na.rm = TRUE)
-  
-  ifelse(between(x, mean_x - 3 * sd_x, mean_x + 3 * sd_x),
-         x, NA)
-}
-
-df_ncds <- ncds_interim %>%
-  group_by(fup) %>%
-  mutate(
-    across(c(height, weight, bmi), remove_outliers),
-         height = ifelse(!between(height, 1.4, 2.3) & fup >= 20, NA, height),
-         bmi = case_when(is.na(height) | is.na(weight) ~ NA,
-                         between(bmi, 13, 50) ~ bmi,
-                         TRUE ~ NA)
-  ) %>%
-  ungroup()
-
-saveRDS(df_ncds, "data/ncds_clean.Rds")
-```
-
-### Formal Tests with `testthat`
-
-We can perform more formal unit tests with the `testthat` package. This package contains a series of function for testing that data are as aniticpated given rules set out by a user, throwing an error if not met - this means that code will not proceed if the test is failed, providing some insurance.
-Here are some key functions in the context of LDA:
-
--   XX
-
-```{r}
-EXAMPLES
-```
-
-### Task I
-
-1. Carry out same but for MCS

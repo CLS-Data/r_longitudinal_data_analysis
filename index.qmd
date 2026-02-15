@@ -1,0 +1,31 @@
+# Preface {.unnumbered}
+
+This [Quarto book](https://quarto.org/docs/books/) contains materials to accompany the two-day short course, *R for Longitudinal Data Analysis* run by Liam Wright of the [Centre for Longitudinal Studies (CLS)](https://cls.ucl.ac.uk/) at University College London. Comments and questions about this book can be submitted to the [GitHub repository](https://github.com/CLS-Data/r_longitudinal_data_analysis).
+
+To follow along, you will need to have [R](https://cran.r-project.org/) and [RStudio](https://posit.co/download/rstudio-desktop/) installed on your computer and to possess data from the [National Child Development Study (1958 British Birth Cohort)](http://doi.org/10.5255/UKDA-Series-2000032) and the [Millennium Cohort Study](http://doi.org/10.5255/UKDA-Series-2000031), downloaded from the UK Data Service `.dta` (Stata) format and arranged into directory structures following the instructions here [here](https://cls-data.github.io/docs/ncds-sweep_folders.html) and [here](https://cls-data.github.io/docs/mcs-sweep_folders.html).
+
+The following `R` packages are used on the course.
+
+```{r}
+#| label: pkg-list
+#| eval: false
+
+install.packages(c("tidyverse",
+                   "glue",
+                   "usethis",
+                   "summarytools",
+                   "labelled",
+                   "codebookr",
+                   "corrr",
+                   "naniar",
+                   "pointblank",
+                   "lme4",
+                   "marginaleffects",
+                   "broom.mixed",
+                   "gt",
+                   "gtsummary",
+                   "flextable",
+                   "officer",
+                   "patchwork"))
+```
+
