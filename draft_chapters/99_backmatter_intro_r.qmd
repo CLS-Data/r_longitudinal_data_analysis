@@ -165,7 +165,7 @@ The simplest structure for storing data in `R` is the `vector`. We created a num
 
 -   `double`: Numbers with ability to store decimal places (e.g. `c(2.49, 1, 3/2)`)
 -   `integer`: A round number. Denoted using `L` operator (e.g. `c(1L, 54L, 800L)`).
--   `characte`\*: Strings, such as "Hello" and "My name is Liam".
+-   `character`: Strings, such as "Hello" and "My name is Liam".
     -   Strings are surrounded by single (`'`) or double (`"`) quote marks (e.g. `c("Bye", 'Hi')`)
 -   `logical`: *Boolean* values `TRUE` or `FALSE`
 -   `complex`: Have limited use, and we will not come across them in this course.

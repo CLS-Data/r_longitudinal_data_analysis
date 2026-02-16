@@ -1,14 +1,10 @@
-## --------------------------------------------------------------------------------------------------------------
-#| warning: false
+# Interlude: Data Cleaning {#sec-interlude} ----
 
 library(tidyverse)
 library(haven)
 library(glue)
 library(labelled)
 library(magrittr)
-
-
-## --------------------------------------------------------------------------------------------------------------
 mcs_fld <- Sys.getenv("mcs_fld")
 ncds_fld <- Sys.getenv("ncds_fld")
 
@@ -21,9 +17,7 @@ values_to_na <- function(x, values){
   na_values(x) <- values
   user_na_to_na(x)
 }
-
-
-## --------------------------------------------------------------------------------------------------------------
+## NCDS ----
 ncds_raw <- list()
 ncds_clean <- list()
 
@@ -152,9 +146,7 @@ df_ncds <- reduce(ncds_clean, ~ left_join(.x, .y, by = "ncdsid")) %>%
     bmi = "Body Mass Index (kg/m^2^)",
     obese = "Obese (BMI ≥ 30 kg/m^2^)"
   )
-
-
-## --------------------------------------------------------------------------------------------------------------
+## MCS ----
 mcs_raw <- list()
 mcs_clean <- list()
 
@@ -372,9 +364,6 @@ df_mcs <- mcs_clean$xwave %>%
   )
 
 saveRDS(df_mcs, "data/mcs_clean.Rds")
-
-
-## --------------------------------------------------------------------------------------------------------------
+## The Cleaned Datasets ----
 lookfor(df_ncds)
 lookfor(df_mcs)
-

@@ -1,28 +1,17 @@
-## --------------------------------------------------------------------------------------------------------------
-#| label: setup
-#| include: false
+# Preparing Data for Analysis {#sec-data_munging} ----
 knitr::opts_chunk$set(echo = TRUE)
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| warning: false
-#| message: false
 
 library(tidyverse)
 library(haven)
 library(glue)
 library(labelled)
-
-
-## --------------------------------------------------------------------------------------------------------------
 mcs_fld <- Sys.getenv("mcs_fld")
 ncds_fld <- Sys.getenv("ncds_fld")
 
 mcs_17y <- glue("{mcs_fld}/17y/mcs7_cm_interview.dta") %>%
   read_dta()
-
-
-## --------------------------------------------------------------------------------------------------------------
+## Advanced Functions for Data Cleaning ----
+### `tidyselect` Helpers ----
 mcs_17y %>%
   select(matches("^GCW")) %>%
   select(GCWESM00:last_col()) %>%
@@ -30,22 +19,14 @@ mcs_17y %>%
   select(all_of(c("GCWWOP00", "GCWWUS00", "GCWWRE00"))) %>%
   select(any_of(c("GCWWOP00", "GCWWRE00", "not_a_variable"))) %>%
   select(!matches("^GCWWO"))
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| output: false
+### `dplyr::rename_with()` ----
 
 mcs_17y %>%
   rename_with(str_to_lower) %>% # Equivalent to ~ str_to_lower(.x)
   rename_with(~ str_remove(.x, "^g")) %>%  # Removes sweep-specific prefix "G"
   rename_with(~ glue("{.x}_17"),
               .cols = -c(mcsid, cnum00))
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| output: false
-#| code-fold: true
-#| code-summary: "Reveal the solution"
+### Task I ----
 
 ncds_50y <- glue("{ncds_fld}/50y/ncds_2008_followup.dta") %>% 
   read_dta() 
@@ -60,12 +41,6 @@ ncds_50y %>%
 
 ncds_62y %>%
   select(ncdsid, matches("nd10"))
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| output: false
-#| code-fold: true
-#| code-summary: "Reveal the solution"
 
 names(ncds_50y)
 names(ncds_62y)
@@ -82,9 +57,7 @@ harmonise_names <- function(df){
 
 harmonise_names(ncds_50y)
 harmonise_names(ncds_62y)
-
-
-## --------------------------------------------------------------------------------------------------------------
+### `dplyr::across()` ----
 negative_to_na <- function(x){
   na_range(x) <- c(-Inf, -1)
   user_na_to_na(x)
@@ -93,9 +66,6 @@ negative_to_na <- function(x){
 mcs_17y %>%
   select(MCSID, GCNUM00, matches("^GCHT(CM|FT|IN)00")) %>%
   mutate(across(where(is.labelled), ~ negative_to_na(.x)))
-
-
-## --------------------------------------------------------------------------------------------------------------
 mcs_17y %>%
   select(matches("^GCHT(CM|FT|IN)00")) %>%
   mutate(across(where(is.labelled), ~ negative_to_na(.x))) %>%
@@ -103,15 +73,10 @@ mcs_17y %>%
                    list(mean = ~ mean(.x, na.rm = TRUE),
                         sd = ~ sd(.x, na.rm = TRUE)),
                    .names = "{.col}_{.fn}"))
-
-
-## --------------------------------------------------------------------------------------------------------------
 mcs_17y %>%
   mutate(across(where(is.labelled), ~ negative_to_na(.x))) %>%
   count(across(matches("^GCWW")))
-
-
-## --------------------------------------------------------------------------------------------------------------
+### Some Helpful Functions for Labelled Data ----
 values_to_na <- function(x, values){
   na_values(x) <- values
   user_na_to_na(x)
@@ -122,9 +87,6 @@ mcs_17y %>%
            values_to_na(6:8) %>%
            as_factor()) %>%
   count(GCCGHE00, self_rated_health)
-
-
-## --------------------------------------------------------------------------------------------------------------
 fix_labels <- function(x){
   if (is.null(val_labels(x))){
     clean <- zap_labels(x)
@@ -139,9 +101,6 @@ mcs_17y %>%
   mutate(across(everything(), 
                 ~ negative_to_na(.x) %>%
                   fix_labels()))
-
-
-## --------------------------------------------------------------------------------------------------------------
 mcs_17y %>%
   mutate(weight = negative_to_na(GCWTCM00),
          height = negative_to_na(GCHTCM00) / 100,
@@ -155,9 +114,7 @@ mcs_17y %>%
     weight = "Weight (kg)",
     bmi = "Body Mass Index (kg/m^2)"
   )
-
-
-## --------------------------------------------------------------------------------------------------------------
+### `dplyr::if_any()` / `dplyr::if_all()` ----
 mcs_17y %>%
   mutate(across(where(is.labelled), ~ negative_to_na(.x))) %>%
   count(across(matches("^GCWW"))) %>%
@@ -167,19 +124,12 @@ mcs_17y %>%
   mutate(across(where(is.labelled), ~ negative_to_na(.x))) %>%
   count(across(matches("^GCWW"))) %>%
   filter(if_all(matches("^GCWW"), ~ .x == 1))
-
-
-## --------------------------------------------------------------------------------------------------------------
+### `dplyr::pick()` ----
 mcs_17y %>%
   select(matches("^GCWW")) %>%
   mutate(across(everything(), ~ negative_to_na(.x)),
          swemwbs_total = pick(matches("^GCWW")) %>% rowSums())
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| output: false
-#| code-fold: true
-#| code-summary: "Reveal the solution"
+### Task II ----
 
 ncds_55y <- glue("{ncds_fld}/55y/ncds_2013_flatfile.dta") %>% 
   read_dta()
@@ -200,12 +150,6 @@ ncds_55y %>%
   group_by(casp6_missing) %>%
   slice(1) %>%
   ungroup()
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| output: false
-#| code-fold: true
-#| code-summary: "Reveal the solution"
 
 mcs_14y_cog <- glue("{mcs_fld}/14y/mcs6_cm_cognitive_assessment.dta") %>%
   read_dta()
@@ -231,9 +175,7 @@ mcs_14y_cog %>%
          cog_obs = pick(matches("FCCMCOG[A-T]")) %>% rowSums(!is.na(.)),
          cog_score = ifelse(cog_obs >= 1, cog_score, NA)) %>%
   select(MCSID, FCNUM00, cog_score)
-
-
-## --------------------------------------------------------------------------------------------------------------
+## Writing Functions to Clean Data ----
 mcs_fups <- c(0, 3, 5, 7, 11, 14, 17)
 
 clean_bmi <- function(sweep){
@@ -255,9 +197,7 @@ clean_bmi <- function(sweep){
 }
 
 map(3:7, ~ clean_bmi(.x))
-
-
-## --------------------------------------------------------------------------------------------------------------
+## Combining `tibbles` ----
 load_mcs_mini <- function(sweep){
   sweep_letter <- letters[sweep]
   fup <- mcs_fups[sweep]
@@ -273,9 +213,7 @@ mcs_14y_mini
 
 mcs_17y_mini <- load_mcs_mini(7)
 mcs_17y_mini
-
-
-## --------------------------------------------------------------------------------------------------------------
+### Merging `tibbles` with `dplyr::*_join()` ----
 full_join(mcs_14y_mini,
           mcs_17y_mini,
           by = c("MCSID", FCNUM00 = "GCNUM00"))
@@ -291,9 +229,7 @@ right_join(mcs_14y_mini,
 inner_join(mcs_14y_mini,
            mcs_17y_mini,
            by = c("MCSID", FCNUM00 = "GCNUM00"))
-
-
-## --------------------------------------------------------------------------------------------------------------
+#### Merging 2+ `tibbles` with `purrr::reduce()` ----
 mcs_11y_mini <- load_mcs_mini(5) 
 
 list(mcs_11y_mini,
@@ -306,9 +242,7 @@ list(mcs_11y_mini,
       by = c("MCSID", "CNUM")
     )
   )
-
-
-## --------------------------------------------------------------------------------------------------------------
+#### Filtering Joins ----
 semi_join(mcs_14y_mini,
           mcs_17y_mini,
           by = c("MCSID", FCNUM00 = "GCNUM00"))
@@ -316,9 +250,7 @@ semi_join(mcs_14y_mini,
 anti_join(mcs_14y_mini,
           mcs_17y_mini,
           by = c("MCSID", FCNUM00 = "GCNUM00"))
-
-
-## --------------------------------------------------------------------------------------------------------------
+### Appending `tibbles` with `dplyr::bind_rows()` ----
 # Two equivalent approaches.
 # list(
 #   `11` = mcs_11y_mini,
@@ -333,9 +265,6 @@ bind_rows(
   `17` = mcs_17y_mini, 
   .id = "fup"
 )
-
-
-## --------------------------------------------------------------------------------------------------------------
 list(
   `11` = mcs_11y_mini ,
   `14` = mcs_14y_mini,
@@ -348,10 +277,6 @@ list(
   ) %>%
   bind_rows(.id = "fup")
 
-
-## --------------------------------------------------------------------------------------------------------------
-#| warning: false
-
 list(
   `11` = mcs_11y_mini ,
   `14` = mcs_14y_mini,
@@ -362,12 +287,7 @@ list(
   mutate(height = coalesce(CHTCMA0, CHTCM00), 
          weight = coalesce(CWTCMA0, CWTCM00),
          .after = CNUM00)
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| output: false
-#| code-fold: true
-#| code-summary: "Reveal the solution"
+### Task III ----
 
 ncds_list <- list( # Just to focus on main ID variable
   ncds_50y %>% select(NCDSID),
@@ -381,12 +301,6 @@ reduce(ncds_list, ~ inner_join(.x, .y, by = "NCDSID")) %>%
   nrow()
 reduce(ncds_list, ~ right_join(.x, .y, by = "NCDSID")) %>%
   nrow()
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| output: false
-#| code-fold: true
-#| code-summary: "Reveal the solution"
 
 load_anthro <- function(sweep){
   sweep_letter <- letters[sweep]
@@ -414,9 +328,8 @@ task3_solution <- map_dfr(
 )
 
 task3_solution
-
-
-## --------------------------------------------------------------------------------------------------------------
+## Reshaping `tibbles` with `tidyr::pivot_*()` ----
+### Wide-to-Long Transformations with `tidyr::pivot_longer()` ----
 df_mini_wide <- list(mcs_11y_mini,
                      mcs_14y_mini, 
                      mcs_17y_mini) %>%
@@ -430,26 +343,17 @@ df_mini_wide <- list(mcs_11y_mini,
   rename_with(~ str_replace(.x, "A0$", "00"))
 
 df_mini_wide
-
-
-## --------------------------------------------------------------------------------------------------------------
 df_mini_wide %>%
   pivot_longer(
     cols = -c(MCSID, CNUM), # Columns to pivot (everything but MCSID and CNUM)
     names_to = "variable",
     values_to = "value"
   )
-
-
-## --------------------------------------------------------------------------------------------------------------
 df_mini_wide %>%
   pivot_longer(
     cols = matches("^.C(W|H)TCM00"), # The columns to pivot.
     names_pattern = "(.)(.*)", # Two groups: first letter, and subsequent letters
     names_to = c("sweep", ".value")) # Names for the new groups
-
-
-## --------------------------------------------------------------------------------------------------------------
 df_mini_wide %>%
   pivot_longer(
     cols = matches("^.C(W|H)TCM00"), # The columns to pivot.
@@ -458,9 +362,6 @@ df_mini_wide %>%
   mutate(sweep = match(sweep_letter, LETTERS),
          fup = mcs_fups[sweep],
          .before = sweep_letter)
-
-
-## --------------------------------------------------------------------------------------------------------------
 rename_col <- function(var_name){
   var_dict <- c("CHTCM00" = "height", "CWTCM00" = "weight")
   sweep_letter <- str_sub(var_name, 1, 1)
@@ -477,12 +378,7 @@ df_mini_wide %>%
     names_to = c(".value", "fup"),
     names_transform = list(fup = as.integer) # To change `fup` column from character to integer
   )
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| output: false
-#| code-fold: true
-#| code-summary: "Reveal the solution"
+#### Task IV ----
 
 df_mini_wide %>%
   pivot_longer(
@@ -491,10 +387,7 @@ df_mini_wide %>%
     names_to = c(".value", "variable")) %>%
   group_by(variable) %>%
   summarise(rho = cor(E, G, use = "complete.obs"))
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| warning: false
+### Long-to-Wide Transformations with `tidyr::pivot_wider()` ----
 
 df_long_mini <- list(
   `11` = mcs_11y_mini %>% rename_with(~ str_replace(.x, "A0$", "00")),
@@ -508,18 +401,12 @@ df_long_mini <- list(
   relocate(fup, .after = CNUM00)
 
 df_long_mini
-
-
-## --------------------------------------------------------------------------------------------------------------
 df_long_mini %>%
   pivot_wider(
     id_cols = c(MCSID, CNUM00),
     names_from = fup,
     values_from = CHTCM00
   )
-
-
-## --------------------------------------------------------------------------------------------------------------
 df_long_mini %>%
   pivot_wider(
     id_cols = c(MCSID, CNUM00),
@@ -527,9 +414,6 @@ df_long_mini %>%
     values_from = CHTCM00,
     names_glue = "{.value}_{fup}"
   )
-
-
-## --------------------------------------------------------------------------------------------------------------
 df_long_mini %>%
   pivot_wider(
     id_cols = c(MCSID, CNUM00),
@@ -538,12 +422,7 @@ df_long_mini %>%
     names_glue = "{.value}_{fup}",
     names_vary = "slowest" # Places variables from the same sweep side-by-side
   )
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| output: false
-#| code-fold: true
-#| code-summary: "Reveal the solution"
+#### Task V ----
 
 task3_solution %>%
   add_count(MCSID, cnum) %>%
@@ -554,9 +433,8 @@ task3_solution %>%
     values_from = c(weight, bmi),
     names_glue = "{.value}_{sweep}",
   )
-
-
-## --------------------------------------------------------------------------------------------------------------
+## Some Helpful Functions for Cleaning Long Data ----
+### `tidyr::complete()` ----
 df_long_mini %>%
   unite("iid", MCSID, CNUM00, sep = "_") %>%
   complete(iid, fup) %>%
@@ -564,17 +442,13 @@ df_long_mini %>%
            into = c("MCSID", "CNUM00"), 
            sep = "_",
            convert = TRUE)
-
-
-## --------------------------------------------------------------------------------------------------------------
+### `tidyr::fill()` ----
 df_long_mini %>%
   complete(MCSID, CNUM00, fup) %>% # Simplified as CNUM == 1 always
   group_by(MCSID, CNUM00) %>%
   fill(CHTCM00, .direction = "down") %>% 
   ungroup()
-
-
-## --------------------------------------------------------------------------------------------------------------
+### Some `dplyr` Helpers ----
 df_long_mini %>%
   select(-CHTCM00, -CWTCM00) %>%
   group_by(MCSID, CNUM00) %>%
@@ -595,12 +469,7 @@ df_long_mini %>%
     n_distinct_fups = n_distinct(fup),
     .groups = "drop"
   )
-
-
-## --------------------------------------------------------------------------------------------------------------
-#| output: false
-#| code-fold: true
-#| code-summary: "Reveal the solution"
+### Task VI ----
 
 ncds_44y <- glue("{ncds_fld}/42y-44y Biomedical/ncds42-4_biomedical_eul.dta") %>%
   read_dta(col_select = c(ncdsid, htres))
@@ -627,4 +496,3 @@ ncds_44y %>%
   pivot_wider(names_from = fup,
               values_from = height,
               names_glue = "height_{fup}")
-

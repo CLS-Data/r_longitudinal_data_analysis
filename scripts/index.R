@@ -1,22 +1,19 @@
-## --------------------------------------------------------------------------------------------------------------
-#| label: pkg-list
-#| eval: false
+# Preface {.unnumbered} ----
 
-# install.packages(c("tidyverse",
-#                    "glue",
-#                    "usethis",
-#                    "summarytools",
-#                    "labelled",
-#                    "codebookr",
-#                    "corrr",
-#                    "naniar",
-#                    "pointblank",
-#                    "lme4",
-#                    "marginaleffects",
-#                    "broom.mixed",
-#                    "gt",
-#                    "gtsummary",
-#                    "flextable",
-#                    "officer",
-#                    "patchwork"))
-
+install.packages(c("tidyverse",
+                   "glue",
+                   "usethis",
+                   "summarytools",
+                   "labelled",
+                   "codebookr",
+                   "corrr",
+                   "naniar",
+                   "pointblank",
+                   "lme4",
+                   "marginaleffects",
+                   "broom.mixed",
+                   "gt",
+                   "gtsummary",
+                   "flextable",
+                   "officer",
+                   "patchwork"))
