@@ -27,7 +27,7 @@ convert_qmd <- function(file){
     summarise(first_row = first(row),
               last_row = last(row),
               line = glue_collapse(line, "\n")) %>%
-    mutate(line = glue("{line}\n"))
+    mutate(line = glue("{line}\n\n"))
   
   chunk_row <- chunks %>%
     select(first_row, last_row) %>% 
@@ -39,7 +39,7 @@ convert_qmd <- function(file){
     select(line, row) %>%
     filter(!(row %in% chunk_row),
            !str_detect(line, "^\\#\\|")) %>%
-    mutate(line = glue("\n{line} ----"))
+    mutate(line = glue("{line} ----"))
   
   out_script <- bind_rows(headers, 
                           chunks %>% rename(row = first_row)) %>%

@@ -17,3 +17,4 @@ install.packages(c("tidyverse",
                    "flextable",
                    "officer",
                    "patchwork"))
+

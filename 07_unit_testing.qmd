@@ -1,0 +1,102 @@
+# Unit Testing
+
+In the last chapter, we created cleaned versions of the MCS and NCDS to use to assess the association between childhood/adolescent cognitive ability and body mass index (BMI). However, the code did not include any checks of the the data. As it is possible that mistakes are included in our code, it is best practice to include *unit tests* to determine whether the data conforms to expectations. In this chapter, we will use the (non-`tidyverse`) package `pointblank` to create a series of tests for our data. This package contains an array of helper functions that produce errors, halting code, if data do not follow user-specified rules. For instance, that variables such as BMI which conceptually should not be negative, do in fact not contain any negative values.
+
+We will also use this opportunity to perform some less formal checks to determine whether the data conforms to expectations - specifically, whether the distributions of variables are as anticipation and whether values are biologically plausible. In practice, the results of these formal and informal tests should feed back into our code development, to ensure the errors do not arise in the first place. But for the purposes of this chapter, we will run the tests on the cleaned datasets as they are, editing and resaving them, to demonstrate how to use `pointblank` and perform other data checks.
+
+The packages we will use are:
+
+```{r}
+#| warning: false
+
+library(tidyverse)
+library(pointblank)
+library(skimr)
+library(dlookr)
+library(summarytools)
+
+df_ncds <- readRDS("data/ncds_clean.Rds")
+df_mcs <- readRDS("data/mcs_clean.Rds")
+```
+
+Let's start with the less formal checks and move on to the more formal checks.
+
+## Data Checking with `skimr`, `dlookr`, and `summarytools`
+
+In [Chapter @sec-data_discovery], we saw a series of packages that can be used for data exploration. In particular, we saw `summarytools::dfSummary()` for obtaining data overviews. This is an excellent function, but here we use the opportunity to show some more `summarytools` functions and other packages that can also be helpful.
+
+We'll start with `skimr::skim()`. This function takes a `tibble` and prints an overview of the data to the console, including an ASCII histogram for continuous variables. `skimr` is integrated into the `tidyverse`, so it can be performed on *grouped* `tibbles` as well as its output post-processed with `dpylr` functions (e.g., `filter()`). Below we `skim()` the NCDS data, reshaping into wide format - given the source variables differ by sweep, it makes sense to treat these observations separately when checking the cleaned data.[^07_unit_testing-1]
+
+[^07_unit_testing-1]: Another option would be to group the `tibble` by follow-up age before piping into `skim()`. However, this would lead to time-invariant variables being presented multiple times, rather than once (though checking these 'time-invariant variable' are in fact invariant, is an important data check).
+
+```{r}
+df_ncds %>%
+  arrange(fup, iid) %>%
+  pivot_wider(names_from = fup,
+              values_from = c(height, weight, bmi, obese),
+              names_glue = "{.value}_{fup}") %>%
+  select(-iid) %>%
+  skim()
+```
+
+One important data check is to determine whether missingness levels increase for later measurements, as should be expected given attrition in longitudinal studies. We can see that this is the case for cohort member BMI and weight. It is not the case for height, but this is explainable as we used earlier adult measurements to deterministically impute later height values. We also see that the covariates collected in cohort members' childhood (e.g., parental BMI and education) generally have lower missingness than the adult anthropometric measurement, though the missingness for year's of education is relatively high, which we could investigate further.
+
+The data cleaning of anthropometric variables in [Chapter @sec-interlude] was relatively limited and focused on recoding negative values as `R`'s `NA`. We can see this decision could be improved as there are a number of biologically implausible values - e.g., the shortest height at 42y was 0.59m and the lowest weight was 0kg, which must be mistakes. So let's use this opportunity to restrict height and BMI to more plausible ranges (1.4 - 2.1m for height, 13 - 50 kg/m<sup>2</sup> for BMI) and to say that weight should be at least strictly positive. These rules are relatively simple and could be improved further, for instance by using heuristics for detecting outliers (+/- 3 SD from the mean) or looking within person at how much temporal stability there is in their data and selecting the most plausible values where they exist. Note, as the BMI and obesity variables are a function of height and weight, we set both to missing if height or weight have been set to missing, too. We use the `dplyr::if_else()` to recode `obese` as `ifelse()` can strip attributes of a variable, `obese` would no longer be a `factor` variable.
+
+```{r}
+ncds_updated <- df_ncds %>%
+  mutate(
+    height = case_when(fup >= 20 & between(height, 1.4, 2.1) ~  height,
+                       fup < 20 ~ height),
+    weight = ifelse(weight > 0, weight, NA),
+    bmi = case_when(is.na(height) ~ NA,
+                    is.na(weight) ~ NA,
+                    between(bmi, 13, 50) ~  bmi),
+    obese = if_else(!is.na(bmi), obese, NA)
+  )
+```
+
+The `descr()` function from `summarytools()` is another good function for getting quick summaries of numerical variables in a `tibble` (or even producing descriptive statistics in general). Again this function works within `dplyr` pipelines (e.g., with grouped `tibbles`). Piped into `tb()`, the output of `descr()` can be converted to a `tibble`.
+
+```{r}
+ncds_updated %>%
+  group_by(fup) %>%
+  descr() %>%
+  tb()
+```
+
+The `dlookr` contains a series of `diagnose*()` functions for performing relevant tests on different types of variables. This includes the `diagnose_outlier()` function which counts the number of outliers per numeric variable and the `diagnose()` function which outputs information on e.g., the number of unique values in each variable. See the [`dlookr` package website](https://choonghyunryu.github.io/dlookr/) for more information.
+
+```{r}
+diagnose(ncds_updated)
+diagnose_outlier(ncds_updated)
+```
+
+We see the height and parental education have a large number of outliers. However, this is likely due to the fact that the outlier detection method is not ideal for skewed distributions.
+
+### Task I
+
+> Perform similar checks for the MCS data and clean the data as necessary. As the majority of the anthropemtric measures are from childhood and adolescence (and BMI is less reliable or interpretable at this age), outliers could be detected by projecting onto z-scores of reference growth charts ([Cole et al., 1995](https://doi.org/10.1136/adc.73.1.25))
+
+## Unit Testing with `pointblank`
+
+We can now move on to more format unit testing using functionality within the `pointblank` package. This package contains many specific unit tests functions which cannot be summarised fully here ([see the package website for more details](https://rstudio.github.io/pointblank/reference/index.html#validation-expectation-and-test-functions)). If a unit test fails, the functions error, halting code. Here we pick out two salient  `pointblank` functions:
+
+```{r}
+ncds_updated %>%
+  col_vals_gt(c(height, weight, bmi), 0, na_pass = TRUE) %>%
+  col_vals_expr(~ bmi == weight / height ^ 2, na_pass = TRUE)
+```
+There are various ways `pointblank` functionality can be customised, including producing warnings rather than errors on failure, and specifying preprocessing steps (e.g., combining variables) before the unit test is conducted
+
+### Task II
+
+> Create a series of unit tests for the MCS data using `pointblank` functions.Read the [package website](https://rstudio.github.io/pointblank/reference/index.html#validation-expectation-and-test-functions) for different tests to those used above.
+
+## Coda
+
+We'll save the updated NCDS and MCS files and use these rather than the files from [Chapter @sec-interlude] in subsequent chapters, given they have been checked and cleaned further.
+
+```{r}
+saveRDS(ncds_updated, "data/ncds_updated.Rds")
+```

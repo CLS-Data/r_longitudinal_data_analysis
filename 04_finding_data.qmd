@@ -204,6 +204,7 @@ mcs_dict_clean <- mcs_data_dict %>%
   separate(path, into = c("fld", "file"), sep = "/") %>%
   mutate(variable_low = str_to_lower(variable),
          label_low = str_to_lower(label))
+saveRDS(mcs_dict_clean, "outputs/mcs_data_dict.Rds")
 
 mcs_dict_clean %>%
   filter(str_detect(label_low, "bmi|body"))
@@ -247,6 +248,7 @@ ncds_data_dict <- tibble(path = list.files(path = ncds_fld,
   separate(path, into = c("fld", "file"), sep = "/") %>%
   mutate(variable_low = str_to_lower(variable),
          label_low = str_to_lower(label))
+saveRDS(ncds_data_dict, "outputs/ncds_data_dict.Rds")
 
 ncds_data_dict %>%
   filter(str_detect(label_low, "diabetes")) # Only looked in variable label!

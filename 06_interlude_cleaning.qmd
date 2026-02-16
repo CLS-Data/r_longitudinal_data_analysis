@@ -36,6 +36,8 @@ values_to_na <- function(x, values){
 ## NCDS
 
 ```{r}
+#| warning: false
+#| 
 ncds_raw <- list()
 ncds_clean <- list()
 
@@ -164,11 +166,14 @@ df_ncds <- reduce(ncds_clean, ~ left_join(.x, .y, by = "ncdsid")) %>%
     bmi = "Body Mass Index (kg/m^2^)",
     obese = "Obese (BMI ≥ 30 kg/m^2^)"
   )
+saveRDS(df_ncds, "data/ncds_clean.Rds")
 ```
 
 ## MCS
 
 ```{r}
+#| warning: false
+
 mcs_raw <- list()
 mcs_clean <- list()
 
