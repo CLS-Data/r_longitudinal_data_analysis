@@ -23,6 +23,12 @@ knitr::opts_chunk$set(
 )
 ```
 
+## Instructions
+
+1. Sign-up to UK Data Service
+2. Download the MCS and NCDS data from the OneDrive link
+3. Clone the GitHub repository with course materials
+
 # Introduction to Course
 
 ## Characteristics of Longitudinal Data {.smaller}
@@ -361,5 +367,4 @@ levels(my_df$nationality)
 dim(my_df)
 ```
 
-## Generic Functions {.smaller}
 

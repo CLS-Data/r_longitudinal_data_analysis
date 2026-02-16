@@ -206,6 +206,14 @@ Liam Wright
 
   <p class="date">2026-02-15</p>
 </section>
+<section id="instructions" class="slide level2">
+<h2>Instructions</h2>
+<ol type="1">
+<li>Sign-up to UK Data Service</li>
+<li>Download the MCS and NCDS data from the OneDrive link</li>
+<li>Clone the GitHub repository with course materials</li>
+</ol>
+</section>
 <section>
 <section id="introduction-to-course" class="title-slide slide level1 center">
 <h1>Introduction to Course</h1>
@@ -274,7 +282,7 @@ Liam Wright
 <li>Please ask questions at any point!</li>
 </ul>
 </section>
-<section id="instructions" class="slide level2">
+<section id="instructions-1" class="slide level2">
 <h2>Instructions</h2>
 <ol type="1">
 <li>Sign-up to UK Data Service</li>
@@ -363,7 +371,7 @@ Liam Wright
 </div>
 </div>
 </section>
-<section id="lists" class="slide level2">
+<section id="lists" class="slide level2 smaller">
 <h2>Lists</h2>
 <ul>
 <li>Collections of objects, potentially of different types and lengths.</li>
@@ -693,7 +701,7 @@ Liam Wright
 </div>
 </div>
 </section>
-<section id="creating-integer-vectors" class="slide level2">
+<section id="creating-integer-vectors" class="slide level2 smaller">
 <h2>Creating Integer Vectors</h2>
 <ul>
 <li><code>which(logical_vector)</code>: Returns the indices where the logical vector equals <code>TRUE</code>.</li>
@@ -745,6 +753,77 @@ Liam Wright
 <div class="cell-output cell-output-stdout">
 <pre><code>   name age
 3 Peter  30</code></pre>
+</div>
+</div>
+</section></section>
+<section>
+<section id="attributes-and-generic-functions" class="title-slide slide level1 center">
+<h1>Attributes and Generic Functions</h1>
+
+</section>
+<section id="attributes" class="slide level2 smaller">
+<h2>Attributes</h2>
+<ul>
+<li>Objects in <code>R</code> can have attributes, - metadata about the object.</li>
+<li><code>names</code> is one attribute we have used already, which we specified with <code>key=value</code> pairs when creating objects.</li>
+<li>Other common attributes include <code>class</code> (which enable more complex data structures that the atomic types) and <code>levels</code> (which defines the categories of a factor variable).
+<ul>
+<li><code>data.frames</code> are in fact lists with the <code>data.frame</code> class</li>
+<li><code>factors</code> are in fact integers with the <code>factor</code> class and a <code>levels</code> attribute</li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href=""></a><span class="fu">typeof</span>(my_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "list"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href=""></a><span class="fu">class</span>(my_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "data.frame"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href=""></a><span class="fu">typeof</span>(my_df<span class="sc">$</span>nationality)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "integer"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href=""></a><span class="fu">class</span>(my_df<span class="sc">$</span>nationality)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "factor"</code></pre>
+</div>
+</div>
+</section>
+<section id="attributes-1" class="slide level2 smaller">
+<h2>Attributes</h2>
+<ul>
+<li>Attributes can be gotten (and set) with <code>attributes(object)</code> and <code>attr(object, "attribute_name")</code> functions</li>
+<li>Widely-used attributes have their own get and set functions too.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href=""></a><span class="fu">attributes</span>(my_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$names
+[1] "name"        "age"         "score"       "nationality"
+
+$class
+[1] "data.frame"
+
+$row.names
+[1] 1 2 3</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href=""></a><span class="fu">names</span>(my_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "name"        "age"         "score"       "nationality"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href=""></a><span class="fu">class</span>(my_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "data.frame"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href=""></a><span class="fu">levels</span>(my_df<span class="sc">$</span>nationality)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "English"  "Scottish"</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href=""></a><span class="fu">dim</span>(my_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3 4</code></pre>
 </div>
 </div>
 
