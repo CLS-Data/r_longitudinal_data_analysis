@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>6&nbsp; Interlude: Data Cleaning – R for Longitudinal Data Analysis</title>
+<title>6&nbsp; Interlude: Creating a Full Cleaned Dataset – R for Longitudinal Data Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,6 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./07_unit_testing.html" rel="next">
 <link href="./05_data_preparation.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -117,7 +118,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./06_interlude_cleaning.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Interlude: Data Cleaning</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./06_interlude_cleaning.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Interlude: Creating a Full Cleaned Dataset</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -183,7 +184,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./06_interlude_cleaning.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Interlude: Data Cleaning</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Interlude: Creating a Full Cleaned Dataset</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_unit_testing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Unit Testing</span></span></a>
   </div>
 </li>
     </ul>
@@ -207,7 +214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-interlude" class="quarto-section-identifier"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Interlude: Data Cleaning</span></span></h1>
+<h1 class="title"><span id="sec-interlude" class="quarto-section-identifier"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Interlude: Creating a Full Cleaned Dataset</span></span></h1>
 </div>
 
 
@@ -379,7 +386,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight =</span> <span class="st">"Weight (kg)"</span>,</span>
 <span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a>    <span class="at">bmi =</span> <span class="st">"Body Mass Index (kg/m^2^)"</span>,</span>
 <span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>    <span class="at">obese =</span> <span class="st">"Obese (BMI ≥ 30 kg/m^2^)"</span></span>
-<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(df_ncds, <span class="st">"data/ncds_clean.Rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="mcs" class="level2" data-number="6.2">
@@ -421,301 +429,193 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>           <span class="at">.before =</span> <span class="dv">1</span>)</span>
 <span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>hhgrid <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>, load_mcs_hhgrid)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$p_sex` and `..2$p_sex` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$p_sex`.
-✖ Values: -2</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$rel` and `..2$rel` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$rel`.
-✖ Values: -1</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$p_sex` and `..3$p_sex` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$p_sex`.
-✖ Values: -2</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$rel` and `..3$rel` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$rel`.
-✖ Values: -8, -1, and 6</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$p_sex` and `..4$p_sex` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$p_sex`.
-✖ Values: -2</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$rel` and `..4$rel` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$rel`.
-✖ Values: -8 and -1</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$rel` and `..5$rel` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$rel`.
-✖ Values: -1, 6, and 10</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$cm_sex` and `..6$cm_sex` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$cm_sex`.
-✖ Values: -1</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$p_sex` and `..6$p_sex` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$p_sex`.
-✖ Values: -1</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$rel` and `..6$rel` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$rel`.
-✖ Values: -1, 6, and 10</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$rel` and `..7$rel` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$rel`.
-✖ Values: -9, -8, -1, 6, 10, 12, 13, 14, and 15</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">## c. Cohort Member Sex ----</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>cm_sex <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>hhgrid <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(CNUM00 <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sex =</span> <span class="fu">negative_to_na</span>(cm_sex) <span class="sc">%&gt;%</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>           <span class="fu">factor</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(sex) <span class="sc">%&gt;%</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(MCSID, CNUM00, sex) <span class="sc">%&gt;%</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, CNUM00) <span class="sc">%&gt;%</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n) <span class="sc">%&gt;%</span> <span class="co"># Keep most common response (in case of changes)</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="co"># Keep first most common so unique per individual</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n)</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="do">## d. Cohort Member Ethnic Group ----</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>load_cm_ethnicity <span class="ot">&lt;-</span> <span class="cf">function</span>(sweep){</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  fup <span class="ot">&lt;-</span> mcs_fups[sweep]</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{fup}y/mcs{sweep}_cm_derived.dta"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">matches</span>(<span class="st">"MCSID|CNUM|CE06|C06E"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">CNUM00 =</span> <span class="fu">matches</span>(<span class="st">"^.CNUM00"</span>),</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">ethnicity_raw =</span> <span class="fu">matches</span>(<span class="st">"CE06|C06E"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sweep =</span> <span class="sc">!!</span>sweep)</span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>cm_ethnicity <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, load_cm_ethnicity)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$ethnicity_raw` and `..2$ethnicity_raw` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$ethnicity_raw`.
-✖ Values: -8 and 6</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$ethnicity_raw` and `..4$ethnicity_raw` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$ethnicity_raw`.
-✖ Values: 6</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$ethnicity_raw` and `..5$ethnicity_raw` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$ethnicity_raw`.
-✖ Values: -8 and -1</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$ethnicity_raw` and `..6$ethnicity_raw` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$ethnicity_raw`.
-✖ Values: -8 and -1</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>cm_ethnicity <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>cm_ethnicity <span class="sc">%&gt;%</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">ethnic_group =</span> <span class="fu">case_when</span>(ethnicity_raw <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"White"</span>,</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                             ethnicity_raw <span class="sc">%in%</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span> <span class="sc">~</span> <span class="st">"Non-White"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"White"</span>, <span class="st">"Non-White"</span>))</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(ethnic_group) <span class="sc">%&gt;%</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, CNUM00) <span class="sc">%&gt;%</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">ethnic_group =</span> <span class="fu">first</span>(ethnic_group),</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="do">## e. Parental Characteristics ----</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>parent_grid <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>hhgrid <span class="sc">%&gt;%</span></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rel <span class="sc">%in%</span> <span class="dv">7</span><span class="sc">:</span><span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="co"># Natural, adoptive, foster or step-parent.</span></span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">parent_type =</span> <span class="fu">case_when</span>(p_sex <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"father"</span>, </span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>                                 p_sex <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"mother"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(parent_type) <span class="sc">%&gt;%</span></span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, parent_type) <span class="sc">%&gt;%</span></span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(sweep) <span class="sc">%&gt;%</span> <span class="co"># First parent of parent type</span></span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(rel) <span class="sc">%&gt;%</span></span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, PNUM00, parent_type)</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>load_parent_data <span class="ot">&lt;-</span> <span class="cf">function</span>(sweep){</span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>  fup <span class="ot">&lt;-</span> mcs_fups[sweep]</span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{fup}y/mcs{sweep}_parent_derived.dta"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">matches</span>(<span class="st">"MCSID|PNUM|DDBMI00|ACAQ00"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">PNUM00 =</span> <span class="fu">matches</span>(<span class="st">"^.PNUM00"</span>),</span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>           <span class="at">bmi_raw =</span> <span class="fu">matches</span>(<span class="st">"^.DDBMI00"</span>),</span>
-<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>           <span class="at">nvq_raw =</span> <span class="fu">matches</span>(<span class="st">"ACAQ00"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sweep =</span> <span class="sc">!!</span>sweep)</span>
-<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>parent_char <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>, load_parent_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$nvq_raw` and `..5$nvq_raw` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$nvq_raw`.
-✖ Values: 1, 2, 3, 4, 5, and 95</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$nvq_raw` and `..6$nvq_raw` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$nvq_raw`.
-✖ Values: 1, 2, 3, 4, 5, and 95</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>parent_char <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>parent_char <span class="sc">%&gt;%</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.labelled), negative_to_na),</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">edu_level =</span> <span class="fu">ordered</span>(nvq_raw, </span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">96</span>, <span class="dv">95</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>),</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No Qualifications"</span>, </span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Foreign Qualification"</span>, </span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>                                              <span class="fu">glue</span>(<span class="st">"NVQ Level {1:5}"</span>)))) <span class="sc">%&gt;%</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, PNUM00) <span class="sc">%&gt;%</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">bmi =</span> <span class="fu">first</span>(bmi_raw, <span class="at">na_rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">edu_level =</span> <span class="fu">max</span>(edu_level, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(mcs_clean<span class="sc">$</span>parent_grid, </span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"PNUM00"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>PNUM00) <span class="sc">%&gt;%</span></span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">id_cols =</span> MCSID,</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_from =</span> parent_type,</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> <span class="fu">c</span>(bmi, edu_level),</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_glue =</span> <span class="st">"{parent_type}_{.value}"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: There were 2710 warnings in `summarise()`.
-The first warning was:
-ℹ In argument: `edu_level = max(edu_level, na.rm = TRUE)`.
-ℹ In group 47: `MCSID = "M10042X"`, `PNUM00 = 3`.
-Caused by warning in `max()`:
-! no non-missing arguments to max; returning -Inf
-ℹ Run `dplyr::last_dplyr_warnings()` to see the 2709 remaining warnings.</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="do">## f. Cohort Member Cognitive Ability ----</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>verbal_11 <span class="ot">&lt;-</span> <span class="fu">load_mcs</span>(<span class="st">"11y/mcs5_cm_derived.dta"</span>, <span class="st">"EVSABIL"</span>)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>vocab_14 <span class="ot">&lt;-</span> <span class="fu">load_mcs</span>(<span class="st">"14y/mcs6_cm_cognitive_assessment.dta"</span>,</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                             <span class="fu">glue</span>(<span class="st">"FCCMCOG{LETTERS[1:20]}"</span>))</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>clean_vocab_item <span class="ot">&lt;-</span> <span class="cf">function</span>(item){</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  value_labels <span class="ot">&lt;-</span> <span class="fu">val_labels</span>(item)</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  correct_answer <span class="ot">&lt;-</span> value_labels[<span class="fu">str_detect</span>(<span class="fu">names</span>(value_labels), <span class="st">"</span><span class="sc">\\</span><span class="st">(correct answer</span><span class="sc">\\</span><span class="st">)"</span>)]</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">case_when</span>(item <span class="sc">==</span> correct_answer <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>            item <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> <span class="sc">~</span> <span class="dv">0</span>)</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>cog <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>verbal_11 <span class="sc">%&gt;%</span></span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mcs_raw<span class="sc">$</span>vocab_14, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="at">ECNUM00 =</span> <span class="st">"FCNUM00"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbal_11 =</span> <span class="fu">negative_to_na</span>(EVSABIL),</span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">matches</span>(<span class="st">"FCCMCOG[A-T]"</span>), clean_vocab_item),</span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_14 =</span> <span class="fu">pick</span>(<span class="fu">matches</span>(<span class="st">"FCCMCOG[A-T]"</span>)) <span class="sc">%&gt;%</span> <span class="fu">rowSums</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_14_obs =</span> <span class="fu">pick</span>(<span class="fu">matches</span>(<span class="st">"FCCMCOG[A-T]"</span>)) <span class="sc">%&gt;%</span> <span class="fu">rowSums</span>(<span class="sc">!</span><span class="fu">is.na</span>(.)),</span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_14 =</span> <span class="fu">ifelse</span>(vocab_14_obs <span class="sc">&gt;=</span> <span class="dv">1</span>, vocab_14, <span class="cn">NA</span>)</span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, <span class="at">CNUM00 =</span> ECNUM00, verbal_11, vocab_14)</span>
-<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a><span class="do">## g. Cohort Member BMI ----</span></span>
-<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>anthro_3y <span class="ot">&lt;-</span> <span class="fu">load_mcs</span>(<span class="st">"3y/mcs2_cm_interview.dta"</span>,</span>
-<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">c</span>(<span class="st">"BCWTKC00"</span>, <span class="st">"BCWTGC00"</span>, <span class="st">"BCHCMC00"</span>, <span class="st">"BCHMMC00"</span>))</span>
-<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>load_cm_bmi <span class="ot">&lt;-</span> <span class="cf">function</span>(sweep){</span>
-<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>  fup <span class="ot">&lt;-</span> mcs_fups[sweep]</span>
-<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{fup}y/mcs{sweep}_cm_interview.dta"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">matches</span>(<span class="st">"MCSID|CNUM|(W|H)TCM(A|0)0"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">CNUM00 =</span> <span class="fu">matches</span>(<span class="st">"^.CNUM00"</span>),</span>
-<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a>           <span class="at">height_raw =</span> <span class="fu">matches</span>(<span class="st">"^.CHTCM(A|0)0"</span>),</span>
-<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a>           <span class="at">weight_raw =</span> <span class="fu">matches</span>(<span class="st">"^.CWTCM(A|0)0"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb26-39"><a href="#cb26-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sweep =</span> <span class="sc">!!</span>sweep) </span>
-<span id="cb26-40"><a href="#cb26-40" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb26-41"><a href="#cb26-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-42"><a href="#cb26-42" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>anthro_5y_17y <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">3</span><span class="sc">:</span><span class="dv">7</span>, load_cm_bmi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$height_raw` and `..2$height_raw` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$height_raw`.
-✖ Values: -8</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$weight_raw` and `..2$weight_raw` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$weight_raw`.
-✖ Values: -8</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$height_raw` and `..5$height_raw` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$height_raw`.
-✖ Values: -5</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: `..1$weight_raw` and `..5$weight_raw` have conflicting value labels.
-ℹ Labels for these values will be taken from `..1$weight_raw`.
-✖ Values: -5</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>anthro <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>anthro_3y <span class="sc">%&gt;%</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">where</span>(is.labelled), negative_to_na),</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">height =</span> (BCHCMC00 <span class="sc">+</span> BCHMMC00<span class="sc">/</span><span class="dv">10</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight =</span> (BCWTKC00 <span class="sc">+</span> BCWTGC00<span class="sc">*</span><span class="dv">10</span>),</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">sweep =</span> <span class="dv">2</span></span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, <span class="at">CNUM00 =</span> BCNUM00, sweep, height, weight) <span class="sc">%&gt;%</span></span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    mcs_raw<span class="sc">$</span>anthro_5y_17y <span class="sc">%&gt;%</span></span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">height =</span> <span class="fu">negative_to_na</span>(height_raw) <span class="sc">/</span> <span class="dv">100</span>,</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>             <span class="at">weight =</span> <span class="fu">negative_to_na</span>(weight_raw)) <span class="sc">%&gt;%</span></span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span><span class="fu">matches</span>(<span class="st">"_raw$"</span>))</span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bmi =</span> weight <span class="sc">/</span> (height <span class="sc">^</span> <span class="dv">2</span>),</span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">obese =</span> <span class="fu">ifelse</span>(bmi <span class="sc">&gt;=</span> <span class="dv">30</span>, <span class="st">"Obese"</span>, <span class="st">"Not Obese"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>           <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"Not Obese"</span>, <span class="st">"Obese"</span>)))</span>
-<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a><span class="co"># f. Combine Cleaned Data ----</span></span>
-<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>df_mcs <span class="ot">&lt;-</span> mcs_clean<span class="sc">$</span>xwave <span class="sc">%&gt;%</span></span>
-<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">uncount</span>(<span class="fu">length</span>(mcs_fups), <span class="at">.id =</span> <span class="st">"sweep"</span>) <span class="sc">%&gt;%</span> <span class="co"># To ensure 1 row per sweep for every cohort member</span></span>
-<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mcs_clean<span class="sc">$</span>cm_sex, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM00"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mcs_clean<span class="sc">$</span>cm_ethnicity, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM00"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mcs_clean<span class="sc">$</span>cog, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM00"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mcs_clean<span class="sc">$</span>parent_char, <span class="at">by =</span> <span class="st">"MCSID"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mcs_clean<span class="sc">$</span>anthro, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM00"</span>, <span class="st">"sweep"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">iid =</span> <span class="fu">glue</span>(<span class="st">"{MCSID}_{CNUM00}"</span>),</span>
-<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">fup =</span> mcs_fups[sweep], <span class="at">.after =</span> sweep) <span class="sc">%&gt;%</span></span>
-<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sweep <span class="sc">%in%</span> mcs_clean<span class="sc">$</span>anthro<span class="sc">$</span>sweep) <span class="sc">%&gt;%</span></span>
-<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(MCSID<span class="sc">:</span>sweep)) <span class="sc">%&gt;%</span></span>
-<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">zap_labels</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">zap_formats</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_variable_labels</span>(</span>
-<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">iid =</span> <span class="st">"Individual ID"</span>,</span>
-<span id="cb31-37"><a href="#cb31-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">fup =</span> <span class="st">"Follow-Up Age"</span>,</span>
-<span id="cb31-38"><a href="#cb31-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="st">"Sex"</span>,</span>
-<span id="cb31-39"><a href="#cb31-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">ethnic_group =</span> <span class="st">"Ethnic Group"</span>,</span>
-<span id="cb31-40"><a href="#cb31-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">father_edu_level =</span> <span class="st">"Father's Highest Qualification"</span>,</span>
-<span id="cb31-41"><a href="#cb31-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">mother_edu_level =</span> <span class="st">"Mother's Highest Qualification"</span>,</span>
-<span id="cb31-42"><a href="#cb31-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">father_bmi =</span> <span class="st">"Father's BMI"</span>,</span>
-<span id="cb31-43"><a href="#cb31-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">mother_bmi =</span> <span class="st">"Mother's BMI"</span>,</span>
-<span id="cb31-44"><a href="#cb31-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbal_11 =</span> <span class="st">"Verbal Score @ Age 11y"</span>,</span>
-<span id="cb31-45"><a href="#cb31-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_14 =</span> <span class="st">"Vocabulary Score @ Age 14y"</span>,</span>
-<span id="cb31-46"><a href="#cb31-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">height =</span> <span class="st">"Height (m)"</span>,</span>
-<span id="cb31-47"><a href="#cb31-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight =</span> <span class="st">"Weight (kg)"</span>,</span>
-<span id="cb31-48"><a href="#cb31-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">bmi =</span> <span class="st">"Body Mass Index (kg/m^2^)"</span>,</span>
-<span id="cb31-49"><a href="#cb31-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">obese =</span> <span class="st">"Obese (BMI ≥ 30 kg/m^2^)"</span></span>
-<span id="cb31-50"><a href="#cb31-50" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb31-51"><a href="#cb31-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-52"><a href="#cb31-52" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(df_mcs, <span class="st">"data/mcs_clean.Rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>hhgrid <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>, load_mcs_hhgrid)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="do">## c. Cohort Member Sex ----</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>cm_sex <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>hhgrid <span class="sc">%&gt;%</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(CNUM00 <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sex =</span> <span class="fu">negative_to_na</span>(cm_sex) <span class="sc">%&gt;%</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>           <span class="fu">factor</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(sex) <span class="sc">%&gt;%</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(MCSID, CNUM00, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, CNUM00) <span class="sc">%&gt;%</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n) <span class="sc">%&gt;%</span> <span class="co"># Keep most common response (in case of changes)</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="co"># Keep first most common so unique per individual</span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="do">## d. Cohort Member Ethnic Group ----</span></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>load_cm_ethnicity <span class="ot">&lt;-</span> <span class="cf">function</span>(sweep){</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>  fup <span class="ot">&lt;-</span> mcs_fups[sweep]</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{fup}y/mcs{sweep}_cm_derived.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">matches</span>(<span class="st">"MCSID|CNUM|CE06|C06E"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">CNUM00 =</span> <span class="fu">matches</span>(<span class="st">"^.CNUM00"</span>),</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>           <span class="at">ethnicity_raw =</span> <span class="fu">matches</span>(<span class="st">"CE06|C06E"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sweep =</span> <span class="sc">!!</span>sweep)</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>cm_ethnicity <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, load_cm_ethnicity)</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>cm_ethnicity <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>cm_ethnicity <span class="sc">%&gt;%</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">ethnic_group =</span> <span class="fu">case_when</span>(ethnicity_raw <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"White"</span>,</span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>                             ethnicity_raw <span class="sc">%in%</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span> <span class="sc">~</span> <span class="st">"Non-White"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>      <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"White"</span>, <span class="st">"Non-White"</span>))</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(ethnic_group) <span class="sc">%&gt;%</span></span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, CNUM00) <span class="sc">%&gt;%</span></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">ethnic_group =</span> <span class="fu">first</span>(ethnic_group),</span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a><span class="do">## e. Parental Characteristics ----</span></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>parent_grid <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>hhgrid <span class="sc">%&gt;%</span></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rel <span class="sc">%in%</span> <span class="dv">7</span><span class="sc">:</span><span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="co"># Natural, adoptive, foster or step-parent.</span></span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">parent_type =</span> <span class="fu">case_when</span>(p_sex <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"father"</span>, </span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>                                 p_sex <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"mother"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(parent_type) <span class="sc">%&gt;%</span></span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, parent_type) <span class="sc">%&gt;%</span></span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(sweep) <span class="sc">%&gt;%</span> <span class="co"># First parent of parent type</span></span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_min</span>(rel) <span class="sc">%&gt;%</span></span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, PNUM00, parent_type)</span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>load_parent_data <span class="ot">&lt;-</span> <span class="cf">function</span>(sweep){</span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>  fup <span class="ot">&lt;-</span> mcs_fups[sweep]</span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{fup}y/mcs{sweep}_parent_derived.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">matches</span>(<span class="st">"MCSID|PNUM|DDBMI00|ACAQ00"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">PNUM00 =</span> <span class="fu">matches</span>(<span class="st">"^.PNUM00"</span>),</span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>           <span class="at">bmi_raw =</span> <span class="fu">matches</span>(<span class="st">"^.DDBMI00"</span>),</span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>           <span class="at">nvq_raw =</span> <span class="fu">matches</span>(<span class="st">"ACAQ00"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sweep =</span> <span class="sc">!!</span>sweep)</span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>parent_char <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>, load_parent_data)</span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>parent_char <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>parent_char <span class="sc">%&gt;%</span></span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.labelled), negative_to_na),</span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>         <span class="at">edu_level =</span> <span class="fu">ordered</span>(nvq_raw, </span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">96</span>, <span class="dv">95</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>),</span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No Qualifications"</span>, </span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Foreign Qualification"</span>, </span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>                                              <span class="fu">glue</span>(<span class="st">"NVQ Level {1:5}"</span>)))) <span class="sc">%&gt;%</span></span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, PNUM00) <span class="sc">%&gt;%</span></span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">bmi =</span> <span class="fu">first</span>(bmi_raw, <span class="at">na_rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>            <span class="at">edu_level =</span> <span class="fu">max</span>(edu_level, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(mcs_clean<span class="sc">$</span>parent_grid, </span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>             <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"PNUM00"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>PNUM00) <span class="sc">%&gt;%</span></span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">id_cols =</span> MCSID,</span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_from =</span> parent_type,</span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> <span class="fu">c</span>(bmi, edu_level),</span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_glue =</span> <span class="st">"{parent_type}_{.value}"</span>) </span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a><span class="do">## f. Cohort Member Cognitive Ability ----</span></span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>verbal_11 <span class="ot">&lt;-</span> <span class="fu">load_mcs</span>(<span class="st">"11y/mcs5_cm_derived.dta"</span>, <span class="st">"EVSABIL"</span>)</span>
+<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>vocab_14 <span class="ot">&lt;-</span> <span class="fu">load_mcs</span>(<span class="st">"14y/mcs6_cm_cognitive_assessment.dta"</span>,</span>
+<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a>                             <span class="fu">glue</span>(<span class="st">"FCCMCOG{LETTERS[1:20]}"</span>))</span>
+<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>clean_vocab_item <span class="ot">&lt;-</span> <span class="cf">function</span>(item){</span>
+<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>  value_labels <span class="ot">&lt;-</span> <span class="fu">val_labels</span>(item)</span>
+<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>  correct_answer <span class="ot">&lt;-</span> value_labels[<span class="fu">str_detect</span>(<span class="fu">names</span>(value_labels), <span class="st">"</span><span class="sc">\\</span><span class="st">(correct answer</span><span class="sc">\\</span><span class="st">)"</span>)]</span>
+<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a>  <span class="fu">case_when</span>(item <span class="sc">==</span> correct_answer <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>            item <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> <span class="sc">~</span> <span class="dv">0</span>)</span>
+<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>cog <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>verbal_11 <span class="sc">%&gt;%</span></span>
+<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(mcs_raw<span class="sc">$</span>vocab_14, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="at">ECNUM00 =</span> <span class="st">"FCNUM00"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbal_11 =</span> <span class="fu">negative_to_na</span>(EVSABIL),</span>
+<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">matches</span>(<span class="st">"FCCMCOG[A-T]"</span>), clean_vocab_item),</span>
+<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_14 =</span> <span class="fu">pick</span>(<span class="fu">matches</span>(<span class="st">"FCCMCOG[A-T]"</span>)) <span class="sc">%&gt;%</span> <span class="fu">rowSums</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_14_obs =</span> <span class="fu">pick</span>(<span class="fu">matches</span>(<span class="st">"FCCMCOG[A-T]"</span>)) <span class="sc">%&gt;%</span> <span class="fu">rowSums</span>(<span class="sc">!</span><span class="fu">is.na</span>(.)),</span>
+<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_14 =</span> <span class="fu">ifelse</span>(vocab_14_obs <span class="sc">&gt;=</span> <span class="dv">1</span>, vocab_14, <span class="cn">NA</span>)</span>
+<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, <span class="at">CNUM00 =</span> ECNUM00, verbal_11, vocab_14)</span>
+<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a><span class="do">## g. Cohort Member BMI ----</span></span>
+<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>anthro_3y <span class="ot">&lt;-</span> <span class="fu">load_mcs</span>(<span class="st">"3y/mcs2_cm_interview.dta"</span>,</span>
+<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">c</span>(<span class="st">"BCWTKC00"</span>, <span class="st">"BCWTGC00"</span>, <span class="st">"BCHCMC00"</span>, <span class="st">"BCHMMC00"</span>))</span>
+<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a>load_cm_bmi <span class="ot">&lt;-</span> <span class="cf">function</span>(sweep){</span>
+<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a>  fup <span class="ot">&lt;-</span> mcs_fups[sweep]</span>
+<span id="cb4-155"><a href="#cb4-155" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{fup}y/mcs{sweep}_cm_interview.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">matches</span>(<span class="st">"MCSID|CNUM|(W|H)TCM(A|0)0"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">CNUM00 =</span> <span class="fu">matches</span>(<span class="st">"^.CNUM00"</span>),</span>
+<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a>           <span class="at">height_raw =</span> <span class="fu">matches</span>(<span class="st">"^.CHTCM(A|0)0"</span>),</span>
+<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a>           <span class="at">weight_raw =</span> <span class="fu">matches</span>(<span class="st">"^.CWTCM(A|0)0"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sweep =</span> <span class="sc">!!</span>sweep) </span>
+<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a>mcs_raw<span class="sc">$</span>anthro_5y_17y <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">3</span><span class="sc">:</span><span class="dv">7</span>, load_cm_bmi)</span>
+<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a>mcs_clean<span class="sc">$</span>anthro <span class="ot">&lt;-</span> mcs_raw<span class="sc">$</span>anthro_3y <span class="sc">%&gt;%</span></span>
+<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">where</span>(is.labelled), negative_to_na),</span>
+<span id="cb4-169"><a href="#cb4-169" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-170"><a href="#cb4-170" aria-hidden="true" tabindex="-1"></a>    <span class="at">height =</span> (BCHCMC00 <span class="sc">+</span> BCHMMC00<span class="sc">/</span><span class="dv">10</span>) <span class="sc">/</span> <span class="dv">100</span>,</span>
+<span id="cb4-171"><a href="#cb4-171" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight =</span> (BCWTKC00 <span class="sc">+</span> BCWTGC00<span class="sc">*</span><span class="dv">10</span>),</span>
+<span id="cb4-172"><a href="#cb4-172" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-173"><a href="#cb4-173" aria-hidden="true" tabindex="-1"></a>    <span class="at">sweep =</span> <span class="dv">2</span></span>
+<span id="cb4-174"><a href="#cb4-174" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb4-175"><a href="#cb4-175" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, <span class="at">CNUM00 =</span> BCNUM00, sweep, height, weight) <span class="sc">%&gt;%</span></span>
+<span id="cb4-176"><a href="#cb4-176" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
+<span id="cb4-177"><a href="#cb4-177" aria-hidden="true" tabindex="-1"></a>    mcs_raw<span class="sc">$</span>anthro_5y_17y <span class="sc">%&gt;%</span></span>
+<span id="cb4-178"><a href="#cb4-178" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">height =</span> <span class="fu">negative_to_na</span>(height_raw) <span class="sc">/</span> <span class="dv">100</span>,</span>
+<span id="cb4-179"><a href="#cb4-179" aria-hidden="true" tabindex="-1"></a>             <span class="at">weight =</span> <span class="fu">negative_to_na</span>(weight_raw)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-180"><a href="#cb4-180" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span><span class="fu">matches</span>(<span class="st">"_raw$"</span>))</span>
+<span id="cb4-181"><a href="#cb4-181" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb4-182"><a href="#cb4-182" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bmi =</span> weight <span class="sc">/</span> (height <span class="sc">^</span> <span class="dv">2</span>),</span>
+<span id="cb4-183"><a href="#cb4-183" aria-hidden="true" tabindex="-1"></a>         <span class="at">obese =</span> <span class="fu">ifelse</span>(bmi <span class="sc">&gt;=</span> <span class="dv">30</span>, <span class="st">"Obese"</span>, <span class="st">"Not Obese"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-184"><a href="#cb4-184" aria-hidden="true" tabindex="-1"></a>           <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"Not Obese"</span>, <span class="st">"Obese"</span>)))</span>
+<span id="cb4-185"><a href="#cb4-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-186"><a href="#cb4-186" aria-hidden="true" tabindex="-1"></a><span class="co"># f. Combine Cleaned Data ----</span></span>
+<span id="cb4-187"><a href="#cb4-187" aria-hidden="true" tabindex="-1"></a>df_mcs <span class="ot">&lt;-</span> mcs_clean<span class="sc">$</span>xwave <span class="sc">%&gt;%</span></span>
+<span id="cb4-188"><a href="#cb4-188" aria-hidden="true" tabindex="-1"></a>  <span class="fu">uncount</span>(<span class="fu">length</span>(mcs_fups), <span class="at">.id =</span> <span class="st">"sweep"</span>) <span class="sc">%&gt;%</span> <span class="co"># To ensure 1 row per sweep for every cohort member</span></span>
+<span id="cb4-189"><a href="#cb4-189" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mcs_clean<span class="sc">$</span>cm_sex, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM00"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-190"><a href="#cb4-190" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mcs_clean<span class="sc">$</span>cm_ethnicity, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM00"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-191"><a href="#cb4-191" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mcs_clean<span class="sc">$</span>cog, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM00"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-192"><a href="#cb4-192" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mcs_clean<span class="sc">$</span>parent_char, <span class="at">by =</span> <span class="st">"MCSID"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-193"><a href="#cb4-193" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(mcs_clean<span class="sc">$</span>anthro, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM00"</span>, <span class="st">"sweep"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-194"><a href="#cb4-194" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">iid =</span> <span class="fu">glue</span>(<span class="st">"{MCSID}_{CNUM00}"</span>),</span>
+<span id="cb4-195"><a href="#cb4-195" aria-hidden="true" tabindex="-1"></a>         <span class="at">fup =</span> mcs_fups[sweep], <span class="at">.after =</span> sweep) <span class="sc">%&gt;%</span></span>
+<span id="cb4-196"><a href="#cb4-196" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sweep <span class="sc">%in%</span> mcs_clean<span class="sc">$</span>anthro<span class="sc">$</span>sweep) <span class="sc">%&gt;%</span></span>
+<span id="cb4-197"><a href="#cb4-197" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(MCSID<span class="sc">:</span>sweep)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-198"><a href="#cb4-198" aria-hidden="true" tabindex="-1"></a>  <span class="fu">zap_labels</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb4-199"><a href="#cb4-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">zap_formats</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb4-200"><a href="#cb4-200" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_variable_labels</span>(</span>
+<span id="cb4-201"><a href="#cb4-201" aria-hidden="true" tabindex="-1"></a>    <span class="at">iid =</span> <span class="st">"Individual ID"</span>,</span>
+<span id="cb4-202"><a href="#cb4-202" aria-hidden="true" tabindex="-1"></a>    <span class="at">fup =</span> <span class="st">"Follow-Up Age"</span>,</span>
+<span id="cb4-203"><a href="#cb4-203" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="st">"Sex"</span>,</span>
+<span id="cb4-204"><a href="#cb4-204" aria-hidden="true" tabindex="-1"></a>    <span class="at">ethnic_group =</span> <span class="st">"Ethnic Group"</span>,</span>
+<span id="cb4-205"><a href="#cb4-205" aria-hidden="true" tabindex="-1"></a>    <span class="at">father_edu_level =</span> <span class="st">"Father's Highest Qualification"</span>,</span>
+<span id="cb4-206"><a href="#cb4-206" aria-hidden="true" tabindex="-1"></a>    <span class="at">mother_edu_level =</span> <span class="st">"Mother's Highest Qualification"</span>,</span>
+<span id="cb4-207"><a href="#cb4-207" aria-hidden="true" tabindex="-1"></a>    <span class="at">father_bmi =</span> <span class="st">"Father's BMI"</span>,</span>
+<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a>    <span class="at">mother_bmi =</span> <span class="st">"Mother's BMI"</span>,</span>
+<span id="cb4-209"><a href="#cb4-209" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbal_11 =</span> <span class="st">"Verbal Score @ Age 11y"</span>,</span>
+<span id="cb4-210"><a href="#cb4-210" aria-hidden="true" tabindex="-1"></a>    <span class="at">vocab_14 =</span> <span class="st">"Vocabulary Score @ Age 14y"</span>,</span>
+<span id="cb4-211"><a href="#cb4-211" aria-hidden="true" tabindex="-1"></a>    <span class="at">height =</span> <span class="st">"Height (m)"</span>,</span>
+<span id="cb4-212"><a href="#cb4-212" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight =</span> <span class="st">"Weight (kg)"</span>,</span>
+<span id="cb4-213"><a href="#cb4-213" aria-hidden="true" tabindex="-1"></a>    <span class="at">bmi =</span> <span class="st">"Body Mass Index (kg/m^2^)"</span>,</span>
+<span id="cb4-214"><a href="#cb4-214" aria-hidden="true" tabindex="-1"></a>    <span class="at">obese =</span> <span class="st">"Obese (BMI ≥ 30 kg/m^2^)"</span></span>
+<span id="cb4-215"><a href="#cb4-215" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-216"><a href="#cb4-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-217"><a href="#cb4-217" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(df_mcs, <span class="st">"data/mcs_clean.Rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="the-cleaned-datasets" class="level2" data-number="6.3">
 <h2 data-number="6.3" class="anchored" data-anchor-id="the-cleaned-datasets"><span class="header-section-number">6.3</span> The Cleaned Datasets</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(df_ncds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(df_ncds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> pos variable         label                      col_type missing values   
  1   iid              Individual ID              chr      0                
@@ -736,7 +636,7 @@ Caused by warning in `max()`:
  14  obese            Obese (BMI ≥ 30 kg/m^2^)   fct      68378   Not Obese
                                                                   Obese    </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(df_mcs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(df_mcs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> pos variable         label               col_type missing values             
  1   iid              Individual ID       glue     0                          
@@ -1183,6 +1083,9 @@ Caused by warning in `max()`:
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./07_unit_testing.html" class="pagination-link" aria-label="Unit Testing">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Unit Testing</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

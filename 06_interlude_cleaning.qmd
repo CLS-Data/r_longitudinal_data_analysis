@@ -1,4 +1,4 @@
-# Interlude: Data Cleaning {#sec-interlude}
+# Interlude: Creating a Full Cleaned Dataset {#sec-interlude}
 
 The following chapters cover analysis and require cleaned data. Here we will prepare two datasets (one for MCS, one for NCDS) allowing us to assess the association between childhood/adolescent cognitive ability and body mass index (BMI). These datasets will include BMI at each sweep in which it is measured, as well multiple measures of cognitive ability and a set of control variables (age of BMI measurement, sex, mother's and father's education, mother and father's BMI, and ethnicity). More detail on the various cognitive measures are described in Moulton et al.'s ([2024](https://closer.ac.uk/cross-study-data-guides/cognitive-measures-guide/)) excellent report on the measurement of cognition in the British birth cohorts.
 
@@ -37,7 +37,7 @@ values_to_na <- function(x, values){
 
 ```{r}
 #| warning: false
-#| 
+
 ncds_raw <- list()
 ncds_clean <- list()
 

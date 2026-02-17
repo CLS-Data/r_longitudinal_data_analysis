@@ -13,7 +13,7 @@ book:
     - 04_finding_data.qmd
     - 05_data_preparation.qmd
     - 06_interlude_cleaning.qmd
-    # - 07_unit_testing.qmd
+    - 07_unit_testing.qmd
     # - 08_descriptive_statistics.qmd
     # - 09_regression_analyses.qmd
     # - 10_presenting_results.qmd
