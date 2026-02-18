@@ -9,9 +9,12 @@ library(marginaleffects)
 rm(list = ls())
 
 df_ncds <- readRDS("data/ncds_updated.Rds")
+df_mcs <- readRDS("data/mcs_clean.Rds")
 
-# A Single Regression Model ----
+# 1. Repeated Regression Models ----
+## A Single Regression Model ----
 glimpse(df_ncds)
+glimpse(df_mcs)
 
 mod_lm <- lm(bmi ~ verbal_11 + sex + ethnic_group + mother_edu_years + mother_bmi,
              data = df_ncds %>% filter(fup == 23))
@@ -21,25 +24,30 @@ tidy(mod_lm, conf.int = TRUE)
 glance(mod_lm)
 augment(mod_lm)
 
-mod_lm <- lm(bmi ~ verbal_11 + sex + ethnic_group + mother_edu_years + mother_bmi,
-             data = df_ncds %>% filter(fup == 23))
+tidy(mod_lm, conf.int = TRUE) %>%
+  filter(term == "verbal_11") %>%
+  ggplot() +
+  aes(x = term, y = estimate, ymin = conf.low, ymax = conf.high) +
+  geom_hline(yintercept = 0) +
+  geom_pointrange()
 
-# A Preliminary Function ----
+## A Preliminary Function ----
 run_lm <- function(fup){
   df <- df_ncds %>%
     filter(fup == !!fup)
   
-  lm(bmi ~ verbal_11 + sex + father_edu_years + mother_bmi, df) %>%
+  lm(bmi ~ verbal_11 + sex + father_edu_years + mother_bmi, 
+     data = df) %>%
     tidy(conf.int = TRUE) %>%
     filter(term == "verbal_11") %>%
     mutate(fup = !!fup)
 }
 
-lm_res <- unique(df_ncds$fup) %>%
+lm_res <- unique(df_mcs$fup) %>%
   map_dfr(run_lm)
 lm_res
 
-# Plotting the Results ----
+## Plotting the Results ----
 ggplot(lm_res) +
   aes(x = fup, y = estimate, ymin = conf.low, ymax = conf.high) +
   geom_hline(yintercept = 0) +
@@ -52,7 +60,24 @@ ggplot(lm_res) +
   geom_line() +
   geom_point()
 
-# Adding More Complexity ----
+### Task 1: ----
+# 1. Create a similar function for the MCS.
+run_lm_mcs <- function(fup){
+  df <- df_mcs %>%
+    filter(fup == !!fup)
+  
+  lm(bmi ~ verbal_11 + sex + father_edu_level + mother_bmi, 
+     data = df) %>%
+    tidy(conf.int = TRUE) %>%
+    filter(term == "verbal_11") %>%
+    mutate(fup = !!fup)
+}
+
+lm_res_mcs <- unique(df_mcs$fup) %>%
+  map_dfr(run_lm_mcs)
+lm_res_mcs
+
+## Adding More Complexity ----
 run_lm_v2 <- function(fup, cog_var){
   df <- df_ncds %>%
     filter(fup == !!fup) %>%
@@ -85,7 +110,7 @@ expand_grid(
   unnest(res)
 
 
-# Accounting for mutate() ----
+## Accounting for mutate() ----
 run_lm_v3 <- function(fup, cog_var){
   df <- df_ncds %>%
     filter(fup == !!fup) %>%
@@ -103,7 +128,7 @@ expand_grid(
   mutate(res = map2(fup, cog_var, run_lm_v3)) %>%
   unnest(res)
 
-# Spec ID for Arbitrary Complexity ----
+## Spec ID for Arbitrary Complexity ----
 ncds_spec_grid <- expand_grid(
   fup = unique(df_ncds$fup),
   cog_var = c("verbal_11", "vocab_16")
@@ -128,7 +153,11 @@ ncds_spec_grid %>%
   mutate(res = map(spec_id, run_lm_with_id)) %>%
   unnest(res)
 
-# Adding Control Variables ----
+### Task 2 ----
+### 1. Create a function that achieves the same as run_lm_with_id but for the cleaned MCS data
+
+
+## Adding Control Variables ----
 ncds_mod_covars <- lst(
   basic = c("sex", "ethnic_group"),
   parent_bmi = c(basic, "father_bmi", "mother_bmi"),
@@ -164,14 +193,14 @@ ncds_spec_grid_v2 %>%
   mutate(res = map(spec_id, run_lm_with_id_v2)) %>%
   unnest(res)
 
+### Task 3 ----
+# 1. Create a function that achieves the same as run_lm_with_id_v2 but for the cleaned MCS data
+# 2. Amend so that it returns the mode R^2 and observations for the model too
+# 3. Come up with a neat way to plot the results
 
 
-# Task I:
-### 1. Create a function that achieves the same as run_lm_with_id_v2 but for the cleaned MCS data
-### 2. Amend run_lm_with_id_v2 to return model R^2, too, and to include additional sex-stratified analyses
-
-
-# Growth Curve Modelling ----
+# 2. Growth Curve Modelling ----
+## Simple Growth Curve Models ----
 mod_lmer <- lmer(bmi ~ verbal_11 + fup + verbal_11:fup + sex + (1 | iid),
                  data = df_ncds)
 summary(mod_lmer)
@@ -192,7 +221,7 @@ mod_lmer_v2 <- lmer(bmi ~ verbal_11 + fup_23 + verbal_11:fup_23 + sex + (1 | iid
                     data = df_ncds_scaled)
 tidy(mod_lmer_v2, conf.int = TRUE)
 
-# Marginal Effects Package ----
+## Marginal Effects Package ----
 mod_lmer_v3 <- lmer(bmi ~ verbal_11 + fup + verbal_11:fup + sex + (1 | iid),
                     data = df_ncds_scaled)
 tidy(mod_lmer_v3, conf.int = TRUE)
@@ -219,13 +248,15 @@ lmer_coefs <- fixef(mod_lmer_v3)
 1*lmer_coefs["verbal_11"] + 1*7*lmer_coefs["verbal_11:fup"]
 1*lmer_coefs["verbal_11"] + 1*55*lmer_coefs["verbal_11:fup"]
 
-lmer_comps <- comparisons(mod_lmer_v3, 
-                          variables = list(verbal_11 = c(1, 0)), 
-                          newdata = datagrid(iid = NA,
-                                             fup = seq(from = min(df_ncds$fup),
-                                                       to = max(df_ncds$fup),
-                                                       by = 1)),
-                          re.form = NA) %>%
+lmer_comps <- comparisons(
+  mod_lmer_v3, 
+  variables = list(verbal_11 = c(1, 0)), 
+  newdata = datagrid(iid = NA,
+                     fup = seq(from = min(df_ncds$fup),
+                               to = max(df_ncds$fup),
+                               by = 1)),
+  re.form = NA
+) %>%
   as_tibble() %>%
   select(fup, estimate, conf.low, conf.high)
 
@@ -252,7 +283,7 @@ bind_rows(
   geom_line()
 
 
-## Non-Linear Interactions ----
+### Non-Linear Interactions ----
 mod_lmer_v4 <- lmer(bmi ~ verbal_11 + fup + I(fup^2) +
                       verbal_11:fup + verbal_11:I(fup^2) +
                       sex + (1 | iid),
@@ -270,7 +301,6 @@ lmer_comps_v4 <- comparisons(mod_lmer_v4,
   select(fup, estimate, conf.low, conf.high)
 
 bind_rows(
-  lm = lm_res,
   lmer = lmer_comps,
   lmer_quad = lmer_comps_v4,
   .id = "model"
@@ -329,7 +359,6 @@ lmer_comps_v5 <- comparisons(mod_lmer_v5,
   select(fup, estimate, conf.low, conf.high)
 
 bind_rows(
-  lm = lm_res,
   lmer = lmer_comps,
   lmer_quad = lmer_comps_v4,
   lmer_splines = lmer_comps_v5,
@@ -342,18 +371,18 @@ bind_rows(
   geom_ribbon(alpha = 0.3, color = NA) +
   geom_line()
 
-# mod_slopes_v5 <- slopes(mod_lmer_v5, 
-#        variables = "verbal_11",
-#        newdata = datagrid(iid = NA,
-#                           fup = seq(from = min(df_ncds$fup),
-#                                     to = max(df_ncds$fup),
-#                                     by = 1)),
-#        re.form = NA) %>%
-#   as_tibble()
-# 
-# ggplot(mod_slopes_v5) +
-#   aes(x = fup, y = estimate, ymin = conf.low,
-#       ymax = conf.high) +
-#   geom_hline(yintercept = 0) +
-#   geom_ribbon(alpha = 0.3, color = NA) +
-#   geom_line()
+mod_slopes_v5 <- slopes(mod_lmer_v5,
+                        variables = "verbal_11",
+                        newdata = datagrid(iid = NA,
+                                           fup = seq(from = min(df_ncds$fup),
+                                                     to = max(df_ncds$fup),
+                                                     by = 1)),
+                        re.form = NA) %>%
+  as_tibble()
+
+ggplot(mod_slopes_v5) +
+  aes(x = fup, y = estimate, ymin = conf.low,
+      ymax = conf.high) +
+  geom_hline(yintercept = 0) +
+  geom_ribbon(alpha = 0.3, color = NA) +
+  geom_line()

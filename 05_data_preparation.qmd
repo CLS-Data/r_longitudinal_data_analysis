@@ -79,7 +79,7 @@ Notice the line `rename_with(str_to_lower)` - when just a function name is speci
 
 ### Task I
 
->  Open the age 50y and 62y main interview files (`ncds_2008_followup.dta` and `ncds10_age62_main_interview.dta`, respectively). Use `tidyselect` helpers to select every derived variable in these datasets.
+> Open the age 50y and 62y main interview files (`ncds_2008_followup.dta` and `ncds10_age62_main_interview.dta`, respectively). Use `tidyselect` helpers to select every derived variable in these datasets.
 
 ```{r}
 #| output: false
@@ -101,7 +101,7 @@ ncds_62y %>%
   select(ncdsid, matches("nd10"))
 ```
 
->  Consider how to rename the variables in both datasets so that they could be appended together.
+> Consider how to rename the variables in both datasets so that they could be appended together.
 
 ```{r}
 #| output: false
@@ -245,7 +245,7 @@ mcs_17y %>%
 
 ### Task II
 
->  Open the Age 55y NCDS main interview file (`ncds_2013_flatfile.dta`). Create a CASP-6 Quality of Life score, where higher values indicate better quality of life. To construct this score take the mean item response and set to the score to missing if the cohort member has four or more items missing (hint: `rowSums(is.na(df)` calculate the number of missing values in a row). Be aware of how each item is coded when answering this question.
+> Open the Age 55y NCDS main interview file (`ncds_2013_flatfile.dta`). Create a CASP-6 Quality of Life score, where higher values indicate better quality of life. To construct this score take the mean item response and set to the score to missing if the cohort member has four or more items missing (hint: `rowSums(is.na(df))` calculate the number of missing values in a row). Be aware of how each item is coded when answering this question.
 
 ```{r}
 #| output: false
@@ -507,7 +507,7 @@ Notice that `bind_rows()` outputs rows for all observations in the input `tibble
 
 ### Task III
 
->   Merge the Age 50y, 55y and 62y NCDS datasets together, with `*_join()` and `reduce()`. Use `_join()` functions such that (a) anyone who appeared in any of the three sweeps is retained, (b) anyone who appeared in all three sweeps is retain, and (c) anyone who appeared in the Age 62y sweep is retained. How many rows are in each?
+> Merge the Age 50y, 55y and 62y NCDS datasets together, with `*_join()` and `reduce()`. Use `_join()` functions such that (a) anyone who appeared in any of the three sweeps is retained, (b) anyone who appeared in all three sweeps is retain, and (c) anyone who appeared in the Age 62y sweep is retained. How many rows are in each?
 
 ```{r}
 #| output: false
@@ -528,7 +528,7 @@ reduce(ncds_list, ~ right_join(.x, .y, by = "NCDSID")) %>%
   nrow()
 ```
 
->  It is often more efficient to append raw data together and then clean the data. Amend the `clean_bmi()` code above to append the data from Sweeps 3-7 and then clean the output.
+> It is often more efficient to append raw data together and then clean the data. Amend the `clean_bmi()` code above to append the data from Sweeps 3-7 and then clean the output.
 
 ```{r}
 #| output: false
@@ -650,7 +650,7 @@ df_mini_wide %>%
 
 #### Task IV
 
->  Change `names_to = c(".value", "sweep_letter")` in the code above and run. Before looking at the output, predict what the resulting dataset will look like. What will the columns names be? How many rows of data will there be in the output? Can you think of a purpose of data in this format? (Hint: consider what could be achieved with `group_by()`).
+> Change `names_to = c(".value", "sweep_letter")` in the code above and run. Before looking at the output, predict what the resulting dataset will look like. What will the columns names be? How many rows of data will there be in the output? Can you think of a purpose of data in this format? (Hint: consider what could be achieved with `group_by()`).
 
 ```{r}
 #| output: false
@@ -729,7 +729,7 @@ Notice in the output that we have one row per cohort member and a `NA` value for
 
 #### Task V
 
->  Take the output of the solution to Task III and reshape the weight and BMI columns to wide format, discarding height. Keep rows for only those individuals who appeared in all sweeps.
+> Take the output of the solution to Task III and reshape the weight and BMI columns to wide format, discarding height. Keep rows for only those individuals who appeared in all sweeps.
 
 ```{r}
 #| output: false
@@ -753,7 +753,7 @@ We'll finish with a few functions that are helpful when cleaning long data.
 
 ### `tidyr::complete()`
 
-While `pivot_wider()` makes implicit values explicit, `bind_rows()` does not. It is possible to create missing rows when data are in long format by using `tidyr::complete()`. This function is straightforward - you pass it a `tibble` and then specify the columns one wishes to get every combination for (here the ID and time variables). By default, other columns will be filled with `NA` values in the newly created rows. This behaviour can be overridden using the `fill` argument. 
+While `pivot_wider()` makes implicit values explicit, `bind_rows()` does not. It is possible to create missing rows when data are in long format by using `tidyr::complete()`. This function is straightforward - you pass it a `tibble` and then specify the columns one wishes to get every combination for (here the ID and time variables). By default, other columns will be filled with `NA` values in the newly created rows. This behaviour can be overridden using the `fill` argument.
 
 One issue with MCS data is that ID columns are spread over two variables. Making all combinations of `MCSID` and `CNUM00` creates `CNUM00 == 2` values for each `MCSID`, even if they are singleton families. This problem can be avoided first *uniting* (`unite()`) the ID columns then separating (`separate()`) them after using `complete()`.
 

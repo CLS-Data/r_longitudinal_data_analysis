@@ -16,7 +16,6 @@ book:
     - 07_unit_testing.qmd
     # - 08_descriptive_statistics.qmd
     # - 09_regression_analyses.qmd
-    # - 10_presenting_results.qmd
     # - 99_backmatter_intro_r.qmd
 
 bibliography: references.bib
