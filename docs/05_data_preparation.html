@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Preparing Data for Analysis – R for Longitudinal Data Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./06_interlude_cleaning.html" rel="next">
+<link href="./04_finding_data.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./05_data_preparation.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">R for Longitudinal Data Analysis</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_introduction_course.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_background_r.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Background on <code>R</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_introduction_tidyverse.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">An Introduction to the <code>tidyverse</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_finding_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Discovery</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_data_preparation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_interlude_cleaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Interlude: Creating a Full Cleaned Dataset</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_unit_testing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Unit Testing</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#advanced-functions-for-data-cleaning" id="toc-advanced-functions-for-data-cleaning" class="nav-link active" data-scroll-target="#advanced-functions-for-data-cleaning"><span class="header-section-number">5.1</span> Advanced Functions for Data Cleaning</a>
+  <ul class="collapse">
+  <li><a href="#tidyselect-helpers" id="toc-tidyselect-helpers" class="nav-link" data-scroll-target="#tidyselect-helpers"><span class="header-section-number">5.1.1</span> <code>tidyselect</code> Helpers</a></li>
+  <li><a href="#dplyrrename_with" id="toc-dplyrrename_with" class="nav-link" data-scroll-target="#dplyrrename_with"><span class="header-section-number">5.1.2</span> <code>dplyr::rename_with()</code></a></li>
+  <li><a href="#task-i" id="toc-task-i" class="nav-link" data-scroll-target="#task-i"><span class="header-section-number">5.1.3</span> Task I</a></li>
+  <li><a href="#dplyracross" id="toc-dplyracross" class="nav-link" data-scroll-target="#dplyracross"><span class="header-section-number">5.1.4</span> <code>dplyr::across()</code></a></li>
+  <li><a href="#some-helpful-functions-for-labelled-data" id="toc-some-helpful-functions-for-labelled-data" class="nav-link" data-scroll-target="#some-helpful-functions-for-labelled-data"><span class="header-section-number">5.1.5</span> Some Helpful Functions for Labelled Data</a></li>
+  <li><a href="#dplyrif_any-dplyrif_all" id="toc-dplyrif_any-dplyrif_all" class="nav-link" data-scroll-target="#dplyrif_any-dplyrif_all"><span class="header-section-number">5.1.6</span> <code>dplyr::if_any()</code> / <code>dplyr::if_all()</code></a></li>
+  <li><a href="#dplyrpick" id="toc-dplyrpick" class="nav-link" data-scroll-target="#dplyrpick"><span class="header-section-number">5.1.7</span> <code>dplyr::pick()</code></a></li>
+  <li><a href="#task-ii" id="toc-task-ii" class="nav-link" data-scroll-target="#task-ii"><span class="header-section-number">5.1.8</span> Task II</a></li>
+  </ul></li>
+  <li><a href="#writing-functions-to-clean-data" id="toc-writing-functions-to-clean-data" class="nav-link" data-scroll-target="#writing-functions-to-clean-data"><span class="header-section-number">5.2</span> Writing Functions to Clean Data</a></li>
+  <li><a href="#combining-tibbles" id="toc-combining-tibbles" class="nav-link" data-scroll-target="#combining-tibbles"><span class="header-section-number">5.3</span> Combining <code>tibbles</code></a>
+  <ul class="collapse">
+  <li><a href="#merging-tibbles-with-dplyr_join" id="toc-merging-tibbles-with-dplyr_join" class="nav-link" data-scroll-target="#merging-tibbles-with-dplyr_join"><span class="header-section-number">5.3.1</span> Merging <code>tibbles</code> with <code>dplyr::*_join()</code></a></li>
+  <li><a href="#appending-tibbles-with-dplyrbind_rows" id="toc-appending-tibbles-with-dplyrbind_rows" class="nav-link" data-scroll-target="#appending-tibbles-with-dplyrbind_rows"><span class="header-section-number">5.3.2</span> Appending <code>tibbles</code> with <code>dplyr::bind_rows()</code></a></li>
+  <li><a href="#task-iii" id="toc-task-iii" class="nav-link" data-scroll-target="#task-iii"><span class="header-section-number">5.3.3</span> Task III</a></li>
+  </ul></li>
+  <li><a href="#reshaping-tibbles-with-tidyrpivot_" id="toc-reshaping-tibbles-with-tidyrpivot_" class="nav-link" data-scroll-target="#reshaping-tibbles-with-tidyrpivot_"><span class="header-section-number">5.4</span> Reshaping <code>tibbles</code> with <code>tidyr::pivot_*()</code></a>
+  <ul class="collapse">
+  <li><a href="#wide-to-long-transformations-with-tidyrpivot_longer" id="toc-wide-to-long-transformations-with-tidyrpivot_longer" class="nav-link" data-scroll-target="#wide-to-long-transformations-with-tidyrpivot_longer"><span class="header-section-number">5.4.1</span> Wide-to-Long Transformations with <code>tidyr::pivot_longer()</code></a></li>
+  <li><a href="#long-to-wide-transformations-with-tidyrpivot_wider" id="toc-long-to-wide-transformations-with-tidyrpivot_wider" class="nav-link" data-scroll-target="#long-to-wide-transformations-with-tidyrpivot_wider"><span class="header-section-number">5.4.2</span> Long-to-Wide Transformations with <code>tidyr::pivot_wider()</code></a></li>
+  </ul></li>
+  <li><a href="#some-helpful-functions-for-cleaning-long-data" id="toc-some-helpful-functions-for-cleaning-long-data" class="nav-link" data-scroll-target="#some-helpful-functions-for-cleaning-long-data"><span class="header-section-number">5.5</span> Some Helpful Functions for Cleaning Long Data</a>
+  <ul class="collapse">
+  <li><a href="#tidyrcomplete" id="toc-tidyrcomplete" class="nav-link" data-scroll-target="#tidyrcomplete"><span class="header-section-number">5.5.1</span> <code>tidyr::complete()</code></a></li>
+  <li><a href="#tidyrfill" id="toc-tidyrfill" class="nav-link" data-scroll-target="#tidyrfill"><span class="header-section-number">5.5.2</span> <code>tidyr::fill()</code></a></li>
+  <li><a href="#some-dplyr-helpers" id="toc-some-dplyr-helpers" class="nav-link" data-scroll-target="#some-dplyr-helpers"><span class="header-section-number">5.5.3</span> Some <code>dplyr</code> Helpers</a></li>
+  <li><a href="#task-vi" id="toc-task-vi" class="nav-link" data-scroll-target="#task-vi"><span class="header-section-number">5.5.4</span> Task VI</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-data_munging" class="quarto-section-identifier"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Preparing Data for Analysis</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In <a href="03_introduction_tidyverse.html" class="quarto-xref">Chapter&nbsp;<span>3</span></a>, we saw the main functions of the <code>tidyverse</code>. In this chapter, we will explore advanced uses of these functions, as well as introduce further functions for merging and reshaping <code>tibbles</code>, key steps in LDA. The aim is to make analysis-ready datasets in as efficient a manner as possible.</p>
+<p>The packages we will use are:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glue)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(labelled)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>We’ll begin using data from the MCS Sweep 7 (17y) cohort member interview dataset.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mcs_fld <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"mcs_fld"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ncds_fld <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"ncds_fld"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"{mcs_fld}/17y/mcs7_cm_interview.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_dta</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="advanced-functions-for-data-cleaning" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="advanced-functions-for-data-cleaning"><span class="header-section-number">5.1</span> Advanced Functions for Data Cleaning</h2>
+<section id="tidyselect-helpers" class="level3" data-number="5.1.1">
+<h3 data-number="5.1.1" class="anchored" data-anchor-id="tidyselect-helpers"><span class="header-section-number">5.1.1</span> <code>tidyselect</code> Helpers</h3>
+<p>In <a href="03_introduction_tidyverse.html" class="quarto-xref">Chapter&nbsp;<span>3</span></a>, we used <code>select()</code> to retain or drop variables from a <code>tibble</code>. We saw the manual way of doing this (specifying each variable separately), as well as a more programmatic way: using a <code>tidyselect</code> helper, <code>matches()</code>, that selected every variable whose name matched a regular expression. <code>matches()</code> is one of many <a href="https://tidyselect.r-lib.org/reference/language.html"><code>tidyselect</code> helpers</a>:</p>
+<ul>
+<li><code>matches()</code>: selects variables based on regular expressions (e.g., <code>matches("^G")</code> selects any variable starting <code>"G"</code>).</li>
+<li><code>x:y</code>: selects variables location between <code>x</code> and <code>y</code> (inclusive). <code>x</code> and <code>y</code> can be variable names and/or positions. <code>last_col()</code> is another useful helper that can be used in this context (e.g., <code>age:last_col()</code> selects every column from <code>age</code> to the last column).</li>
+<li><code>where()</code>: selects variables based on a logical condition - this condition is applied to the values not the variable names. For example, <code>where(is.factor)</code> selects all factor variables.</li>
+<li><code>all_of()</code>: selects all variables specified in a character vector (e.g., <code>all_of(c("sex", "age")</code> selects columns <code>sex</code> and <code>age</code>). Note, <code>all_of()</code> throws an error if not all of the specified variables are present in the <code>tibble</code>.</li>
+<li><code>any_of()</code>: returns any variables specified in a character vector that are available in a <code>tibble</code>. Unlike <code>all_of()</code>, <code>any_of()</code> does not throw an error if a specified variable is not present.</li>
+<li><code>everything()</code>: selects every column in a <code>tibble</code>. This may seem redundant, but we will see contexts in which it is useful.</li>
+</ul>
+<p><code>tidyselect</code> helpers can be combined with the <code>&amp;</code> (<code>AND</code>) and <code>|</code> (<code>OR</code>) operators, while the <code>!</code> (<code>NOT</code>) operator can be used to identify variables that do not meet a condition. For example, <code>where(is.numeric) &amp; !matches("^G")</code> selects all numeric variables that do not start <code>"G"</code>. Below is some example code.</p>
+<blockquote class="blockquote">
+<p><strong>Question</strong>: Which variables will remain in the outputted <code>tibble</code>?</p>
+</blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">matches</span>(<span class="st">"^GCW"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(GCWESM00<span class="sc">:</span><span class="fu">last_col</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.labelled)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(<span class="fu">c</span>(<span class="st">"GCWWOP00"</span>, <span class="st">"GCWWUS00"</span>, <span class="st">"GCWWRE00"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"GCWWOP00"</span>, <span class="st">"GCWWRE00"</span>, <span class="st">"not_a_variable"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">!</span><span class="fu">matches</span>(<span class="st">"^GCWWO"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,345 × 1
+   GCWWRE00            
+   &lt;dbl+lbl&gt;           
+ 1 2 [Rarely]          
+ 2 3 [Some of the time]
+ 3 2 [Rarely]          
+ 4 4 [Often]           
+ 5 2 [Rarely]          
+ 6 1 [None of the time]
+ 7 4 [Often]           
+ 8 4 [Often]           
+ 9 2 [Rarely]          
+10 3 [Some of the time]
+# ℹ 10,335 more rows</code></pre>
+</div>
+</div>
+<p><code>tidyselect</code> helpers can be used in many functions in the <code>tidyverse</code> beyond <code>select()</code>. For instance, they can be used to specify columns in <code>drop_na()</code>, in the <code>col_select = ...</code> argument of <code>read_dta()</code>, in the <code>.cols = ...</code> argument of <code>rename_with()</code>, and in <code>across()</code> (more on which below).</p>
+<p><code>tidyselect</code> helpers are not just useful for selecting raw variables <em>en masse</em>, but can also be used with cleaned variables too. This is made easier if care is taken to name cleaned variables consistently. For instance, naming BMI variables in a ‘wide’ dataset in a consistent way (e.g., <code>bmi_03</code>, <code>bmi_05</code>, …, <code>bmi_17</code>) allows one to use a simple regular expression (<code>matches("^bmi_\\d\\d$")</code>) to select them. Later, we will use vectors that specify control variables to be used in regression models and select them with <code>all_of()</code>.</p>
+</section>
+<section id="dplyrrename_with" class="level3" data-number="5.1.2">
+<h3 data-number="5.1.2" class="anchored" data-anchor-id="dplyrrename_with"><span class="header-section-number">5.1.2</span> <code>dplyr::rename_with()</code></h3>
+<p>Variables can be renamed <em>en masse</em> using <code>rename_with()</code>. <code>rename_with()</code> applies a function to each variable name in turn. Functions can be specified using the lambda notation we used in <a href="03_introduction_tidyverse.html" class="quarto-xref">Chapter&nbsp;<span>3</span></a> with <code>purrr:map()</code>. The <a href="https://stringr.tidyverse.org/"><code>stringr</code> package</a> contains several functions that can be used inside <code>rename_with</code>, including <code>str_replace()</code> (to replace part of a string with another string), <code>str_remove()</code> (to remove part of a string), <code>str_to_lower()</code> (to put strings in lower case), and <code>str_sub()</code> (to extract characters between specified positions in a string; e.g., <code>str_sub(x, 2, -2)</code> extracts the second to penultimate letters of <code>x</code>). <code>glue::glue()</code> can also be handy. Here are some examples:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(str_to_lower) <span class="sc">%&gt;%</span> <span class="co"># Equivalent to ~ str_to_lower(.x)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">str_remove</span>(.x, <span class="st">"^g"</span>)) <span class="sc">%&gt;%</span>  <span class="co"># Removes sweep-specific prefix "G"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"{.x}_17"</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">.cols =</span> <span class="sc">-</span><span class="fu">c</span>(mcsid, cnum00))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Notice the line <code>rename_with(str_to_lower)</code> - when just a function name is specified, the column will be placed in the first argument of that function. This syntax can also be used in <code>purrr::map()</code>. Note, <code>rename_with(~ str_remove(.x, "^G"))</code> is an essential preparatory step if one wishes to append data from different sweeps of the MCS together.</p>
+</section>
+<section id="task-i" class="level3" data-number="5.1.3">
+<h3 data-number="5.1.3" class="anchored" data-anchor-id="task-i"><span class="header-section-number">5.1.3</span> Task I</h3>
+<blockquote class="blockquote">
+<p>Open the age 50y and 62y main interview files (<code>ncds_2008_followup.dta</code> and <code>ncds10_age62_main_interview.dta</code>, respectively). Use <code>tidyselect</code> helpers to select every derived variable in these datasets.</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ncds_50y <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"{ncds_fld}/50y/ncds_2008_followup.dta"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_dta</span>() </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ncds_62y <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"{ncds_fld}/62y/ncds10_age62_main_interview.dta"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_dta</span>()</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(ncds_50y, <span class="st">"derived"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(ncds_62y, <span class="st">"derived"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>ncds_50y <span class="sc">%&gt;%</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(NCDSID, <span class="fu">matches</span>(<span class="st">"ND8"</span>))</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>ncds_62y <span class="sc">%&gt;%</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ncdsid, <span class="fu">matches</span>(<span class="st">"nd10"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<blockquote class="blockquote">
+<p>Consider how to rename the variables in both datasets so that they could be appended together.</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ncds_50y)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ncds_62y)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>harmonise_names <span class="ot">&lt;-</span> <span class="cf">function</span>(df){</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename_with</span>(str_to_lower) <span class="sc">%&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">str_remove</span>(.x, <span class="st">"^nd(8|10)"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">paste0</span>(<span class="st">"_derived"</span>),</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">.cols =</span> <span class="fu">matches</span>(<span class="st">"^nd(8|10)"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">str_remove</span>(.x, <span class="st">"^n(8|10)"</span>),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">.cols =</span> <span class="sc">-</span><span class="fu">matches</span>(<span class="st">"_derived$"</span>))</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="fu">harmonise_names</span>(ncds_50y)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="fu">harmonise_names</span>(ncds_62y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="dplyracross" class="level3" data-number="5.1.4">
+<h3 data-number="5.1.4" class="anchored" data-anchor-id="dplyracross"><span class="header-section-number">5.1.4</span> <code>dplyr::across()</code></h3>
+<p><code>across()</code> allows one to apply a function to multiple variables in turn. It is most typically used in <code>mutate()</code> to transform multiple variables in the same way. A key use of <code>across()</code> in LDA is to replace negative values representing missing codes with <code>R</code>’s <code>NA</code> missing value. In <a href="03_introduction_tidyverse.html" class="quarto-xref">Chapter&nbsp;<span>3</span></a>, we used <code>ifelse()</code> to recode negative values, but this drops variable metadata (e.g., value labels) that we may wish to keep. To recode missing values while retaining other metadata, we can use functionality from the <code>labelled</code> package as in the <code>negative_to_na()</code> function below. We apply this to all labelled variables (<code>where(is.labelled)</code>) using <code>across()</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>negative_to_na <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na_range</span>(x) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, <span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">user_na_to_na</span>(x)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, GCNUM00, <span class="fu">matches</span>(<span class="st">"^GCHT(CM|FT|IN)00"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.labelled), <span class="sc">~</span> <span class="fu">negative_to_na</span>(.x)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,345 × 5
+   MCSID   GCNUM00                             GCHTCM00  GCHTFT00  GCHTIN00 
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl+lbl&gt; &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+ 1 M10002P 1 [1st Cohort Member of the family] 174.      NA        NA       
+ 2 M10007U 1 [1st Cohort Member of the family] 181.       5        11       
+ 3 M10015U 1 [1st Cohort Member of the family] 169        5         6       
+ 4 M10016V 1 [1st Cohort Member of the family] 185.       6         0       
+ 5 M10018X 1 [1st Cohort Member of the family] 166.       5         5       
+ 6 M10021S 1 [1st Cohort Member of the family] 157.       5         1       
+ 7 M10022T 1 [1st Cohort Member of the family] 185.       6         0       
+ 8 M10025W 1 [1st Cohort Member of the family] 191        6         3       
+ 9 M10034X 1 [1st Cohort Member of the family] 179.       5        10       
+10 M10041W 1 [1st Cohort Member of the family]  NA       NA        NA       
+# ℹ 10,335 more rows</code></pre>
+</div>
+</div>
+<p>By default, <code>mutate(across())</code> overwrites the original variables. New columns can be created instead by specifying a named list of functions. The <code>.names</code> argument of <code>across()</code> allows one to also specify a rubric for the new columns names and uses <code>glue()</code>-like syntax.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">matches</span>(<span class="st">"^GCHT(CM|FT|IN)00"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.labelled), <span class="sc">~</span> <span class="fu">negative_to_na</span>(.x))) <span class="sc">%&gt;%</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">list</span>(<span class="at">mean =</span> <span class="sc">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">sd =</span> <span class="sc">~</span> <span class="fu">sd</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                   <span class="at">.names =</span> <span class="st">"{.col}_{.fn}"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 6
+  GCHTCM00_mean GCHTCM00_sd GCHTFT00_mean GCHTFT00_sd GCHTIN00_mean GCHTIN00_sd
+          &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+1          170.        9.37          5.07       0.343          5.56        3.25</code></pre>
+</div>
+</div>
+<p><code>across()</code> appears in a few other places in the <code>tidyverse</code>, including <code>distinct()</code> and <code>count()</code>. If a <code>tidyselect</code> helper doesn’t work on its own in a function, wrapping it in <code>across()</code> often does the trick.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.labelled), <span class="sc">~</span> <span class="fu">negative_to_na</span>(.x))) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="fu">across</span>(<span class="fu">matches</span>(<span class="st">"^GCWW"</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3,900 × 8
+   GCWWOP00          GCWWUS00 GCWWRE00 GCWWDE00 GCWWTH00 GCWWCL00 GCWWMN00     n
+   &lt;dbl+lbl&gt;         &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;int&gt;
+ 1 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None…    12
+ 2 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 2 [Rare…     2
+ 3 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 3 [Some…     1
+ 4 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 4 [Ofte…     1
+ 5 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 5 [All …     1
+ 6 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 2 [Rare… 1 [None…     1
+ 7 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 2 [Rare… 4 [Ofte…     1
+ 8 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 2 [Rare… 5 [All …     1
+ 9 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 3 [Some… 2 [Rare…     2
+10 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 3 [Some… 3 [Some…     3
+# ℹ 3,890 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="some-helpful-functions-for-labelled-data" class="level3" data-number="5.1.5">
+<h3 data-number="5.1.5" class="anchored" data-anchor-id="some-helpful-functions-for-labelled-data"><span class="header-section-number">5.1.5</span> Some Helpful Functions for Labelled Data</h3>
+<p>Sometimes, in longitudinal datasets, certain positive values can indicate missingness, particularly in the context of a specific analysis. For instance, some self-complete items in the Sweep 7 of the MCS use positive values for responses that could be considered missing (e.g., “Don’t know” or “Prefer not to say”). Specific values can be replaced with <code>NA</code> using the code below. This code also uses <code>haven::as_factor()</code>, which converts <code>labelled</code> vectors to factors using the value labels as levels.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>values_to_na <span class="ot">&lt;-</span> <span class="cf">function</span>(x, values){</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na_values</span>(x) <span class="ot">&lt;-</span> values</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">user_na_to_na</span>(x)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">self_rated_health =</span> <span class="fu">negative_to_na</span>(GCCGHE00) <span class="sc">%&gt;%</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>           <span class="fu">values_to_na</span>(<span class="dv">6</span><span class="sc">:</span><span class="dv">8</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>           <span class="fu">as_factor</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(GCCGHE00, self_rated_health)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 3
+  GCCGHE00                    self_rated_health     n
+  &lt;dbl+lbl&gt;                   &lt;fct&gt;             &lt;int&gt;
+1 1 [Excellent]               Excellent          2874
+2 2 [Very good]               Very good          3945
+3 3 [Good]                    Good               2448
+4 4 [Fair, or]                Fair, or            585
+5 5 [Poor?]                   Poor?               119
+6 6 [Do not know]             &lt;NA&gt;                  2
+7 7 [I do not wish to answer] &lt;NA&gt;                  3
+8 8 [No answer]               &lt;NA&gt;                369</code></pre>
+</div>
+</div>
+<p>After replacing missing value codes with <code>NA</code>, a <code>labelled</code> vector may not actually contain any value labels - e.g., where it is a continuous variable, like height. One operation you may wish to perform <em>en masse</em> then is to replace negative values with <code>NA</code> and to convert any variables with remaining value labels to factor variables or to otherwise remove the labelled class (which can be done using <code>haven::zap_labels()</code>). This can be achieved as below:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fix_labels <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(<span class="fu">val_labels</span>(x))){</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    clean <span class="ot">&lt;-</span> <span class="fu">zap_labels</span>(x)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span>{</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    clean <span class="ot">&lt;-</span> <span class="fu">as_factor</span>(x)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(clean)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(GCSDQH00, GCHTCM00) <span class="sc">%&gt;%</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), </span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>                <span class="sc">~</span> <span class="fu">negative_to_na</span>(.x) <span class="sc">%&gt;%</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">fix_labels</span>()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,345 × 2
+   GCSDQH00       GCHTCM00
+   &lt;fct&gt;             &lt;dbl&gt;
+ 1 Somewhat true      174.
+ 2 Somewhat true      181.
+ 3 Certainly true     169 
+ 4 Somewhat true      185.
+ 5 Somewhat true      166.
+ 6 Somewhat true      157.
+ 7 Somewhat true      185.
+ 8 Somewhat true      191 
+ 9 Certainly true     179.
+10 &lt;NA&gt;                NA 
+# ℹ 10,335 more rows</code></pre>
+</div>
+</div>
+<p>After cleaning data, it is good practice to add a descriptive label to each variable to make clear what they represent (<a href="https://doi.org/10.1093/aje/kwab092">Vable et al., 2021</a>). The <code>labelled</code> package contains the <code>set_variable_labels()</code> function to do this. The typical syntax uses <code>column = "label"</code> syntax, but a named vector can instead be passed via the <code>.labels</code> argument. By default, setting the label for a variable that isn’t present in the <code>tibble</code> will throw an error. This can be changed by setting the argument <code>.strict = FALSE</code> - this may be helpful when working with many datasets, each of which may not contain the exact same columns.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weight =</span> <span class="fu">negative_to_na</span>(GCWTCM00),</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">height =</span> <span class="fu">negative_to_na</span>(GCHTCM00) <span class="sc">/</span> <span class="dv">100</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">bmi =</span> weight <span class="sc">/</span> (height <span class="sc">^</span> <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, <span class="at">cnum =</span> GCNUM00, </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>         height, weight, bmi) <span class="sc">%&gt;%</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_variable_labels</span>(</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">MCSID =</span> <span class="st">"Family ID"</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">cnum =</span> <span class="st">"Cohort Member Number"</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">height =</span> <span class="st">"Height (cm)"</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight =</span> <span class="st">"Weight (kg)"</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">bmi =</span> <span class="st">"Body Mass Index (kg/m^2)"</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,345 × 5
+   MCSID   cnum                                height weight      bmi
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                            &lt;dbl&gt; &lt;dbl+lbl&gt; &lt;dbl&gt;
+ 1 M10002P 1 [1st Cohort Member of the family]   1.74  59.4      19.6
+ 2 M10007U 1 [1st Cohort Member of the family]   1.81  71.4      21.9
+ 3 M10015U 1 [1st Cohort Member of the family]   1.69  75.7      26.5
+ 4 M10016V 1 [1st Cohort Member of the family]   1.85  74.1      21.6
+ 5 M10018X 1 [1st Cohort Member of the family]   1.66  56        20.4
+ 6 M10021S 1 [1st Cohort Member of the family]   1.57  51.8      21.1
+ 7 M10022T 1 [1st Cohort Member of the family]   1.85 107.       31.1
+ 8 M10025W 1 [1st Cohort Member of the family]   1.91  75.4      20.7
+ 9 M10034X 1 [1st Cohort Member of the family]   1.79  67.4      21.0
+10 M10041W 1 [1st Cohort Member of the family]  NA     NA        NA  
+# ℹ 10,335 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="dplyrif_any-dplyrif_all" class="level3" data-number="5.1.6">
+<h3 data-number="5.1.6" class="anchored" data-anchor-id="dplyrif_any-dplyrif_all"><span class="header-section-number">5.1.6</span> <code>dplyr::if_any()</code> / <code>dplyr::if_all()</code></h3>
+<p><code>if_any()</code> and <code>if_all()</code> are similar to <code>across()</code> in that they apply a function to multiple variables at once. They differ in that the function aggregates the results to return a single logical vector. Both <code>if_any()</code> and <code>if_all()</code> are vectorised. <code>if_any()</code> returns <code>TRUE</code> if the function returns <code>TRUE</code> for any of the variables, while <code>if_all()</code> returns <code>TRUE</code> if the function returns <code>TRUE</code> for all of the variables. <code>if_any()</code> and <code>if_all()</code> are most typically used in <code>filter()</code>, but can also be used in <code>mutate()</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.labelled), <span class="sc">~</span> <span class="fu">negative_to_na</span>(.x))) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="fu">across</span>(<span class="fu">matches</span>(<span class="st">"^GCWW"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">if_any</span>(<span class="fu">matches</span>(<span class="st">"^GCWW"</span>), <span class="sc">~</span> .x <span class="sc">==</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,076 × 8
+   GCWWOP00          GCWWUS00 GCWWRE00 GCWWDE00 GCWWTH00 GCWWCL00 GCWWMN00     n
+   &lt;dbl+lbl&gt;         &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;int&gt;
+ 1 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None…    12
+ 2 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 2 [Rare…     2
+ 3 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 3 [Some…     1
+ 4 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 4 [Ofte…     1
+ 5 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 5 [All …     1
+ 6 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 2 [Rare… 1 [None…     1
+ 7 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 2 [Rare… 4 [Ofte…     1
+ 8 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 2 [Rare… 5 [All …     1
+ 9 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 3 [Some… 2 [Rare…     2
+10 1 [None of the t… 1 [None… 1 [None… 1 [None… 1 [None… 3 [Some… 3 [Some…     3
+# ℹ 1,066 more rows</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.labelled), <span class="sc">~</span> <span class="fu">negative_to_na</span>(.x))) <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="fu">across</span>(<span class="fu">matches</span>(<span class="st">"^GCWW"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">if_all</span>(<span class="fu">matches</span>(<span class="st">"^GCWW"</span>), <span class="sc">~</span> .x <span class="sc">==</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  GCWWOP00           GCWWUS00 GCWWRE00 GCWWDE00 GCWWTH00 GCWWCL00 GCWWMN00     n
+  &lt;dbl+lbl&gt;          &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;int&gt;
+1 1 [None of the ti… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None… 1 [None…    12</code></pre>
+</div>
+</div>
+</section>
+<section id="dplyrpick" class="level3" data-number="5.1.7">
+<h3 data-number="5.1.7" class="anchored" data-anchor-id="dplyrpick"><span class="header-section-number">5.1.7</span> <code>dplyr::pick()</code></h3>
+<p>Sometimes we may want to perform a function using several columns simultaneously - for instance, for a mental health measure, to sum the values across several columns into a total Likert score. Base <code>R</code> contains several functions for carrying out row-wise operations, including <code>pmin()</code>, <code>pmax()</code>, <code>rowSums()</code> and <code>rowMeans()</code>, but these functions are not pipe-friendly as, although they use <code>data.frames</code> or <code>tibbles</code> as inputs, they operate on every column (which may include more columns than one wants) and output a single vector, rather than a transformed <code>tibble</code>. <code>pick()</code> instead allows one to specify the correct columns to put into these functions and place them within a pipe. In essence, <code>pick()</code> takes the current <code>tibble</code> and temporarily creates another which has just the columns specified. <code>tidyselect</code> helpers can be used to specify columns.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>mcs_17y <span class="sc">%&gt;%</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">matches</span>(<span class="st">"^GCWW"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> <span class="fu">negative_to_na</span>(.x)),</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">swemwbs_total =</span> <span class="fu">pick</span>(<span class="fu">matches</span>(<span class="st">"^GCWW"</span>)) <span class="sc">%&gt;%</span> <span class="fu">rowSums</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,345 × 8
+   GCWWOP00  GCWWUS00 GCWWRE00 GCWWDE00 GCWWTH00 GCWWCL00 GCWWMN00 swemwbs_total
+   &lt;dbl+lbl&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt;         &lt;dbl&gt;
+ 1 2 [Rarel… 2 [Rare… 2 [Rare… 2 [Rare… 2 [Rare… 2 [Rare… 2 [Rare…            14
+ 2 3 [Some … 3 [Some… 3 [Some… 4 [Ofte… 4 [Ofte… 4 [Ofte… 4 [Ofte…            25
+ 3 2 [Rarel… 4 [Ofte… 2 [Rare… 3 [Some… 3 [Some… 4 [Ofte… 3 [Some…            21
+ 4 4 [Often] 4 [Ofte… 4 [Ofte… 4 [Ofte… 4 [Ofte… 4 [Ofte… 5 [All …            29
+ 5 3 [Some … 2 [Rare… 2 [Rare… 3 [Some… 3 [Some… 4 [Ofte… 4 [Ofte…            21
+ 6 2 [Rarel… 3 [Some… 1 [None… 3 [Some… 3 [Some… 2 [Rare… 5 [All …            19
+ 7 3 [Some … 2 [Rare… 4 [Ofte… 4 [Ofte… 3 [Some… 5 [All … 5 [All …            26
+ 8 2 [Rarel… 3 [Some… 4 [Ofte… 4 [Ofte… 5 [All … 5 [All … 4 [Ofte…            27
+ 9 2 [Rarel… 3 [Some… 2 [Rare… 2 [Rare… 2 [Rare… 3 [Some… 4 [Ofte…            18
+10 2 [Rarel… 3 [Some… 3 [Some… 2 [Rare… 3 [Some… 2 [Rare… 1 [None…            16
+# ℹ 10,335 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="task-ii" class="level3" data-number="5.1.8">
+<h3 data-number="5.1.8" class="anchored" data-anchor-id="task-ii"><span class="header-section-number">5.1.8</span> Task II</h3>
+<blockquote class="blockquote">
+<p>Open the Age 55y NCDS main interview file (<code>ncds_2013_flatfile.dta</code>). Create a CASP-6 Quality of Life score, where higher values indicate better quality of life. To construct this score take the mean item response and set to the score to missing if the cohort member has four or more items missing (hint: <code>rowSums(is.na(df))</code> calculate the number of missing values in a row). Be aware of how each item is coded when answering this question.</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>ncds_55y <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"{ncds_fld}/55y/ncds_2013_flatfile.dta"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_dta</span>()</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(ncds_55y, <span class="st">"casp"</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>ncds_55y <span class="sc">%&gt;%</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">matches</span>(<span class="st">"N9CASP"</span>), negative_to_na)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lookfor</span>(<span class="st">"casp"</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>ncds_55y <span class="sc">%&gt;%</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">matches</span>(<span class="st">"N9CASP"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">matches</span>(<span class="st">"N9CASP"</span>), negative_to_na),</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>         <span class="fu">across</span>(<span class="fu">matches</span>(<span class="st">"N9CASP[4-6])"</span>), <span class="sc">~</span> <span class="dv">5</span> <span class="sc">-</span> .x),</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">casp6_mean =</span> <span class="fu">rowMeans</span>(<span class="fu">pick</span>(<span class="fu">matches</span>(<span class="st">"N9CASP[1-6]"</span>)), <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">casp6_missing =</span> <span class="fu">rowSums</span>(<span class="fu">is.na</span>(<span class="fu">pick</span>(<span class="fu">matches</span>(<span class="st">"N9CASP[1-6]"</span>)))),</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">casp6_mean =</span> <span class="fu">ifelse</span>(casp6_missing <span class="sc">&gt;=</span> <span class="dv">4</span>, <span class="cn">NA</span>, casp6_mean)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(casp6_missing) <span class="sc">%&gt;%</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Note, the <code>naniar</code> package contains multiple functions for working with missing data, including <code>n_miss_row()</code>, which is equivalent to <code>rowSums(is.na(df))</code>.</p>
+<blockquote class="blockquote">
+<p>Sweep 6 (14y) of the MCS included several cognitive assessments, including a 20-item vocabularly test. Answers to the individual items are contained in the variables <code>FCCMCOGA</code> to <code>FCCMCOGT</code> within the <code>mcs6_cm_cognitive_assessment.dta</code> file. The value label indicates which answer is correct. Load the data and create a variable for a cohort member’s total score on the test as the number of correct items. Only give a score to an individual if they attempt one or more items.</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>mcs_14y_cog <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"{mcs_fld}/14y/mcs6_cm_cognitive_assessment.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_dta</span>()</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(mcs_14y_cog)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(mcs_14y_cog, <span class="st">"FCCMCOG[A-T]"</span>)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="fu">val_labels</span>(mcs_14y_cog<span class="sc">$</span>FCCMCOGA)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="fu">val_labels</span>(mcs_14y_cog<span class="sc">$</span>FCCMCOGT)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>clean_vocab_item <span class="ot">&lt;-</span> <span class="cf">function</span>(item){</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  value_labels <span class="ot">&lt;-</span> <span class="fu">val_labels</span>(item)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  correct_answer <span class="ot">&lt;-</span> value_labels[<span class="fu">str_detect</span>(<span class="fu">names</span>(value_labels), <span class="st">"</span><span class="sc">\\</span><span class="st">(correct answer</span><span class="sc">\\</span><span class="st">)"</span>)]</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">case_when</span>(item <span class="sc">==</span> correct_answer <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>            item <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span> <span class="sc">~</span> <span class="dv">0</span>)</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>mcs_14y_cog <span class="sc">%&gt;%</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, FCNUM00, <span class="fu">matches</span>(<span class="st">"FCCMCOG[A-T]"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">matches</span>(<span class="st">"FCCMCOG[A-T]"</span>), clean_vocab_item),</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">cog_score =</span> <span class="fu">pick</span>(<span class="fu">matches</span>(<span class="st">"FCCMCOG[A-T]"</span>)) <span class="sc">%&gt;%</span> <span class="fu">rowSums</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">cog_obs =</span> <span class="fu">pick</span>(<span class="fu">matches</span>(<span class="st">"FCCMCOG[A-T]"</span>)) <span class="sc">%&gt;%</span> <span class="fu">rowSums</span>(<span class="sc">!</span><span class="fu">is.na</span>(.)),</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">cog_score =</span> <span class="fu">ifelse</span>(cog_obs <span class="sc">&gt;=</span> <span class="dv">1</span>, cog_score, <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MCSID, FCNUM00, cog_score)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+<section id="writing-functions-to-clean-data" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="writing-functions-to-clean-data"><span class="header-section-number">5.2</span> Writing Functions to Clean Data</h2>
+<p>As has been discussed, cleaning data is often a repetitive process in LDA: we may need to clean the same variables in the same way across different sweeps. In this case, to make our code efficient and less error-prone, we can write bespoke functions. Below is a function that cleans height and weight data and derives BMI in each of sweeps 3-7 in the MCS. As we saw in <a href="04_finding_data.html" class="quarto-xref">Chapter&nbsp;<span>4</span></a>, height and weight are contained in the variables <code>XCHTCM00</code> and <code>XCWTCM00</code> in each of these sweeps (or <code>XCHTCMA0</code> and <code>XCWTCMA0</code> for Sweep 5). This makes the cleaning predictable.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>mcs_fups <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">11</span>, <span class="dv">14</span>, <span class="dv">17</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>clean_bmi <span class="ot">&lt;-</span> <span class="cf">function</span>(sweep){</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  sweep_letter <span class="ot">&lt;-</span> letters[sweep]</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  fup <span class="ot">&lt;-</span> mcs_fups[sweep]</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{fup}y/mcs{sweep}_cm_interview.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>,</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">matches</span>(<span class="st">"^.(CNUM|C(W|H)TCM)(A|0)0"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">cnum =</span> <span class="fu">matches</span>(<span class="st">".CNUM00"</span>),</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">height_raw =</span> <span class="fu">matches</span>(<span class="st">".CHTCM(A|0)0"</span>),</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">weight_raw =</span> <span class="fu">matches</span>(<span class="st">".CWTCM(A|0)0"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">height =</span> <span class="fu">negative_to_na</span>(height_raw) <span class="sc">%&gt;%</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>             <span class="fu">as.numeric</span>(),</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>           <span class="at">weight =</span> <span class="fu">negative_to_na</span>(weight_raw) <span class="sc">%&gt;%</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>             <span class="fu">as.numeric</span>(),</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">bmi =</span> weight <span class="sc">/</span> ( (height <span class="sc">/</span> <span class="dv">100</span>) <span class="sc">^</span> <span class="dv">2</span>),</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">fup =</span> <span class="sc">!!</span>fup) <span class="sc">%&gt;%</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(MCSID, cnum, fup, height, weight)</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span>(<span class="dv">3</span><span class="sc">:</span><span class="dv">7</span>, <span class="sc">~</span> <span class="fu">clean_bmi</span>(.x))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+# A tibble: 15,431 × 5
+   MCSID   cnum                                  fup height weight
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1 M10001N 1 [1st Cohort Member of the family]     5   114.   21.2
+ 2 M10002P 1 [1st Cohort Member of the family]     5   110.   19.2
+ 3 M10007U 1 [1st Cohort Member of the family]     5   118    25.3
+ 4 M10011Q 1 [1st Cohort Member of the family]     5   121    32.9
+ 5 M10015U 1 [1st Cohort Member of the family]     5   110.   19.7
+ 6 M10016V 1 [1st Cohort Member of the family]     5   118.   23  
+ 7 M10017W 1 [1st Cohort Member of the family]     5   110.   18.9
+ 8 M10018X 1 [1st Cohort Member of the family]     5   113.   19.4
+ 9 M10020R 1 [1st Cohort Member of the family]     5   112.   20.6
+10 M10021S 1 [1st Cohort Member of the family]     5   108    18.4
+# ℹ 15,421 more rows
+
+[[2]]
+# A tibble: 14,013 × 5
+   MCSID   cnum                                  fup height weight
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1 M10001N 1 [1st Cohort Member of the family]     7   128.   25.5
+ 2 M10002P 1 [1st Cohort Member of the family]     7   123    26.2
+ 3 M10007U 1 [1st Cohort Member of the family]     7   129    26.5
+ 4 M10011Q 1 [1st Cohort Member of the family]     7   137    51.2
+ 5 M10015U 1 [1st Cohort Member of the family]     7   122.   24.1
+ 6 M10016V 1 [1st Cohort Member of the family]     7   130    29  
+ 7 M10017W 1 [1st Cohort Member of the family]     7   121.   21.7
+ 8 M10018X 1 [1st Cohort Member of the family]     7   128.   22  
+ 9 M10020R 1 [1st Cohort Member of the family]     7   123    24.6
+10 M10021S 1 [1st Cohort Member of the family]     7   121    24.2
+# ℹ 14,003 more rows
+
+[[3]]
+# A tibble: 13,447 × 5
+   MCSID   cnum                                  fup height weight
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1 M10002P 1 [1st Cohort Member of the family]    11   144.   41.8
+ 2 M10007U 1 [1st Cohort Member of the family]    11   154.   40.6
+ 3 M10011Q 1 [1st Cohort Member of the family]    11   168.   74  
+ 4 M10015U 1 [1st Cohort Member of the family]    11   143    38.2
+ 5 M10016V 1 [1st Cohort Member of the family]    11   152.   41.5
+ 6 M10018X 1 [1st Cohort Member of the family]    11   150.   37.3
+ 7 M10020R 1 [1st Cohort Member of the family]    11   141.   33.8
+ 8 M10021S 1 [1st Cohort Member of the family]    11   147    40.3
+ 9 M10022T 1 [1st Cohort Member of the family]    11   152.   59.7
+10 M10025W 1 [1st Cohort Member of the family]    11   154.   39  
+# ℹ 13,437 more rows
+
+[[4]]
+# A tibble: 11,859 × 5
+   MCSID   cnum                                  fup height weight
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1 M10002P 1 [1st Cohort Member of the family]    14   163.   52.3
+ 2 M10007U 1 [1st Cohort Member of the family]    14   174.   57.1
+ 3 M10015U 1 [1st Cohort Member of the family]    14   164.   56.2
+ 4 M10016V 1 [1st Cohort Member of the family]    14   167    51.5
+ 5 M10018X 1 [1st Cohort Member of the family]    14   164.   56.9
+ 6 M10020R 1 [1st Cohort Member of the family]    14   161    46.8
+ 7 M10021S 1 [1st Cohort Member of the family]    14   157    51.6
+ 8 M10022T 1 [1st Cohort Member of the family]    14   168.   83  
+ 9 M10029A 1 [1st Cohort Member of the family]    14   154.   34.8
+10 M10034X 1 [1st Cohort Member of the family]    14   168.   58.3
+# ℹ 11,849 more rows
+
+[[5]]
+# A tibble: 10,345 × 5
+   MCSID   cnum                                  fup height weight
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1 M10002P 1 [1st Cohort Member of the family]    17   174.   59.4
+ 2 M10007U 1 [1st Cohort Member of the family]    17   181.   71.4
+ 3 M10015U 1 [1st Cohort Member of the family]    17   169    75.7
+ 4 M10016V 1 [1st Cohort Member of the family]    17   185.   74.1
+ 5 M10018X 1 [1st Cohort Member of the family]    17   166.   56  
+ 6 M10021S 1 [1st Cohort Member of the family]    17   157.   51.8
+ 7 M10022T 1 [1st Cohort Member of the family]    17   185.  107. 
+ 8 M10025W 1 [1st Cohort Member of the family]    17   191    75.4
+ 9 M10034X 1 [1st Cohort Member of the family]    17   179.   67.4
+10 M10041W 1 [1st Cohort Member of the family]    17    NA    NA  
+# ℹ 10,335 more rows</code></pre>
+</div>
+</div>
+<p>Notice the use of the <code>!!</code> (bang-bang) operator in <code>mutate(..., fup = !!fup)</code>. This is a form of <a href="https://adv-r.hadley.nz/quasiquotation.html">“quasiquotation”</a> that allows one to use the value of an external object (e.g., <code>fup &lt;- mcs_fups[sweep]</code>) in a <code>tibble</code> rather than the column (if they share the same name). We will return to this in a later chapter.</p>
+</section>
+<section id="combining-tibbles" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="combining-tibbles"><span class="header-section-number">5.3</span> Combining <code>tibbles</code></h2>
+<p>A key step in LDA is combining different datasets together - e.g., from different sweeps. This can be done by merging (placing the data in wide format) or by appending (placing the data in long format). We will start by discussing merging and then move on to appending.</p>
+<p>To make the process easier to understand, we will use small datasets from sweeps 6 &amp; 7, containing data on height (<code>(F|G)CHTCM00</code>) and weight (<code>(F|G)CWTCM00</code>) from three cohort members (<code>MCSIDs</code>: <code>M10020R</code>, <code>M10025W</code>, and <code>M10002P</code>) who appeared in sweeps 6 only, 7 only, and both sweeps, respectively. Later, to show how to combine more than two datasets at once, we will add in data from the same individuals from Sweep 5, which they all appeared in.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>load_mcs_mini <span class="ot">&lt;-</span> <span class="cf">function</span>(sweep){</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  sweep_letter <span class="ot">&lt;-</span> letters[sweep]</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  fup <span class="ot">&lt;-</span> mcs_fups[sweep]</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{fup}y/mcs{sweep}_cm_interview.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="fu">matches</span>(<span class="st">"^.(CNUM|C(W|H)TCM)(A|0)0"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(MCSID <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"M10020R"</span>, <span class="st">"M10025W"</span>, <span class="st">"M10002P"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(MCSID)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>mcs_14y_mini <span class="ot">&lt;-</span> <span class="fu">load_mcs_mini</span>(<span class="dv">6</span>)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>mcs_14y_mini</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  MCSID   FCNUM00                             FCHTCM00  FCWTCM00 
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+1 M10002P 1 [1st Cohort Member of the family] 163.      52.3     
+2 M10020R 1 [1st Cohort Member of the family] 161       46.8     </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini <span class="ot">&lt;-</span> <span class="fu">load_mcs_mini</span>(<span class="dv">7</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>mcs_17y_mini</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  MCSID   GCNUM00                             GCHTCM00  GCWTCM00 
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+1 M10002P 1 [1st Cohort Member of the family] 174.      59.4     
+2 M10025W 1 [1st Cohort Member of the family] 191       75.4     </code></pre>
+</div>
+</div>
+<section id="merging-tibbles-with-dplyr_join" class="level3" data-number="5.3.1">
+<h3 data-number="5.3.1" class="anchored" data-anchor-id="merging-tibbles-with-dplyr_join"><span class="header-section-number">5.3.1</span> Merging <code>tibbles</code> with <code>dplyr::*_join()</code></h3>
+<p>To merge two <code>tibbles</code> together - i.e., to create a new <code>tibble</code> with columns from both <code>tibbles</code> - we can use the <code>dplyr</code> mutating <code>*_join()</code> functions. These are called mutating joins because they add new columns to the outputted <code>tibble</code>. The functions differ in the rows that each retain in the output <code>tibble</code>.</p>
+<ul>
+<li><code>full_join(x, y, by = ...)</code>: Returns all rows from <code>x</code> and <code>y</code> . The missing value <code>NA</code> is used to fill cells that are created during the merge. Rows in <code>x</code> with no match in <code>y</code> will have <code>NA</code> values in the new columns from <code>y</code>. Rows in <code>y</code> with no match in <code>x</code> will have <code>NA</code> values in the columns of <code>x</code>.</li>
+<li><code>inner_join(x, y, by = ...)</code>: Returns all rows from <code>x</code> and <code>y</code> where there are matching rows in both <code>tibbles</code>.</li>
+<li><code>left_join(x, y, by = ...)</code>: Returns all rows from <code>x</code> Rows in <code>x</code> with no match in <code>y</code> will have <code>NA</code> values in the new columns from <code>y</code>.</li>
+<li><code>right_join(x, y, by = ...)</code>: Returns all rows from <code>y</code>, and all columns from <code>x</code> and <code>y.</code> Rows in <code>y</code> with no match in <code>x</code> will have <code>NA</code> values in the columns of <code>x</code>.</li>
+</ul>
+<p>To join the two datasets together, we need to specify the columns to join by (the “key” variables). By default, <code>*_join()</code> functions will use all variables with common names across the two datasets as the key variables. To specify particular columns, we can instead provide a character vector of the joining columns to the <code>by</code> argument. Joining columns do not need to have the same name in each <code>tibble</code>. If they have different names, we can specify a named vector. The names of this vector are names of the columns in the left (<code>x</code>) <code>tibble</code> and the values of the vector are the names of the columns in the right (<code>y</code>) <code>tibble</code>. In the merged <code>tibble</code>, key columns retain the names from the left <code>tibble</code>. Let’s see the functions in action:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">full_join</span>(mcs_14y_mini,</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>          mcs_17y_mini,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="at">FCNUM00 =</span> <span class="st">"GCNUM00"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 6
+  MCSID   FCNUM00                            FCHTCM00 FCWTCM00 GCHTCM00 GCWTCM00
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                          &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt;
+1 M10002P 1 [1st Cohort Member of the famil… 163.     52.3     174.     59.4    
+2 M10020R 1 [1st Cohort Member of the famil… 161      46.8      NA      NA      
+3 M10025W 1 [1st Cohort Member of the famil…  NA      NA       191      75.4    </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">left_join</span>(mcs_14y_mini,</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>          mcs_17y_mini,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="at">FCNUM00 =</span> <span class="st">"GCNUM00"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  MCSID   FCNUM00                            FCHTCM00 FCWTCM00 GCHTCM00 GCWTCM00
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                          &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt;
+1 M10002P 1 [1st Cohort Member of the famil… 163.     52.3     174.     59.4    
+2 M10020R 1 [1st Cohort Member of the famil… 161      46.8      NA      NA      </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">right_join</span>(mcs_14y_mini,</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>           mcs_17y_mini,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="at">FCNUM00 =</span> <span class="st">"GCNUM00"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  MCSID   FCNUM00                            FCHTCM00 FCWTCM00 GCHTCM00 GCWTCM00
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                          &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt;
+1 M10002P 1 [1st Cohort Member of the famil… 163.     52.3     174.     59.4    
+2 M10025W 1 [1st Cohort Member of the famil…  NA      NA       191      75.4    </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">inner_join</span>(mcs_14y_mini,</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>           mcs_17y_mini,</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="at">FCNUM00 =</span> <span class="st">"GCNUM00"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 6
+  MCSID   FCNUM00                            FCHTCM00 FCWTCM00 GCHTCM00 GCWTCM00
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                          &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt;
+1 M10002P 1 [1st Cohort Member of the famil… 163.     52.3     174.     59.4    </code></pre>
+</div>
+</div>
+<p>Given cohort members only appear in datasets if they have been surveyed in that sweep, rows retained after a specific <code>*_join()</code> imply a particular response pattern. For instance, <code>inner_join()</code> implies response in both sweeps.</p>
+<blockquote class="blockquote">
+<p><strong>Question</strong>: what response patterns does appearing in the <code>tibble</code> outputted by <code>full_join()</code> imply? What about <code>left_join()</code> and <code>right_join()</code>?</p>
+</blockquote>
+<p>More complicated rules for identifying rows to merge than above can be specified with the <code>join_by()</code> helper function. This is unlikely to be needed for most LDA applications, so we do not discuss this further here (an exception you may come across is joining overlapping activity history datasets) - see the <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>dplyr</code> website</a> for more detail.</p>
+<section id="merging-2-tibbles-with-purrrreduce" class="level4" data-number="5.3.1.1">
+<h4 data-number="5.3.1.1" class="anchored" data-anchor-id="merging-2-tibbles-with-purrrreduce"><span class="header-section-number">5.3.1.1</span> Merging 2+ <code>tibbles</code> with <code>purrr::reduce()</code></h4>
+<p>What if we want to merge more than two datasets together - for instance, merge all seven sweeps of the MCS? Writing out each <code>*_join()</code> function separately would be cumbersome. Instead, we can use <code>purrr::reduce()</code> to chain together successive <code>*_join()</code> function calls, aggregating the result.</p>
+<p><code>reduce()</code> is similar to <code>map()</code> in that repeats a function for each object within an input. But unlike <code>map()</code>, the result from an iteration back into the next iteration. Specifically, <code>reduce()</code> takes an object, applies a function, <code>f</code>, to the first two element and then takes the result and inputs it into <code>f</code> along with the next element of the inputted object, repeating this until the object is exhausted. For instance, specifying <code>inner_join()</code> in <code>reduce()</code> with a list of three <code>tibbles</code> will perform <code>inner_join()</code> on the first two, and then perform <code>inner_join()</code> on the result from that with the third <code>tibble</code>.</p>
+<p>The syntax for <code>reduce()</code> is similar to <code>map2()</code> where <code>.x</code> and <code>.y</code> refer to the first and second elements of the list, respectively, or to the result and to the next element of the list. Below we perform an <code>inner_join()</code> on data from sweeps 5-7. Note, as the <code>XCNUM00</code> joining keys differ depending on which sweeps are being merged, we need to slightly alter the code used above to account for this.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>mcs_11y_mini <span class="ot">&lt;-</span> <span class="fu">load_mcs_mini</span>(<span class="dv">5</span>) </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(mcs_11y_mini,</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>     mcs_14y_mini, </span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>     mcs_17y_mini) <span class="sc">%&gt;%</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reduce</span>(</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">inner_join</span>(</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>      .x <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">CNUM =</span> <span class="fu">matches</span>(<span class="st">"CNUM"</span>)),</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>      .y <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">CNUM =</span> <span class="fu">matches</span>(<span class="st">"CNUM"</span>)) ,</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM"</span>)</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 8
+  MCSID   CNUM             ECHTCMA0 ECWTCMA0 FCHTCM00 FCWTCM00 GCHTCM00 GCWTCM00
+  &lt;chr&gt;   &lt;dbl+lbl&gt;        &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt;
+1 M10002P 1 [1st Cohort M… 144.     41.8     163.     52.3     174.     59.4    </code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Question</strong>: what response pattern does appearing in the <code>tibble</code> outputted by <code>reduce(list(...), ~ inner_join(.x, .y))</code> imply? What would <code>reduce(list(...), ~ full_join(.x, .y))</code> and <code>reduce(list(...), ~ left_join(.x, .y)</code>) each imply?</p>
+</blockquote>
+</section>
+<section id="filtering-joins" class="level4" data-number="5.3.1.2">
+<h4 data-number="5.3.1.2" class="anchored" data-anchor-id="filtering-joins"><span class="header-section-number">5.3.1.2</span> Filtering Joins</h4>
+<p><code>dplyr</code> also contains two filtering join functions, <code>semi_join(x, y)</code> and <code>anti_join(x, y)</code>. Unlike mutating joins, these do not add new columns to the outputted <code>tibble</code>. Instead, they filter rows in <code>x</code> depending on whether there is a match in <code>y</code> or not.</p>
+<ul>
+<li><code>semi_join(x, y, by = ...)</code>: Returns all rows from <code>x</code> that have matches in <code>y</code>. Keeps columns just from <code>x</code>.</li>
+<li><code>anti_join(x, y, by = ...)</code>: Returns all rows from <code>x</code> that <strong>do not</strong> have matches in <code>y</code>. Keeps columns just from <code>x</code>.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">semi_join</span>(mcs_14y_mini,</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>          mcs_17y_mini,</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="at">FCNUM00 =</span> <span class="st">"GCNUM00"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  MCSID   FCNUM00                             FCHTCM00  FCWTCM00 
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+1 M10002P 1 [1st Cohort Member of the family] 163.      52.3     </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anti_join</span>(mcs_14y_mini,</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>          mcs_17y_mini,</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="at">FCNUM00 =</span> <span class="st">"GCNUM00"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  MCSID   FCNUM00                             FCHTCM00  FCWTCM00 
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+1 M10020R 1 [1st Cohort Member of the family] 161       46.8     </code></pre>
+</div>
+</div>
+<p>Again, rows that are retained after a specific filtering <code>*_join()</code> imply a particular response pattern.</p>
+<blockquote class="blockquote">
+<p><strong>Question</strong>: What response pattern does <code>semi_join()</code> above imply? What about <code>anti_join()</code>?</p>
+</blockquote>
+</section>
+</section>
+<section id="appending-tibbles-with-dplyrbind_rows" class="level3" data-number="5.3.2">
+<h3 data-number="5.3.2" class="anchored" data-anchor-id="appending-tibbles-with-dplyrbind_rows"><span class="header-section-number">5.3.2</span> Appending <code>tibbles</code> with <code>dplyr::bind_rows()</code></h3>
+<p>We have seen how the mutating <code>*_join()</code> functions can be used to merge <code>tibbles</code> together in wide format. Appending data with <code>bind_rows()</code> allows us to place data in long format. <code>bind_rows()</code> is simple - it takes a set of <code>tibbles</code> and then stacks these in the order they are specified. If the inputs are named, the <code>.id</code> argument can be used to populate a column in the outputted <code>tibble</code> identifying the input <code>tibble</code> a given row came from. The input <code>tibbles</code> can be specified separately or combined in a list.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Two equivalent approaches.</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="co"># list(</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   `11` = mcs_11y_mini,</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   `14` = mcs_14y_mini,</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   `17` = mcs_17y_mini</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ) %&gt;%</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   bind_rows(.id = "fup")</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">11</span><span class="st">`</span> <span class="ot">=</span> mcs_11y_mini,</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">14</span><span class="st">`</span> <span class="ot">=</span> mcs_14y_mini,</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">17</span><span class="st">`</span> <span class="ot">=</span> mcs_17y_mini, </span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">"fup"</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 11
+  fup   MCSID   ECNUM00    ECHTCMA0 ECWTCMA0 FCNUM00  FCHTCM00 FCWTCM00 GCNUM00 
+  &lt;chr&gt; &lt;chr&gt;   &lt;dbl+lbl&gt;  &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt;
+1 11    M10002P  1 [1st C… 144.     41.8     NA        NA      NA       NA      
+2 11    M10020R  1 [1st C… 141.     33.8     NA        NA      NA       NA      
+3 11    M10025W  1 [1st C… 154.     39       NA        NA      NA       NA      
+4 14    M10002P NA          NA      NA        1 [1st… 163.     52.3     NA      
+5 14    M10020R NA          NA      NA        1 [1st… 161      46.8     NA      
+6 17    M10002P NA          NA      NA       NA        NA      NA        1 [1st…
+7 17    M10025W NA          NA      NA       NA        NA      NA        1 [1st…
+# ℹ 2 more variables: GCHTCM00 &lt;dbl+lbl&gt;, GCWTCM00 &lt;dbl+lbl&gt;</code></pre>
+</div>
+</div>
+<p><code>bind_rows()</code> retains all the columns from the input <code>tibbles</code>, even if a given column did not appear in all of them. We can see this create issues where column names differ across the input datasets. Therefore, variable names should be harmonised before piping into <code>bind_rows()</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">11</span><span class="st">`</span> <span class="ot">=</span> mcs_11y_mini ,</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">14</span><span class="st">`</span> <span class="ot">=</span> mcs_14y_mini,</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">17</span><span class="st">`</span> <span class="ot">=</span> mcs_17y_mini</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> .x <span class="sc">%&gt;%</span> </span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">str_sub</span>(.x, <span class="dv">2</span>),</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">.cols =</span> <span class="sc">-</span>MCSID)</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="at">.id =</span> <span class="st">"fup"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `11$CHTCM00` and `17$CHTCM00` have conflicting value labels.
+ℹ Labels for these values will be taken from `11$CHTCM00`.
+✖ Values: -5</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `11$CWTCM00` and `17$CWTCM00` have conflicting value labels.
+ℹ Labels for these values will be taken from `11$CWTCM00`.
+✖ Values: -5</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 7
+  fup   MCSID   CNUM00                           CHTCMA0 CWTCMA0 CHTCM00 CWTCM00
+  &lt;chr&gt; &lt;chr&gt;   &lt;dbl+lbl&gt;                        &lt;dbl+l&gt; &lt;dbl+l&gt; &lt;dbl+l&gt; &lt;dbl+l&gt;
+1 11    M10002P 1 [1st Cohort Member of the fam… 144.    41.8     NA     NA     
+2 11    M10020R 1 [1st Cohort Member of the fam… 141.    33.8     NA     NA     
+3 11    M10025W 1 [1st Cohort Member of the fam… 154.    39       NA     NA     
+4 14    M10002P 1 [1st Cohort Member of the fam…  NA     NA      163.    52.3   
+5 14    M10020R 1 [1st Cohort Member of the fam…  NA     NA      161     46.8   
+6 17    M10002P 1 [1st Cohort Member of the fam…  NA     NA      174.    59.4   
+7 17    M10025W 1 [1st Cohort Member of the fam…  NA     NA      191     75.4   </code></pre>
+</div>
+</div>
+<p>Note, <code>bind_rows()</code> produces a warning where the column attributes vary between the input <code>tibbles</code>. Here the <code>value_labels</code> attributes varied. <code>bind_rows()</code> resolves inconsistencies by using the attributes from the first <code>tibble</code>.</p>
+<p>This code has worked slightly better - it has placed values from Sweeps 6 &amp; 7 in the same columns, but as Sweep 5 uses a slightly different rubric for variable names, these still appear separately. We could improve the code further with to handle this scenario (e.g., <code>str_sub(.x, 2. -3)</code>, but another helpful function is <code>dplyr::coalesce()</code>. <code>coalesce()</code> takes multiple objects as inputs, and at each position, uses the first non-missing value in the output.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">11</span><span class="st">`</span> <span class="ot">=</span> mcs_11y_mini ,</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">14</span><span class="st">`</span> <span class="ot">=</span> mcs_14y_mini,</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">17</span><span class="st">`</span> <span class="ot">=</span> mcs_17y_mini</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(<span class="sc">~</span> .x <span class="sc">%&gt;%</span> <span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">str_sub</span>(.x, <span class="dv">2</span>), <span class="at">.cols =</span> <span class="sc">-</span>MCSID),</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">.id =</span> <span class="st">"fup"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">height =</span> <span class="fu">coalesce</span>(CHTCMA0, CHTCM00), </span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">weight =</span> <span class="fu">coalesce</span>(CWTCMA0, CWTCM00),</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">.after =</span> CNUM00)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 9
+  fup   MCSID   CNUM00             height weight CHTCMA0 CWTCMA0 CHTCM00 CWTCM00
+  &lt;chr&gt; &lt;chr&gt;   &lt;dbl+lbl&gt;          &lt;dbl+&gt; &lt;dbl+&gt; &lt;dbl+l&gt; &lt;dbl+l&gt; &lt;dbl+l&gt; &lt;dbl+l&gt;
+1 11    M10002P 1 [1st Cohort Mem… 144.   41.8   144.    41.8     NA     NA     
+2 11    M10020R 1 [1st Cohort Mem… 141.   33.8   141.    33.8     NA     NA     
+3 11    M10025W 1 [1st Cohort Mem… 154.   39     154.    39       NA     NA     
+4 14    M10002P 1 [1st Cohort Mem… 163.   52.3    NA     NA      163.    52.3   
+5 14    M10020R 1 [1st Cohort Mem… 161    46.8    NA     NA      161     46.8   
+6 17    M10002P 1 [1st Cohort Mem… 174.   59.4    NA     NA      174.    59.4   
+7 17    M10025W 1 [1st Cohort Mem… 191    75.4    NA     NA      191     75.4   </code></pre>
+</div>
+</div>
+<p>Note, we use <code>map_dfr(.id = "fup")</code> here which achieves the same purpose as <code>map() %&gt;% bind_rows(.id = "fup")</code>, but in a single function call.</p>
+<p>Notice that <code>bind_rows()</code> outputs rows for all observations in the input <code>tibbles</code>, and implies a particular response pattern.</p>
+</section>
+<section id="task-iii" class="level3" data-number="5.3.3">
+<h3 data-number="5.3.3" class="anchored" data-anchor-id="task-iii"><span class="header-section-number">5.3.3</span> Task III</h3>
+<blockquote class="blockquote">
+<p>Merge the Age 50y, 55y and 62y NCDS datasets together, with <code>*_join()</code> and <code>reduce()</code>. Use <code>_join()</code> functions such that (a) anyone who appeared in any of the three sweeps is retained, (b) anyone who appeared in all three sweeps is retain, and (c) anyone who appeared in the Age 62y sweep is retained. How many rows are in each?</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>ncds_list <span class="ot">&lt;-</span> <span class="fu">list</span>( <span class="co"># Just to focus on main ID variable</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  ncds_50y <span class="sc">%&gt;%</span> <span class="fu">select</span>(NCDSID),</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  ncds_55y <span class="sc">%&gt;%</span> <span class="fu">select</span>(NCDSID),</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  ncds_62y <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="at">NCDSID =</span> ncdsid)</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a><span class="fu">reduce</span>(ncds_list, <span class="sc">~</span> <span class="fu">full_join</span>(.x, .y, <span class="at">by =</span> <span class="st">"NCDSID"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a><span class="fu">reduce</span>(ncds_list, <span class="sc">~</span> <span class="fu">inner_join</span>(.x, .y, <span class="at">by =</span> <span class="st">"NCDSID"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a><span class="fu">reduce</span>(ncds_list, <span class="sc">~</span> <span class="fu">right_join</span>(.x, .y, <span class="at">by =</span> <span class="st">"NCDSID"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<blockquote class="blockquote">
+<p>It is often more efficient to append raw data together and then clean the data. Amend the <code>clean_bmi()</code> code above to append the data from Sweeps 3-7 and then clean the output.</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>load_anthro <span class="ot">&lt;-</span> <span class="cf">function</span>(sweep){</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  sweep_letter <span class="ot">&lt;-</span> letters[sweep]</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  fup <span class="ot">&lt;-</span> mcs_fups[sweep]</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue</span>(<span class="st">"{mcs_fld}/{fup}y/mcs{sweep}_cm_interview.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>,</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">matches</span>(<span class="st">"^.(CNUM|C(W|H)TCM)(A|0)0"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">cnum =</span> <span class="fu">matches</span>(<span class="st">".CNUM00"</span>),</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">height_raw =</span> <span class="fu">matches</span>(<span class="st">".CHTCM(A|0)0"</span>),</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">weight_raw =</span> <span class="fu">matches</span>(<span class="st">".CWTCM(A|0)0"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sweep =</span> <span class="sc">!!</span>sweep)</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>task3_solution <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>  <span class="dv">3</span><span class="sc">:</span><span class="dv">7</span>, </span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> <span class="fu">load_anthro</span>(.x) <span class="sc">%&gt;%</span></span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cnum =</span> <span class="fu">as.integer</span>(cnum),</span>
+<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a>           <span class="at">height =</span> <span class="fu">negative_to_na</span>(height_raw) <span class="sc">%&gt;%</span></span>
+<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a>             <span class="fu">as.numeric</span>(),</span>
+<span id="cb57-20"><a href="#cb57-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">weight =</span> <span class="fu">negative_to_na</span>(weight_raw) <span class="sc">%&gt;%</span></span>
+<span id="cb57-21"><a href="#cb57-21" aria-hidden="true" tabindex="-1"></a>             <span class="fu">as.numeric</span>(),</span>
+<span id="cb57-22"><a href="#cb57-22" aria-hidden="true" tabindex="-1"></a>           <span class="at">bmi =</span> weight <span class="sc">/</span> ( (height <span class="sc">/</span> <span class="dv">100</span>) <span class="sc">^</span> <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb57-23"><a href="#cb57-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(MCSID, cnum, sweep, height, weight, bmi)</span>
+<span id="cb57-24"><a href="#cb57-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb57-25"><a href="#cb57-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-26"><a href="#cb57-26" aria-hidden="true" tabindex="-1"></a>task3_solution</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+<section id="reshaping-tibbles-with-tidyrpivot_" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="reshaping-tibbles-with-tidyrpivot_"><span class="header-section-number">5.4</span> Reshaping <code>tibbles</code> with <code>tidyr::pivot_*()</code></h2>
+<p>A key aspect of LDA is moving data between long and wide formats (and vice versa). The <code>pivot_longer()</code> and <code>pivot_wider()</code> functions from <code>tidyr</code> can be used to do this.</p>
+<section id="wide-to-long-transformations-with-tidyrpivot_longer" class="level3" data-number="5.4.1">
+<h3 data-number="5.4.1" class="anchored" data-anchor-id="wide-to-long-transformations-with-tidyrpivot_longer"><span class="header-section-number">5.4.1</span> Wide-to-Long Transformations with <code>tidyr::pivot_longer()</code></h3>
+<p>We will continue with the “mini” datasets we have been using so far. Let’s start by creating a wide-dataset with data from sweeps 5-7 using <code>full_join()</code> and <code>reduce()</code>. As we use <code>full_join()</code>, this dataset contains data for all three cohort members. To simplify things slightly, we’ll rename the variables from Sweep 5 (<code>E...A0</code>) to share the same suffix as Sweeps 6 &amp; 7 (<code>00</code>).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>df_mini_wide <span class="ot">&lt;-</span> <span class="fu">list</span>(mcs_11y_mini,</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>                     mcs_14y_mini, </span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>                     mcs_17y_mini) <span class="sc">%&gt;%</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reduce</span>(</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">full_join</span>(</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>      .x <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">CNUM =</span> <span class="fu">matches</span>(<span class="st">"CNUM"</span>)),</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>      .y <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">CNUM =</span> <span class="fu">matches</span>(<span class="st">"CNUM"</span>)) ,</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM"</span>)</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">str_replace</span>(.x, <span class="st">"A0$"</span>, <span class="st">"00"</span>))</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>df_mini_wide</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 8
+  MCSID   CNUM             ECHTCM00 ECWTCM00 FCHTCM00 FCWTCM00 GCHTCM00 GCWTCM00
+  &lt;chr&gt;   &lt;dbl+lbl&gt;        &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt; &lt;dbl+lb&gt;
+1 M10002P 1 [1st Cohort M… 144.     41.8     163.     52.3     174.     59.4    
+2 M10020R 1 [1st Cohort M… 141.     33.8     161      46.8      NA      NA      
+3 M10025W 1 [1st Cohort M… 154.     39        NA      NA       191      75.4    </code></pre>
+</div>
+</div>
+<p><code>df_mini_wide</code> has one row per cohort member. This <code>tibble</code> is not <em>tidy</em> as the variable <em>names</em> encode information about the sweep of assessment. To make the data tidy, we instead need one row per cohort member x sweep, with one column for height and weight each and with ID variables for person (<code>MCSID</code> &amp; <code>CNUM</code>) and for sweep (to be created). The simplest <code>pivot_longer()</code> call will not achieve our aims, but it is worth seeing the syntax.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>df_mini_wide <span class="sc">%&gt;%</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="sc">-</span><span class="fu">c</span>(MCSID, CNUM), <span class="co"># Columns to pivot (everything but MCSID and CNUM)</span></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"variable"</span>,</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"value"</span></span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `ECHTCM00` and `GCHTCM00` have conflicting value labels.
+ℹ Labels for these values will be taken from `ECHTCM00`.
+✖ Values: -5</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `ECHTCM00` and `GCWTCM00` have conflicting value labels.
+ℹ Labels for these values will be taken from `ECHTCM00`.
+✖ Values: -5</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 18 × 4
+   MCSID   CNUM                                variable value    
+   &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;chr&gt;    &lt;dbl+lbl&gt;
+ 1 M10002P 1 [1st Cohort Member of the family] ECHTCM00 144.     
+ 2 M10002P 1 [1st Cohort Member of the family] ECWTCM00  41.8    
+ 3 M10002P 1 [1st Cohort Member of the family] FCHTCM00 163.     
+ 4 M10002P 1 [1st Cohort Member of the family] FCWTCM00  52.3    
+ 5 M10002P 1 [1st Cohort Member of the family] GCHTCM00 174.     
+ 6 M10002P 1 [1st Cohort Member of the family] GCWTCM00  59.4    
+ 7 M10020R 1 [1st Cohort Member of the family] ECHTCM00 141.     
+ 8 M10020R 1 [1st Cohort Member of the family] ECWTCM00  33.8    
+ 9 M10020R 1 [1st Cohort Member of the family] FCHTCM00 161      
+10 M10020R 1 [1st Cohort Member of the family] FCWTCM00  46.8    
+11 M10020R 1 [1st Cohort Member of the family] GCHTCM00  NA      
+12 M10020R 1 [1st Cohort Member of the family] GCWTCM00  NA      
+13 M10025W 1 [1st Cohort Member of the family] ECHTCM00 154.     
+14 M10025W 1 [1st Cohort Member of the family] ECWTCM00  39      
+15 M10025W 1 [1st Cohort Member of the family] FCHTCM00  NA      
+16 M10025W 1 [1st Cohort Member of the family] FCWTCM00  NA      
+17 M10025W 1 [1st Cohort Member of the family] GCHTCM00 191      
+18 M10025W 1 [1st Cohort Member of the family] GCWTCM00  75.4    </code></pre>
+</div>
+</div>
+<p>This isn’t tidy because there is now only one value column (<code>value</code>) when there should be two (i.e., for height and weight, separately) and the <code>variable</code> column contains information on the sweep of assessment and the variable type (height or weight). Instead, we need to use <code>pivot_longer()</code> to perform a more complex transformation where we extract the information on sweep from the variable name, placing this information in a new <em>name</em> column, and also use the rest of the variable name (<code>CHTCM00</code> or <code>CWTCM00</code>) to name the (two) new <em>value</em> columns.</p>
+<p>To do this, we can use the <code>names_pattern</code> and <code>names_to</code> arguments of <code>pivot_longer()</code>. <code>names_pattern</code> separates the takes a regular expression to capture groups within the variable names. One group will capture the sweep information (e.g., “F” or “G”) and the other will capture the variable type (e.g., <code>CHTCM00</code> or <code>CWTCM00</code>). <code>names_to</code> then specifies the names of these new columns, using the <code>.value</code> placeholder to specify the names will be used for the new value columns.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>df_mini_wide <span class="sc">%&gt;%</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">matches</span>(<span class="st">"^.C(W|H)TCM00"</span>), <span class="co"># The columns to pivot.</span></span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_pattern =</span> <span class="st">"(.)(.*)"</span>, <span class="co"># Two groups: first letter, and subsequent letters</span></span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">"sweep"</span>, <span class="st">".value"</span>)) <span class="co"># Names for the new groups</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `ECHTCM00` and `GCHTCM00` have conflicting value labels.
+ℹ Labels for these values will be taken from `ECHTCM00`.
+✖ Values: -5</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `ECWTCM00` and `GCWTCM00` have conflicting value labels.
+ℹ Labels for these values will be taken from `ECWTCM00`.
+✖ Values: -5</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 5
+  MCSID   CNUM                                sweep CHTCM00   CWTCM00  
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;chr&gt; &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+1 M10002P 1 [1st Cohort Member of the family] E     144.      41.8     
+2 M10002P 1 [1st Cohort Member of the family] F     163.      52.3     
+3 M10002P 1 [1st Cohort Member of the family] G     174.      59.4     
+4 M10020R 1 [1st Cohort Member of the family] E     141.      33.8     
+5 M10020R 1 [1st Cohort Member of the family] F     161       46.8     
+6 M10020R 1 [1st Cohort Member of the family] G      NA       NA       
+7 M10025W 1 [1st Cohort Member of the family] E     154.      39       
+8 M10025W 1 [1st Cohort Member of the family] F      NA       NA       
+9 M10025W 1 [1st Cohort Member of the family] G     191       75.4     </code></pre>
+</div>
+</div>
+<p>If we really insist, we can clean up the resulting variable names a bit more altering <code>names_pattern</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>df_mini_wide <span class="sc">%&gt;%</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">matches</span>(<span class="st">"^.C(W|H)TCM00"</span>), <span class="co"># The columns to pivot.</span></span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_pattern =</span> <span class="st">"(.)C(..)CM00"</span>, <span class="co"># Two groups: first letter, and third and fourth letters</span></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">"sweep_letter"</span>, <span class="st">".value"</span>))  <span class="sc">%&gt;%</span></span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sweep =</span> <span class="fu">match</span>(sweep_letter, LETTERS),</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">fup =</span> mcs_fups[sweep],</span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> sweep_letter)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `ECHTCM00` and `GCHTCM00` have conflicting value labels.
+ℹ Labels for these values will be taken from `ECHTCM00`.
+✖ Values: -5</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `ECWTCM00` and `GCWTCM00` have conflicting value labels.
+ℹ Labels for these values will be taken from `ECWTCM00`.
+✖ Values: -5</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 7
+  MCSID   CNUM                              sweep   fup sweep_letter HT    WT   
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                         &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt;
+1 M10002P 1 [1st Cohort Member of the fami…     5    11 E            144.  41.8 
+2 M10002P 1 [1st Cohort Member of the fami…     6    14 F            163.  52.3 
+3 M10002P 1 [1st Cohort Member of the fami…     7    17 G            174.  59.4 
+4 M10020R 1 [1st Cohort Member of the fami…     5    11 E            141.  33.8 
+5 M10020R 1 [1st Cohort Member of the fami…     6    14 F            161   46.8 
+6 M10020R 1 [1st Cohort Member of the fami…     7    17 G             NA   NA   
+7 M10025W 1 [1st Cohort Member of the fami…     5    11 E            154.  39   
+8 M10025W 1 [1st Cohort Member of the fami…     6    14 F             NA   NA   
+9 M10025W 1 [1st Cohort Member of the fami…     7    17 G            191   75.4 </code></pre>
+</div>
+</div>
+<p>The resulting <code>tibble</code> has 9 rows - 3 for each cohort member (1 for each cohort member x sweep combination). This includes rows for sweeps a cohort member did not even appear in.</p>
+<p>The above code shows how to reshape raw data, but the same principles apply to clean data, too. With that in mind, when cleaning data, one should use consistent naming schemes for variables to make reshaping simpler. Using underscores (<code>_</code>) in variable names and placing sweep or follow-up age as a suffix is particularly helpful.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>rename_col <span class="ot">&lt;-</span> <span class="cf">function</span>(var_name){</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>  var_dict <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"CHTCM00"</span> <span class="ot">=</span> <span class="st">"height"</span>, <span class="st">"CWTCM00"</span> <span class="ot">=</span> <span class="st">"weight"</span>)</span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>  sweep_letter <span class="ot">&lt;-</span> <span class="fu">str_sub</span>(var_name, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>  clean_var <span class="ot">&lt;-</span> var_dict[<span class="fu">str_sub</span>(var_name, <span class="dv">2</span>)]</span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glue</span>(<span class="st">"{clean_var}_{mcs_fups[match(sweep_letter, LETTERS)]}"</span>)</span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>df_mini_wide <span class="sc">%&gt;%</span></span>
+<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.labelled), negative_to_na)) <span class="sc">%&gt;%</span></span>
+<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(rename_col, <span class="at">.cols =</span> <span class="sc">-</span><span class="fu">c</span>(MCSID, CNUM)) <span class="sc">%&gt;%</span></span>
+<span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb72-12"><a href="#cb72-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="sc">-</span><span class="fu">c</span>(MCSID, CNUM),</span>
+<span id="cb72-13"><a href="#cb72-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_pattern =</span> <span class="st">"(.*)_(.*)"</span>, </span>
+<span id="cb72-14"><a href="#cb72-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">".value"</span>, <span class="st">"fup"</span>),</span>
+<span id="cb72-15"><a href="#cb72-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_transform =</span> <span class="fu">list</span>(<span class="at">fup =</span> as.integer) <span class="co"># To change `fup` column from character to integer</span></span>
+<span id="cb72-16"><a href="#cb72-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 5
+  MCSID   CNUM                                  fup height    weight   
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;int&gt; &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+1 M10002P 1 [1st Cohort Member of the family]    11 144.      41.8     
+2 M10002P 1 [1st Cohort Member of the family]    14 163.      52.3     
+3 M10002P 1 [1st Cohort Member of the family]    17 174.      59.4     
+4 M10020R 1 [1st Cohort Member of the family]    11 141.      33.8     
+5 M10020R 1 [1st Cohort Member of the family]    14 161       46.8     
+6 M10020R 1 [1st Cohort Member of the family]    17  NA       NA       
+7 M10025W 1 [1st Cohort Member of the family]    11 154.      39       
+8 M10025W 1 [1st Cohort Member of the family]    14  NA       NA       
+9 M10025W 1 [1st Cohort Member of the family]    17 191       75.4     </code></pre>
+</div>
+</div>
+<section id="task-iv" class="level4" data-number="5.4.1.1">
+<h4 data-number="5.4.1.1" class="anchored" data-anchor-id="task-iv"><span class="header-section-number">5.4.1.1</span> Task IV</h4>
+<blockquote class="blockquote">
+<p>Change <code>names_to = c(".value", "sweep_letter")</code> in the code above and run. Before looking at the output, predict what the resulting dataset will look like. What will the columns names be? How many rows of data will there be in the output? Can you think of a purpose of data in this format? (Hint: consider what could be achieved with <code>group_by()</code>).</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>df_mini_wide <span class="sc">%&gt;%</span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">matches</span>(<span class="st">"^.C(W|H)TCM00"</span>), <span class="co"># The columns to pivot.</span></span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_pattern =</span> <span class="st">"(.)C(.*)CM00"</span>, <span class="co"># Two groups: first letter, and subsequent letters</span></span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">".value"</span>, <span class="st">"variable"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(variable) <span class="sc">%&gt;%</span></span>
+<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rho =</span> <span class="fu">cor</span>(E, G, <span class="at">use =</span> <span class="st">"complete.obs"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+<section id="long-to-wide-transformations-with-tidyrpivot_wider" class="level3" data-number="5.4.2">
+<h3 data-number="5.4.2" class="anchored" data-anchor-id="long-to-wide-transformations-with-tidyrpivot_wider"><span class="header-section-number">5.4.2</span> Long-to-Wide Transformations with <code>tidyr::pivot_wider()</code></h3>
+<p>Let’s now consider the opposite transformation - moving data from long to wide format. <code>pivot_wider()</code> shares some syntax with <code>pivot_longer()</code> but there are also key differences. We’ll again use the “mini” datasets and start with a simple function call, reshaping a single column, and then move on to reshaping multiple columns at once.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>df_long_mini <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">11</span><span class="st">`</span> <span class="ot">=</span> mcs_11y_mini <span class="sc">%&gt;%</span> <span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">str_replace</span>(.x, <span class="st">"A0$"</span>, <span class="st">"00"</span>)),</span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">14</span><span class="st">`</span> <span class="ot">=</span> mcs_14y_mini,</span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">17</span><span class="st">`</span> <span class="ot">=</span> mcs_17y_mini</span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(<span class="sc">~</span> .x <span class="sc">%&gt;%</span> <span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">str_sub</span>(.x, <span class="dv">2</span>), <span class="at">.cols =</span> <span class="sc">-</span>MCSID),</span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">.id =</span> <span class="st">"fup"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fup =</span> <span class="fu">as.integer</span>(fup)) <span class="sc">%&gt;%</span></span>
+<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(MCSID, CNUM00, fup) <span class="sc">%&gt;%</span></span>
+<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">relocate</span>(fup, <span class="at">.after =</span> CNUM00)</span>
+<span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-12"><a href="#cb75-12" aria-hidden="true" tabindex="-1"></a>df_long_mini</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 5
+  MCSID   CNUM00                                fup CHTCM00   CWTCM00  
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;int&gt; &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+1 M10002P 1 [1st Cohort Member of the family]    11 144.      41.8     
+2 M10002P 1 [1st Cohort Member of the family]    14 163.      52.3     
+3 M10002P 1 [1st Cohort Member of the family]    17 174.      59.4     
+4 M10020R 1 [1st Cohort Member of the family]    11 141.      33.8     
+5 M10020R 1 [1st Cohort Member of the family]    14 161       46.8     
+6 M10025W 1 [1st Cohort Member of the family]    11 154.      39       
+7 M10025W 1 [1st Cohort Member of the family]    17 191       75.4     </code></pre>
+</div>
+</div>
+<p>Let’s pivot the height (<code>CHTCM00</code>) variable wider. By specifying the <code>id_cols</code> argument, we can specify the columns to keep as is in the outputted <code>tibble</code> - as <code>CWTCM00</code> does not appear in the specified columns, it is thrown away.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>df_long_mini <span class="sc">%&gt;%</span></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols =</span> <span class="fu">c</span>(MCSID, CNUM00),</span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> fup,</span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> CHTCM00</span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  MCSID   CNUM00                              `11`      `14`      `17`     
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl+lbl&gt; &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+1 M10002P 1 [1st Cohort Member of the family] 144.      163.      174.     
+2 M10020R 1 [1st Cohort Member of the family] 141.      161        NA      
+3 M10025W 1 [1st Cohort Member of the family] 154.       NA       191      </code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Question:</strong> Remove the <code>id_cols = ...</code> argument in the code above and run. What happens and why?</p>
+</blockquote>
+<p>Note, the new column names in the output above are not very helpful as the entire name is taken from the <code>fup</code> column. Instead, the <code>names_glue()</code> argument can be used specify a rubric for the new column names, using <code>glue()</code>-like syntax. As with <code>pivot_longer()</code>, we can use the <code>.value</code> placeholder to use the name of the values column(s).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>df_long_mini <span class="sc">%&gt;%</span></span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols =</span> <span class="fu">c</span>(MCSID, CNUM00),</span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> fup,</span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> CHTCM00,</span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_glue =</span> <span class="st">"{.value}_{fup}"</span></span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  MCSID   CNUM00                              CHTCM00_11 CHTCM00_14 CHTCM00_17
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;dbl+lbl&gt;  &lt;dbl+lbl&gt;  &lt;dbl+lbl&gt; 
+1 M10002P 1 [1st Cohort Member of the family] 144.       163.       174.      
+2 M10020R 1 [1st Cohort Member of the family] 141.       161         NA       
+3 M10025W 1 [1st Cohort Member of the family] 154.        NA        191       </code></pre>
+</div>
+</div>
+<p>Generalising this code to situations where we want to reshape multiple columns at once is easy - we can just amend the <code>values_from</code> argument.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>df_long_mini <span class="sc">%&gt;%</span></span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols =</span> <span class="fu">c</span>(MCSID, CNUM00),</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> fup,</span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> <span class="fu">matches</span>(<span class="st">"C(W|H)TCM00"</span>),</span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_glue =</span> <span class="st">"{.value}_{fup}"</span>,</span>
+<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_vary =</span> <span class="st">"slowest"</span> <span class="co"># Places variables from the same sweep side-by-side</span></span>
+<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 8
+  MCSID   CNUM00          CHTCM00_11 CWTCM00_11 CHTCM00_14 CWTCM00_14 CHTCM00_17
+  &lt;chr&gt;   &lt;dbl+lbl&gt;       &lt;dbl+lbl&gt;  &lt;dbl+lbl&gt;  &lt;dbl+lbl&gt;  &lt;dbl+lbl&gt;  &lt;dbl+lbl&gt; 
+1 M10002P 1 [1st Cohort … 144.       41.8       163.       52.3       174.      
+2 M10020R 1 [1st Cohort … 141.       33.8       161        46.8        NA       
+3 M10025W 1 [1st Cohort … 154.       39          NA        NA         191       
+# ℹ 1 more variable: CWTCM00_17 &lt;dbl+lbl&gt;</code></pre>
+</div>
+</div>
+<p>Notice in the output that we have one row per cohort member and a <code>NA</code> value for the columns for sweeps they may not have even responded in. In other words, <code>pivot_wider()</code> makes <a href="https://r4ds.hadley.nz/missing-values.html">implicit missing values explicit</a>.</p>
+<section id="task-v" class="level4" data-number="5.4.2.1">
+<h4 data-number="5.4.2.1" class="anchored" data-anchor-id="task-v"><span class="header-section-number">5.4.2.1</span> Task V</h4>
+<blockquote class="blockquote">
+<p>Take the output of the solution to Task III and reshape the weight and BMI columns to wide format, discarding height. Keep rows for only those individuals who appeared in all sweeps.</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>task3_solution <span class="sc">%&gt;%</span></span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(MCSID, cnum) <span class="sc">%&gt;%</span></span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">==</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols =</span> <span class="fu">c</span>(MCSID, cnum),</span>
+<span id="cb83-6"><a href="#cb83-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> sweep,</span>
+<span id="cb83-7"><a href="#cb83-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> <span class="fu">c</span>(weight, bmi),</span>
+<span id="cb83-8"><a href="#cb83-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_glue =</span> <span class="st">"{.value}_{sweep}"</span>,</span>
+<span id="cb83-9"><a href="#cb83-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+</section>
+</section>
+<section id="some-helpful-functions-for-cleaning-long-data" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="some-helpful-functions-for-cleaning-long-data"><span class="header-section-number">5.5</span> Some Helpful Functions for Cleaning Long Data</h2>
+<p>We’ll finish with a few functions that are helpful when cleaning long data.</p>
+<section id="tidyrcomplete" class="level3" data-number="5.5.1">
+<h3 data-number="5.5.1" class="anchored" data-anchor-id="tidyrcomplete"><span class="header-section-number">5.5.1</span> <code>tidyr::complete()</code></h3>
+<p>While <code>pivot_wider()</code> makes implicit values explicit, <code>bind_rows()</code> does not. It is possible to create missing rows when data are in long format by using <code>tidyr::complete()</code>. This function is straightforward - you pass it a <code>tibble</code> and then specify the columns one wishes to get every combination for (here the ID and time variables). By default, other columns will be filled with <code>NA</code> values in the newly created rows. This behaviour can be overridden using the <code>fill</code> argument.</p>
+<p>One issue with MCS data is that ID columns are spread over two variables. Making all combinations of <code>MCSID</code> and <code>CNUM00</code> creates <code>CNUM00 == 2</code> values for each <code>MCSID</code>, even if they are singleton families. This problem can be avoided first <em>uniting</em> (<code>unite()</code>) the ID columns then separating (<code>separate()</code>) them after using <code>complete()</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>df_long_mini <span class="sc">%&gt;%</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unite</span>(<span class="st">"iid"</span>, MCSID, CNUM00, <span class="at">sep =</span> <span class="st">"_"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(iid, fup) <span class="sc">%&gt;%</span></span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(iid, </span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"MCSID"</span>, <span class="st">"CNUM00"</span>), </span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">sep =</span> <span class="st">"_"</span>,</span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">convert =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 5
+  MCSID   CNUM00   fup CHTCM00   CWTCM00  
+  &lt;chr&gt;    &lt;int&gt; &lt;int&gt; &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+1 M10002P      1    11 144.      41.8     
+2 M10002P      1    14 163.      52.3     
+3 M10002P      1    17 174.      59.4     
+4 M10020R      1    11 141.      33.8     
+5 M10020R      1    14 161       46.8     
+6 M10020R      1    17  NA       NA       
+7 M10025W      1    11 154.      39       
+8 M10025W      1    14  NA       NA       
+9 M10025W      1    17 191       75.4     </code></pre>
+</div>
+</div>
+<p>Alternatively, one can use the <code>panelr::balance_panel()</code> function (not part of the <code>tidyverse</code>), though this requires converting a <code>tibble</code> to and from the <code>panel</code> class used by that package (<code>as_panel(...) %&gt;% balance_panel() %&gt;% unpanel()</code>).</p>
+</section>
+<section id="tidyrfill" class="level3" data-number="5.5.2">
+<h3 data-number="5.5.2" class="anchored" data-anchor-id="tidyrfill"><span class="header-section-number">5.5.2</span> <code>tidyr::fill()</code></h3>
+<p><code>fill()</code> allows one to fill in missing values in a column with observed values appearing above or below. This is particularly useful when a time-invariant variable is only available for a person in some survey sweeps, or where such an assumption about time-invariance is justified. For instance, in tobacco research, the conservative Russell Standard (<a href="https://doi.org/10.1111/j.1360-0443.2004.00995.x">West et al., 2005</a>) is sometimes used which assumes that smokers who drop-out of a survey continue to smoke. Another example is adult height, which is often only collected from those for whom data is not already available (e..g, as in the NCDS), and can be assumed to be stable over adulthood. Available measures can therefore be used to deterministically impute the missing values.</p>
+<p>The <code>fill()</code> function is straightforward. One passes it a <code>tibble</code> (possibly grouped) and the columns to fill, along with the direction to fill values (using argument <code>.direction</code>): down, up, downup, or updown. Below we use <code>complete()</code> to make missing sweeps explicit, then fill the missing height values with the last observed one for that individuals.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>df_long_mini <span class="sc">%&gt;%</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(MCSID, CNUM00, fup) <span class="sc">%&gt;%</span> <span class="co"># Simplified as CNUM == 1 always</span></span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, CNUM00) <span class="sc">%&gt;%</span></span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fill</span>(CHTCM00, <span class="at">.direction =</span> <span class="st">"down"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 5
+  MCSID   CNUM00                                fup CHTCM00   CWTCM00  
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                           &lt;int&gt; &lt;dbl+lbl&gt; &lt;dbl+lbl&gt;
+1 M10002P 1 [1st Cohort Member of the family]    11 144.      41.8     
+2 M10002P 1 [1st Cohort Member of the family]    14 163.      52.3     
+3 M10002P 1 [1st Cohort Member of the family]    17 174.      59.4     
+4 M10020R 1 [1st Cohort Member of the family]    11 141.      33.8     
+5 M10020R 1 [1st Cohort Member of the family]    14 161       46.8     
+6 M10020R 1 [1st Cohort Member of the family]    17 161       NA       
+7 M10025W 1 [1st Cohort Member of the family]    11 154.      39       
+8 M10025W 1 [1st Cohort Member of the family]    14 154.      NA       
+9 M10025W 1 [1st Cohort Member of the family]    17 191       75.4     </code></pre>
+</div>
+</div>
+<p>(Note, this assumption of invariance in height is invalid here, given the MCS data are from adolescence, not adulthood.)</p>
+</section>
+<section id="some-dplyr-helpers" class="level3" data-number="5.5.3">
+<h3 data-number="5.5.3" class="anchored" data-anchor-id="some-dplyr-helpers"><span class="header-section-number">5.5.3</span> Some <code>dplyr</code> Helpers</h3>
+<p><code>dplyr</code> contains several helpful functions for working with grouped data:</p>
+<ul>
+<li><code>lag()</code> and <code>lead()</code>: Returns the preceding and succeeding values in an object (e.g., a column vector), respectively</li>
+<li><code>first()</code> &amp; <code>last()</code>: Returns the first and last values in an object, respectively.</li>
+<li><code>nth()</code>: Returns the nth value in an object</li>
+<li><code>n_distinct()</code>: Returns the number of distinct values in an object.</li>
+<li><code>n()</code>: Returns the number of rows in the current group.</li>
+<li><code>row_number()</code>: Returns the row number within each group.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>df_long_mini <span class="sc">%&gt;%</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>CHTCM00, <span class="sc">-</span>CWTCM00) <span class="sc">%&gt;%</span></span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, CNUM00) <span class="sc">%&gt;%</span></span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">prev_fup =</span> <span class="fu">lag</span>(fup), </span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">next_fup =</span> <span class="fu">lead</span>(fup),</span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">observation =</span> <span class="fu">row_number</span>()</span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 6
+  MCSID   CNUM00                               fup prev_fup next_fup observation
+  &lt;chr&gt;   &lt;dbl+lbl&gt;                          &lt;int&gt;    &lt;int&gt;    &lt;int&gt;       &lt;int&gt;
+1 M10002P 1 [1st Cohort Member of the famil…    11       NA       14           1
+2 M10002P 1 [1st Cohort Member of the famil…    14       11       17           2
+3 M10002P 1 [1st Cohort Member of the famil…    17       14       NA           3
+4 M10020R 1 [1st Cohort Member of the famil…    11       NA       14           1
+5 M10020R 1 [1st Cohort Member of the famil…    14       11       NA           2
+6 M10025W 1 [1st Cohort Member of the famil…    11       NA       17           1
+7 M10025W 1 [1st Cohort Member of the famil…    17       11       NA           2</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>df_long_mini <span class="sc">%&gt;%</span></span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MCSID, CNUM00) <span class="sc">%&gt;%</span></span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">first_fup =</span> <span class="fu">first</span>(fup), </span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">last_fup =</span> <span class="fu">last</span>(fup), </span>
+<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">second_fup =</span> <span class="fu">nth</span>(fup, <span class="dv">2</span>),</span>
+<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_observations =</span> <span class="fu">n</span>(), </span>
+<span id="cb90-8"><a href="#cb90-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_distinct_fups =</span> <span class="fu">n_distinct</span>(fup),</span>
+<span id="cb90-9"><a href="#cb90-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb90-10"><a href="#cb90-10" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 7
+  MCSID   CNUM00    first_fup last_fup second_fup n_observations n_distinct_fups
+  &lt;chr&gt;   &lt;dbl+lbl&gt;     &lt;int&gt;    &lt;int&gt;      &lt;int&gt;          &lt;int&gt;           &lt;int&gt;
+1 M10002P 1 [1st C…        11       17         14              3               3
+2 M10020R 1 [1st C…        11       14         14              2               2
+3 M10025W 1 [1st C…        11       17         17              2               2</code></pre>
+</div>
+</div>
+<p>Note, care must be taken when using the <code>lag()</code>, <code>lead()</code>, <code>first()</code> and <code>last()</code> functions with an unbalanced panel or irregularly space intervals between sweeps, as (e.g.) in the case of <code>lag()</code>, this function does not respect time and instead, identifies the preceding value based on row order.</p>
+</section>
+<section id="task-vi" class="level3" data-number="5.5.4">
+<h3 data-number="5.5.4" class="anchored" data-anchor-id="task-vi"><span class="header-section-number">5.5.4</span> Task VI</h3>
+<blockquote class="blockquote">
+<p>Load the NCDS Age 42-44y biomedical survey dataset (<code>ncds42-4_biomedical_eul.dta</code>). Clean the height variable <code>htres</code> and append the data with the cleaned height data (<code>DVHT50</code>) from the Age 50y sweep (<code>ncds_2008_followup.dta</code>). Use <code>complete()</code> and <code>fill()</code> to create a height value for every individual who appears in either sweep, then reshape the dataset to wide format.</p>
+</blockquote>
+<div class="cell">
+<details class="code-fold">
+<summary>Reveal the solution</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>ncds_44y <span class="ot">&lt;-</span> <span class="fu">glue</span>(<span class="st">"{ncds_fld}/42y-44y Biomedical/ncds42-4_biomedical_eul.dta"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_dta</span>(<span class="at">col_select =</span> <span class="fu">c</span>(ncdsid, htres))</span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(ncds_44y, <span class="st">"htres"</span>)</span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a><span class="fu">lookfor</span>(ncds_50y, <span class="st">"DVHT50"</span>)</span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>ncds_44y <span class="sc">%&gt;%</span></span>
+<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fup =</span> <span class="dv">44</span>,</span>
+<span id="cb92-9"><a href="#cb92-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">height =</span> <span class="fu">negative_to_na</span>(htres) <span class="sc">/</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb92-10"><a href="#cb92-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ncdsid, fup, height) <span class="sc">%&gt;%</span></span>
+<span id="cb92-11"><a href="#cb92-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
+<span id="cb92-12"><a href="#cb92-12" aria-hidden="true" tabindex="-1"></a>    ncds_50y <span class="sc">%&gt;%</span></span>
+<span id="cb92-13"><a href="#cb92-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">fup =</span> <span class="dv">50</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb92-14"><a href="#cb92-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="at">ncdsid =</span> NCDSID,</span>
+<span id="cb92-15"><a href="#cb92-15" aria-hidden="true" tabindex="-1"></a>             fup,</span>
+<span id="cb92-16"><a href="#cb92-16" aria-hidden="true" tabindex="-1"></a>             <span class="at">height =</span> DVHT50)</span>
+<span id="cb92-17"><a href="#cb92-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb92-18"><a href="#cb92-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(ncdsid, fup) <span class="sc">%&gt;%</span></span>
+<span id="cb92-19"><a href="#cb92-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ncdsid, fup) <span class="sc">%&gt;%</span></span>
+<span id="cb92-20"><a href="#cb92-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ncdsid) <span class="sc">%&gt;%</span></span>
+<span id="cb92-21"><a href="#cb92-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fill</span>(height, <span class="at">.direction =</span> <span class="st">"downup"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb92-22"><a href="#cb92-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb92-23"><a href="#cb92-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> fup,</span>
+<span id="cb92-24"><a href="#cb92-24" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> height,</span>
+<span id="cb92-25"><a href="#cb92-25" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_glue =</span> <span class="st">"height_{fup}"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+
+
+</section>
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Row-wise operations can also be carried out using <code>dplyr::rowwise()</code> and <code>dplyr::c_across()</code>. <code>rowwise()</code> is a special case of <code>group_by()</code>, and groups each row in a <code>tibble</code> separately. <code>c_across()</code> combine multiple columns together into a single object (e.g., a single vector), which may be necessary to use some functions. See the <a href="https://dplyr.tidyverse.org/articles/rowwise.html"><code>dplyr</code> article on row-wise operations</a> for more detail.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>It is possible to seed <code>reduce()</code> with an initial <code>.x</code> value using the <code>.init</code> argument. This strategy can make sense for some transformations.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Even more complex transformations can be achieved with more regular expression groups. See the <a href="https://tidyr.tidyverse.org/articles/pivot.html#longer"><code>pivot_longer()</code> vignette</a> for more details.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./04_finding_data.html" class="pagination-link" aria-label="Data Discovery">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Data Discovery</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./06_interlude_cleaning.html" class="pagination-link" aria-label="Interlude: Creating a Full Cleaned Dataset">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Interlude: Creating a Full Cleaned Dataset</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

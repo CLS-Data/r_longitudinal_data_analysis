@@ -1,5 +1,7 @@
 project:
   type: book
+  # type: website
+  output-dir: docs
 
 book:
   title: "R for Longitudinal Data Analysis"

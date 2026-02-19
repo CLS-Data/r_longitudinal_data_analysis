@@ -1,5 +1,6 @@
 .Renviron
-.Rproj.user
+.Rproj.user/
+.Rhistory
 data/
 /.quarto/
 **/*.quarto_ipynb
