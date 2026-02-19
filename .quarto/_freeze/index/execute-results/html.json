@@ -3,9 +3,7 @@
   "result": {
     "engine": "knitr",
     "markdown": "# Preface {.unnumbered}\n\nThis [Quarto book](https://quarto.org/docs/books/) contains materials to accompany the two-day short course, *R for Longitudinal Data Analysis* run by Liam Wright of the [Centre for Longitudinal Studies (CLS)](https://cls.ucl.ac.uk/) at University College London. Comments and questions about this book can be submitted to the [GitHub repository](https://github.com/CLS-Data/r_longitudinal_data_analysis).\n\nTo follow along, you will need to have [R](https://cran.r-project.org/) and [RStudio](https://posit.co/download/rstudio-desktop/) installed on your computer and to possess data from the [National Child Development Study (1958 British Birth Cohort)](http://doi.org/10.5255/UKDA-Series-2000032) and the [Millennium Cohort Study](http://doi.org/10.5255/UKDA-Series-2000031), downloaded from the UK Data Service `.dta` (Stata) format and arranged into directory structures following the instructions here [here](https://cls-data.github.io/docs/ncds-sweep_folders.html) and [here](https://cls-data.github.io/docs/mcs-sweep_folders.html).\n\nThe following `R` packages are used on the course.\n\n\n::: {.cell}\n\n```{.r .cell-code}\ninstall.packages(c(\"tidyverse\",\n                   \"glue\",\n                   \"usethis\",\n                   \"summarytools\",\n                   \"labelled\",\n                   \"codebookr\",\n                   \"corrr\",\n                   \"naniar\",\n                   \"pointblank\",\n                   \"lme4\",\n                   \"marginaleffects\",\n                   \"broom.mixed\",\n                   \"gt\",\n                   \"gtsummary\",\n                   \"flextable\",\n                   \"officer\",\n                   \"patchwork\"))\n```\n:::\n\n\n",
-    "supporting": [
-      "index_files"
-    ],
+    "supporting": [],
     "filters": [
       "rmarkdown/pagebreak.lua"
     ],
